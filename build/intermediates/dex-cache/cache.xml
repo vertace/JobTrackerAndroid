@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-location\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="73ccb92b70112f2e463e415ef8d7275de7da6516">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-910f2e4e4e846c1c109eee276d1bf7344acf33ff.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\libs\httpmime-4.3.1.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="f49e2348b768a7199e021a97e951df25cd5fb714">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\httpmime-4.3.1-b8780d54e371aa915d169cdcc15520bb2397c5c6.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-analytics\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="29fd6d3794b71491c2789708cd8d03c71feb8954">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-421ffdc8de609ecc5a07c082c7ed8c6bb1e7a30b.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-drive\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="41b3870cbe5fa546d8095b5b89d42cb69f3dd175">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-d38c685133c1861cbe09af9873529d47d7be15bf.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-appindexing\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="a08d65794b844d8e7540bf9a33859bf3b2482d7f">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-00c80e1374f14b2e481cd75bf350e9715d057d73.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-appstate\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="7ff613bf78ab057293892fdbd4169eda899c89b9">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-63c7eca50506907124a9cddaee940800d2a5ec57.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-nearby\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="ef5f051e7308febe289dc93c67c5f32785b4260a">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-6cbce18449638904fc2a66cbfe86e157fcdcf9d5.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-identity\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="fb04b12526b0073c7fb1ebb70c5842d82ee95596">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-c896f635a7b01a0cf697ea0325cbe0b2370f7fd9.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-fitness\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="3c0b099f9de16b265ecd6122fcb603e7d0d29f90">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-5c93d9a9841d1263473701b7a423ed71fafca0a3.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="4e86306289ace4aa0cfec44a05ed2b410d36989d">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-67393ebf02f36a4f4db05d3a80cdb5434e4d5d26.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\libs\picasso-2.5.2.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="7446d06ec8d4f7ffcc53f1da37c95f200dcb9387">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\picasso-2.5.2-3bbb61141c4d34240f17f63a22269c701c5f5ec1.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-base\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="4c93d99d454c975536bbe3b42283eee847f03ea3">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-8334fb060d7122cd4f25b9c999f9e9c463e28f43.jar" />
+    </item>
+    <item
+        jar="C:\Android\adt-bundle-windows-x86_64-20131030\adt-bundle-windows-x86_64-20131030\sdk\extras\android\m2repository\com\android\support\support-annotations\22.0.0\support-annotations-22.0.0.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="685d0b2c590447e85284ed84712cb363ba04eff8">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\support-annotations-22.0.0-0bd7ebb0cd4751e8d8001055c94efcc9817fe71a.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\22.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="d84409890828e07d344a3b9b1da545dba9897b51">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-32a92f566d82051904f33ad703c20cb0300ed850.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.0.0\libs\internal_impl-22.0.0.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="b5b92f469d515a13d778900f6d50c03d12f35504">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\internal_impl-22.0.0-70d945e185629dd7a6c860be7ed2caf2bd785874.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-cast\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="4cd0b093824b3228fffc21ea369b98d0b1db6566">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-8b505779843dcf975c96d46085eee705306bd8d1.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-ads\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="e3d791b42eaa90416cd0b2d2e608092794a3baa4">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-08c8bcbf40af26517e14c6d338b09b8ad96ecdb4.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-panorama\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="1c5a76debf0c2857ccad422c4a80ed785982f8df">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-d9bb81ce3eeb5bb36d7b73f6494f317e5bea8c83.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-wearable\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="3033cc3a2c68dff3e5b646d6d084bdbdf7d00b25">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-4a3d6aa37321a5ca30b541be9f146667866a951d.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-plus\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="0e8228b4bc69c6a2c8d7c18498a77e53417d2574">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-544b5efdea6df0c0b757376fe2636c4fbddb1d03.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-wallet\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="a96b762bde4139de855735f175ec4d17dca55a6d">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-b8f3dec752cf730070084d815b4f4d1f4fa92a9c.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-safetynet\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="c976518693e89ad44fbfccfc654941eaec198d08">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-b9e7fb3505ec6a3204add50f77933effc3e2fb1f.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-gcm\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="9224bc4c54ba95147c7eabd874573763c07cb6be">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-ed3240474a4dfed8cd647b3e2d0f8b788d54c144.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="17f8750d5c0749e44dd7c54aa390d9c937803825">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-eead59109d4f8f23fac62b14029106aa632ae8ff.jar" />
+    </item>
+    <item
+        jar="C:\Users\vasan_000\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.2.4\a60a5e993c98c864010053cb901b7eab25306568\gson-2.2.4.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="a60a5e993c98c864010053cb901b7eab25306568">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\gson-2.2.4-a2f84aa4a2155d129a13900bfad517d4cd88e19c.jar" />
+    </item>
+    <item
+        jar="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-games\7.0.0\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="055783146ba9654a725442563be78cad303aad1f">
+        <dex dex="D:\Projects\JobTracker\AndroidStudio\app\build\intermediates\pre-dexed\debug\classes-14dc8411ec79813175adb6f01946ea6329579951.jar" />
+    </item>
+
+</items>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/mnuClearPhone"
+        android:icon="@drawable/cleardb"
+        android:showAsAction="always"
+        android:title="@string/pendingMeasurementUpload"></item>
+    <item
+        android:id="@+id/mnuAdminSync"
+        android:icon="@drawable/sync"
+        android:showAsAction="always"
+        android:title="@string/sync"></item>
+    <item
+        android:id="@+id/mnuAdminLogout"
+        android:icon="@drawable/logout"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_logout"></item>
+</menu>

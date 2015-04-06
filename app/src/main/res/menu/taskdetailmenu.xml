@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/mnuTaskList"
+        android:icon="@drawable/list"
+        android:showAsAction="always"
+        android:title="@string/taskList"></item>
+
+    <item
+        android:id="@+id/mnuTakePhoto"
+        android:icon="@drawable/camera"
+        android:showAsAction="always"
+        android:title="@string/takePhoto"></item>
+
+    <item
+        android:id="@+id/mnuCheckin"
+        android:icon="@drawable/checkin"
+        android:showAsAction="always"
+        android:title="Checkin"></item>
+
+</menu>

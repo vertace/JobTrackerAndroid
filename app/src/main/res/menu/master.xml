@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/mnuTaskList"
+        android:icon="@drawable/list"
+        android:showAsAction="always"
+        android:title="@string/taskList"></item>
+    <item
+        android:id="@+id/mnuPendingExecution"
+        android:icon="@drawable/photo"
+        android:showAsAction="always"
+        android:title="@string/pendingPhotoUpload"></item>
+
+    <item
+        android:id="@+id/mnuPendingMeasurement"
+        android:icon="@drawable/scale"
+        android:showAsAction="always"
+        android:title="@string/pendingMeasurementUpload"></item>
+    <item
+        android:id="@+id/mnuSync"
+        android:icon="@drawable/sync"
+        android:showAsAction="always"
+        android:title="@string/sync"></item>
+
+    <item
+        android:id="@+id/mnuMap"
+        android:icon="@drawable/imgmap"
+        android:showAsAction="always"
+        android:title="@string/imgMap"></item>
+
+    <item
+        android:id="@+id/mnuAddShop"
+        android:icon="@drawable/plus"
+        android:showAsAction="ifRoom"
+        android:title="@string/addShop"></item>
+    <item
+        android:id="@+id/mnuLogout"
+        android:icon="@drawable/logout"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_logout"></item>
+
+</menu>

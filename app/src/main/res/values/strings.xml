@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Job Tracker</string>
+
+    <string name="action_search">Search</string>
+    <string name="action_settings">Settings</string>
+    <string name="SyncButton">Sync</string>
+    <string name="imgMap">Map</string>
+    <string name="action_logout">Logout</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="login">Login</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="loginFailed">Login failed</string>
+    <string name="shopName">Shop Name</string>
+    <string name="shopLocation">Shop Location</string>
+    <string name="shopAddress">Shop Address</string>
+    <string name="exception_message">Some error occurred</string>
+    <string name="upload">Upload</string>
+    <string name="description">Description</string>
+    <string name="gallery">Gallery</string>
+    <string name="connect">Connect</string>
+    <string name="delete">Delete</string>
+    <string name="clear">Clear</string>
+    <string name="save">Save</string>
+    <string name="height">Height</string>
+    <string name="width">Width</string>
+    <string name="type">Type</string>
+    <string name="in">in</string>
+    <string name="ft">ft</string>
+    <string name="takePhoto">Take Photo</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="taskList">Task List</string>
+    <string name="pendingPhotoUpload">Execution Upload</string>
+    <string name="pendingMeasurementUpload">Measurement Upload</string>
+    <string name="clearPhone">Clear Database</string>
+    <string name="sync">Sync</string>
+    <string name="addShop">Add Shop</string>
+    <string name="jn_materialDamage">Material Damaged</string>
+    <string name="jn_materialNotReached">Material not reached</string>
+    <string name="jn_noSpace">No Space</string>
+    <string name="jn_structureDamage">Structure Damage</string>
+    <string name="jn_shopClosed">Shop closed</string>
+    <string name="jn_OwnerNotWilling">Owner does not allow</string>
+    <string name="jn_addressWrong">Address wrong</string>
+    <string name="search_hint">Search Tasks</string>
+
+    <string-array name="array_menu_main">
+        <item>Task List</item>
+        <item>Settings</item>
+        <item>Logout</item>
+    </string-array>
+
+    <string-array name="menu_array">
+        <item>Task List</item>
+        <item>Measurement Upload</item>
+        <item>Execution Upload</item>
+    </string-array>
+    <string-array name="unit_array">
+        <item>inches</item>
+        <item>feet</item>
+    </string-array>
+    <string-array name="type_array">
+        <item>Foam</item>
+        <item>OWV</item>
+        <item>Backlit</item>
+        <item>BL FC</item>
+        <item>BL D/S</item>
+        <item>Nonlit</item>
+        <item>NL FC</item>
+        <item>NL D/S</item>
+        <item>SAV</item>
+        <item>Clear</item>
+        <item>Film</item>
+        <item>Pole</item>
+        <item>Scaffolding</item>
+        <item>Cutout</item>
+        <item>Others</item>
+    </string-array>
+
+    <string name="markComplete">Complete</string>
+    <string name="notDone">Not Done</string>
+
+</resources>

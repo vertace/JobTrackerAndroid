@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/mnuShopClosed"
+        android:showAsAction="always"
+        android:title="@string/jn_shopClosed"></item>
+    <item
+        android:id="@+id/mnuOwnerNotWilling"
+        android:showAsAction="always"
+        android:title="@string/jn_OwnerNotWilling"></item>
+    <item
+        android:id="@+id/mnuAddressWrong"
+        android:showAsAction="always"
+        android:title="@string/jn_addressWrong"></item>
+</menu>
