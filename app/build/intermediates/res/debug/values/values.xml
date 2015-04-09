@@ -313,15 +313,14 @@ available. Please contact the developer for assistance.</string>
     <eat-comment/>
     <string name="delete">Delete</string>
     <string name="description">Description</string>
+    <string name="done">Done</string>
     <string name="drawer_close">Close navigation drawer</string>
     <string name="drawer_open">Open navigation drawer</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="exception_message">Some error occurred</string>
     <string name="ft">ft</string>
     <string name="gallery">Gallery</string>
+    <string name="group">Group</string>
     <string name="height">Height</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="imgMap">Map</string>
     <string name="in">in</string>
     <string name="jn_OwnerNotWilling">Owner does not allow</string>
@@ -333,6 +332,9 @@ available. Please contact the developer for assistance.</string>
     <string name="jn_structureDamage">Structure Damage</string>
     <string name="login">Login</string>
     <string name="loginFailed">Login failed</string>
+    <string name="map">Map</string>
+    <string name="markComplete">Complete</string>
+    <string name="notDone">Not Done</string>
     <string name="password">Password</string>
     <string name="pendingMeasurementUpload">Measurement Upload</string>
     <string name="pendingPhotoUpload">Execution Upload</string>
@@ -341,6 +343,7 @@ available. Please contact the developer for assistance.</string>
     <string name="shopAddress">Shop Address</string>
     <string name="shopLocation">Shop Location</string>
     <string name="shopName">Shop Name</string>
+    <string name="sort">Sort</string>
     <!-- From: file:/D:/Projects/JobTracker/AndroidStudio/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-ads/7.0.0/res/values/admob_strings.xml -->
     <eat-comment/>
     <string name="store_picture_message">"Allow Ad to store image in Picture gallery?"</string>
@@ -350,7 +353,6 @@ available. Please contact the developer for assistance.</string>
     <string name="sync">Sync</string>
     <string name="takePhoto">Take Photo</string>
     <string name="taskList">Task List</string>
-    <string name="title_activity_fullscreen_image_view">FullscreenImageViewActivity</string>
     <string name="type">Type</string>
     <string name="upload">Upload</string>
     <string name="username">Username</string>

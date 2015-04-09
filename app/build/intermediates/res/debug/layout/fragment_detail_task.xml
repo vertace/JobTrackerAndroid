@@ -1,25 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
-
+    android:id="@+id/rl"
+    tools:context=".MainActivity">
 
     <FrameLayout
         android:id="@+id/fragment_holder_tasklineitem_list"
-        android:layout_width="match_parent"
-        android:layout_height="449dp"
-        android:layout_alignParentBottom="true"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         >
 
 
     </FrameLayout>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Button"
-        android:id="@+id/button"
-        android:layout_above="@id/fragment_holder_tasklineitem_list"
-        android:layout_gravity="center_horizontal|bottom" />
-</LinearLayout><!-- From: file:/D:/Projects/JobTracker/AndroidStudio/app/src/main/res/layout/fragment_detail_task.xml -->
+
+
+</RelativeLayout><!-- From: file:/D:/Projects/JobTracker/AndroidStudio/app/src/main/res/layout/fragment_detail_task.xml -->
