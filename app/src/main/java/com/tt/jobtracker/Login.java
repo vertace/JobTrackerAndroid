@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.sstracker.R;
+import com.tt.jobtracker.R;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

@@ -18,7 +18,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.sstracker.R;
+import com.tt.jobtracker.R;
 import com.tt.adapters.MeasurementPhotoListAdapter;
 import com.tt.data.MeasurementPhoto;
 import com.tt.data.Shared;

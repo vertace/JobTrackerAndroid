@@ -14,7 +14,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.example.sstracker.R;
+import com.tt.jobtracker.R;
 import com.tt.adapters.TaskListAdapter;
 import com.tt.data.Shared;
 import com.tt.data.TaskViewModel;

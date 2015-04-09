@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.sstracker.R;
+import com.tt.jobtracker.R;
 
 
 public class SettingsFragment extends Fragment {

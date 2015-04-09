@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
-import com.example.sstracker.R;
+import com.tt.jobtracker.R;
 import com.tt.data.MeasurementPhoto;
 import com.tt.helpers.ImageLoader;
 import com.tt.helpers.ScaleView;

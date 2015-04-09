@@ -24,6 +24,7 @@ public class Shared {
     public static String EmployeeListAPI = WebAPI + "Employee/AllEmployees";
     public static String UploadShopPhotoAPI = WebAPI + "Task/UploadShopPhotoAzure";
 
+    public static String SaveRegistrationID=WebAPI+"Task/SaveRegistrationID";
 
     public static EmployeeViewModel LoggedInUser;
     public static List<TaskViewModel> TaskList;
@@ -48,6 +49,8 @@ public class Shared {
     public static ArrayList<String> html_instructions;
 
     public static String selectedShopAddress;
+
+    public static String GCM_SENDER_ID = "85852809473";
 
     static {
         LoggedInUser = new EmployeeViewModel();

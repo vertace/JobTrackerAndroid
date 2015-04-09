@@ -9,4 +9,5 @@ public class EmployeeViewModel {
     public String Mobile2;
     public String Password;
     public String Username;
+    public String GcmRegID;
 }

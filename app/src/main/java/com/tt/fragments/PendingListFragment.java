@@ -9,12 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.example.sstracker.R;
 import com.tt.adapters.TaskListAdapter;
 import com.tt.data.Shared;
 import com.tt.data.TaskViewModel;
+import com.tt.enumerations.JobTrackerScreen;
 import com.tt.helpers.DatabaseHelper;
 import com.tt.jobtracker.MainActivity;
+import com.tt.jobtracker.R;
 
 
 public class PendingListFragment extends ListFragment {
@@ -95,6 +96,9 @@ public class PendingListFragment extends ListFragment {
         TaskListAdapter taskListAdapter = new TaskListAdapter(mainActivity, R.layout.row_task);
         setListAdapter(taskListAdapter);
         taskListAdapter.addAll(Shared.TaskList);
+
+        mainActivity.CurrentScreen = JobTrackerScreen.TaskList;
+        mainActivity.SetActionBarMenuItems();
     }
 
 

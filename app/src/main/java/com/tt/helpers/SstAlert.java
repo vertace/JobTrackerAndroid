@@ -3,7 +3,7 @@ package com.tt.helpers;
 import android.app.AlertDialog;
 import android.content.Context;
 
-import com.example.sstracker.R;
+import com.tt.jobtracker.R;
 
 public class SstAlert {
     public static void Show(Context context, String title, String message) {

@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.example.sstracker.R;
+import com.tt.jobtracker.R;
 import com.tt.data.MeasurementPhoto;
 
 /**

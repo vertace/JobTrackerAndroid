@@ -10,7 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import com.example.sstracker.R;
+import com.tt.jobtracker.R;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;

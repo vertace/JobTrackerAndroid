@@ -11,11 +11,13 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 
-import com.example.sstracker.R;
 import com.tt.adapters.ImageAdapter;
 import com.tt.data.TaskLineItemViewModel;
+import com.tt.enumerations.JobTrackerScreen;
 import com.tt.helpers.DatabaseHelper;
 import com.tt.jobtracker.FullScreenImageViewActivity;
+import com.tt.jobtracker.MainActivity;
+import com.tt.jobtracker.R;
 
 import java.util.ArrayList;
 
@@ -49,20 +51,20 @@ public class TaskLineItemDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail_tasklineitem, container, false);
 
-        Button button = (Button) view.findViewById(R.id.btnTakePhoto);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCallback.onTaskLineItemPhotoClickInitiated(taskLineItemViewModel);
-            }
+//        Button button = (Button) view.findViewById(R.id.btnTakePhoto);
+//        button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mCallback.onTaskLineItemPhotoClickInitiated(taskLineItemViewModel);
+//            }
+//
+//        });
 
-        });
-
-
+        MainActivity mainActivity = (MainActivity) getActivity();
         GridView gridview = (GridView) view.findViewById(R.id.gridview);
-        adapter = new ImageAdapter(getActivity());
+        adapter = new ImageAdapter(mainActivity);
         gridview.setAdapter(adapter);
-        DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+        DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
 
         final ArrayList<String> imageList = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(taskLineItemViewModel.ID));
         adapter.addAll(imageList);
@@ -77,6 +79,10 @@ public class TaskLineItemDetailFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+
+        mainActivity.CurrentScreen = JobTrackerScreen.TaskLineItemDetail;
+        mainActivity.SetActionBarMenuItems();
 
         super.onCreate(savedInstanceState);
         return view;

@@ -11,7 +11,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.example.sstracker.R;
+import com.tt.jobtracker.R;
 import com.tt.adapters.PendingUploadListAdapter;
 import com.tt.data.TaskLineItemViewModel;
 import com.tt.enumerations.ServerResult;

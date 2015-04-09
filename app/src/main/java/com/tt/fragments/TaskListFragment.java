@@ -12,18 +12,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.example.sstracker.R;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.tt.data.Shared;
 import com.tt.data.TaskListResponse;
 import com.tt.data.TaskViewModel;
+import com.tt.enumerations.JobTrackerScreen;
 import com.tt.enumerations.ServerResult;
 import com.tt.helpers.CustomHttpClient;
 import com.tt.helpers.DatabaseHelper;
 import com.tt.helpers.SstAlert;
 import com.tt.jobtracker.DownloadFileAsync;
+import com.tt.jobtracker.MainActivity;
+import com.tt.jobtracker.R;
 import com.tt.sync.SyncHelperExecution;
 
 import org.apache.http.NameValuePair;
@@ -45,9 +47,9 @@ public class TaskListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        mTabHost = new FragmentTabHost(getActivity());
-        mTabHost.setup(getActivity(), getChildFragmentManager(), R.id.realtabcontent);
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mTabHost = new FragmentTabHost(mainActivity);
+        mTabHost.setup(mainActivity, getChildFragmentManager(), R.id.realtabcontent);
 
         mTabHost.addTab(mTabHost.newTabSpec("PendingListFragment").setIndicator("Pending List"),
                 PendingListFragment.class, null);
@@ -58,6 +60,8 @@ public class TaskListFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
+        mainActivity.CurrentScreen = JobTrackerScreen.TaskList;
+        mainActivity.SetActionBarMenuItems();
         return mTabHost;
     }
 
@@ -68,11 +72,7 @@ public class TaskListFragment extends Fragment {
 
             case R.id.action_sync:
 
-                m_ProgressDialog = ProgressDialog.show(getActivity(),
-                        "Please wait...", "Downloading task list...", true);
-
-                taskRetriever = new GetTaskList(getActivity());
-                taskRetriever.execute();
+                DownloadTasksFromServer();
                 return true;
             case R.id.action_search:
 
@@ -87,6 +87,14 @@ public class TaskListFragment extends Fragment {
                 return super.onOptionsItemSelected(item);
         }
         return false;
+    }
+
+    public void DownloadTasksFromServer() {
+        m_ProgressDialog = ProgressDialog.show(getActivity(),
+                "Please wait...", "Downloading task list...", true);
+
+        taskRetriever = new GetTaskList(getActivity());
+        taskRetriever.execute();
     }
 
     @Override

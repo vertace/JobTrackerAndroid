@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 
-import com.example.sstracker.R;
+import com.tt.jobtracker.R;
 import com.tt.adapters.FullScreenImageAdapter;
 import com.tt.helpers.Utility;
 

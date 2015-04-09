@@ -17,9 +17,14 @@
 package com.tt.jobtracker;
 
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -38,11 +43,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.sstracker.R;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.tt.data.Shared;
 import com.tt.data.TaskLineItemPhotoViewModel;
 import com.tt.data.TaskLineItemViewModel;
 import com.tt.data.TaskViewModel;
+import com.tt.enumerations.JobTrackerScreen;
+import com.tt.enumerations.ServerResult;
 import com.tt.fragments.PendingListFragment;
 import com.tt.fragments.TaskDetailFragment;
 import com.tt.fragments.TaskLineItemDetailFragment;
@@ -50,9 +57,20 @@ import com.tt.fragments.TaskLineItemFragment;
 import com.tt.fragments.TaskListFragment;
 import com.tt.helpers.CameraHelper;
 import com.tt.helpers.DatabaseHelper;
+import com.tt.helpers.Utility;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * This example illustrates a common usage of the DrawerLayout widget in the
@@ -99,12 +117,171 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
 
     public String SearchText;
 
+    Context context;
+    String regid;
+    GoogleCloudMessaging gcm;
+    public static final String PROPERTY_FbUserID = "fbUserID";
+    public static final String PROPERTY_REG_ID = "registration_id";
+    private static final String PROPERTY_APP_VERSION = "appVersion";
+
+
+    public JobTrackerScreen CurrentScreen = JobTrackerScreen.TaskList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         handleIntent(getIntent());
         if (savedInstanceState == null) {
             selectItem(0);
+        }
+
+        context = getApplicationContext();
+        regid = getRegistrationId(context);
+        Shared.LoggedInUser.GcmRegID = regid;
+        if (regid.isEmpty()) {
+            registerInBackground();
+            GetRegID obj = new GetRegID(this);
+            obj.execute();
+        }
+    }
+
+    private void storeRegistrationId(Context context, String regId,
+                                     String fbUserId) {
+        final SharedPreferences prefs = getGcmPreferences(context);
+        int appVersion = getAppVersion(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(PROPERTY_FbUserID, fbUserId);
+        editor.putString(PROPERTY_REG_ID, regId);
+        editor.putInt(PROPERTY_APP_VERSION, appVersion);
+        editor.commit();
+    }
+
+    private String getRegistrationId(Context context) {
+        final SharedPreferences prefs = getGcmPreferences(context);
+        String registrationId = prefs.getString(PROPERTY_REG_ID, "");
+        if (registrationId.isEmpty()) {
+            return "";
+        }
+        int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION,
+                Integer.MIN_VALUE);
+        int currentVersion = getAppVersion(context);
+        if (registeredVersion != currentVersion) {
+            return "";
+        }
+//		sendRegistrationIdToBackend(registrationId, Shared.LoggedInUser.ID);
+
+        return registrationId;
+    }
+
+    private SharedPreferences getGcmPreferences(Context context) {
+        return getSharedPreferences(MainActivity.class.getSimpleName(),
+                Context.MODE_PRIVATE);
+    }
+
+    private void registerInBackground() {
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                String msg = "";
+                try {
+                    if (gcm == null) {
+                        gcm = GoogleCloudMessaging.getInstance(context);
+                    }
+                    regid = gcm.register(Shared.GCM_SENDER_ID);
+                    msg = "Device registered, registration ID=" + regid;
+                    Shared.LoggedInUser.GcmRegID = regid;
+                    //sendRegistrationIdToBackend(regid, Shared.LoggedInUser.ID);
+
+
+                    storeRegistrationId(context, regid, Shared.LoggedInUser.ID);
+                } catch (IOException ex) {
+                    msg = "Error :" + ex.getMessage();
+                }
+                return msg;
+            }
+
+            @Override
+            protected void onPostExecute(String msg) {
+
+            }
+        }.execute(null, null, null);
+    }
+
+    private static int getAppVersion(Context context) {
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return packageInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            // should never happen
+            throw new RuntimeException("Could not get package name: " + e);
+        }
+    }
+
+    public class GetRegID extends AsyncTask<String, Integer, ServerResult> {
+        Context context;
+
+        public GetRegID(Context _context) {
+            context = _context;
+
+        }
+
+        public GetRegID(AsyncTask<Void, Void, String> asyncTask) {
+            // TODO Auto-generated constructor stub
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+
+        }
+
+        @Override
+        protected ServerResult doInBackground(String... params) {
+
+            try {
+                HttpURLConnection conn;
+                String boundary = "*****";
+                DataOutputStream dos = null;
+                int serverResponseCode = 0;
+                List<NameValuePair> postValue = new ArrayList<NameValuePair>(2);
+                postValue.add(new BasicNameValuePair("RegID", String.valueOf(Shared.LoggedInUser.GcmRegID)));
+                postValue.add(new BasicNameValuePair("UserID", String.valueOf(Shared.LoggedInUser.ID)));
+                URL url = new URL(Shared.SaveRegistrationID + "?" + Utility.getQuery(postValue));
+
+                // Open a HTTP connection to the URL
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setDoInput(true); // Allow Inputs
+                conn.setDoOutput(true); // Allow Outputs
+                conn.setUseCaches(false); // Don't use a Cached Copy
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Connection", "Keep-Alive");
+                conn.setRequestProperty("ENCTYPE", "multipart/form-data");
+                conn.setRequestProperty("Content-Type",
+                        "multipart/form-data;boundary=" + boundary);
+                int code = conn.getResponseCode();
+
+                //	OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+                //	dos = new DataOutputStream(conn.getOutputStream());
+//				 writer.write("message=" + message);
+
+
+                serverResponseCode = conn.getResponseCode();
+
+                dos.flush();
+                dos.close();
+
+            } catch (MalformedURLException ex) {
+
+                ex.printStackTrace();
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+
+            }
+            return ServerResult.LoginSuccess;
+        }
+
+        protected void onPostExecute(ServerResult result) {
+
         }
 
     }
@@ -182,13 +359,12 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
         searchView.setSearchableInfo(searchManager
                 .getSearchableInfo(getComponentName()));
 
+        SetActionBarMenuItems();
         return super.onCreateOptionsMenu(menu);
     }
 
     public void showTaskListMenu(boolean showMenu) {
-        if (menu == null)
-            return;
-        //menu.setGroupVisible(R.id.menu_tasklist, showMenu);
+
     }
 
     /* Called whenever we call invalidateOptionsMenu() */
@@ -295,6 +471,30 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
         }
     }
 
+    public void SetActionBarMenuItems() {
+        if (menu == null)
+            return;
+
+        menu.setGroupVisible(R.id.actionbar_group_home, false);
+        menu.setGroupVisible(R.id.actionbar_group_taskdetail, false);
+        menu.setGroupVisible(R.id.actionbar_group_tasklineitem_detail, false);
+
+
+        switch (CurrentScreen) {
+            case TaskList:
+                menu.setGroupVisible(R.id.actionbar_group_home, true);
+                break;
+            case TaskDetail:
+                menu.setGroupVisible(R.id.actionbar_group_taskdetail, true);
+                break;
+            case TaskLineItemDetail:
+                menu.setGroupVisible(R.id.actionbar_group_tasklineitem_detail, true);
+                break;
+            case Setting:
+                break;
+        }
+    }
+
     public void onTaskSelected(TaskViewModel task) {
 
         Fragment fragment = new TaskDetailFragment();
@@ -325,6 +525,7 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
             fragmentManager.beginTransaction()
                     .replace(R.id.content_frame, taskLineItemDetailFragment).addToBackStack("taskdetail").commit();
         }
+
     }
 
 

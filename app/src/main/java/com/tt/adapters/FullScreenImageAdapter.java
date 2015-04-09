@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import com.example.sstracker.R;
+import com.tt.jobtracker.R;
 import com.squareup.picasso.Picasso;
 import com.tt.custom.TouchImageView;
 

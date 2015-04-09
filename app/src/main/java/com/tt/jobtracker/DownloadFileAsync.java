@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 
-import com.example.sstracker.R;
+import com.tt.jobtracker.R;
 
 import java.io.BufferedInputStream;
 import java.io.File;

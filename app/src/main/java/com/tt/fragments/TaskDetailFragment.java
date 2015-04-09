@@ -9,7 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.sstracker.R;
+import com.tt.jobtracker.MainActivity;
+import com.tt.jobtracker.R;
 import com.tt.data.TaskViewModel;
 
 public class TaskDetailFragment extends Fragment {
@@ -44,6 +45,8 @@ public class TaskDetailFragment extends Fragment {
         transaction.add(R.id.fragment_holder_tasklineitem_list, taskLineItemFragment).commit();
 
         super.onCreate(savedInstanceState);
+
+
         return view;
     }
 

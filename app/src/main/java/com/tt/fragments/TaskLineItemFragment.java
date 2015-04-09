@@ -9,18 +9,20 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import com.example.sstracker.R;
 import com.tt.adapters.TaskDetailAdapter;
 import com.tt.data.Shared;
 import com.tt.data.TaskLineItemViewModel;
 import com.tt.data.TaskViewModel;
+import com.tt.enumerations.JobTrackerScreen;
 import com.tt.helpers.DatabaseHelper;
 import com.tt.jobtracker.MainActivity;
+import com.tt.jobtracker.R;
 
 
 public class TaskLineItemFragment extends ListFragment {
 
     OnTaskLineItemSelected mCallback;
+
     // Container Activity must implement this interface
     public interface OnTaskLineItemSelected {
         public void onTaskLineItemSelected(TaskLineItemViewModel taskLineItemViewModel);
@@ -56,7 +58,8 @@ public class TaskLineItemFragment extends ListFragment {
     private void ShowTaskLineItems() {
         MainActivity mainActivity = (MainActivity) getActivity();
         DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
-
+        mainActivity.CurrentScreen = JobTrackerScreen.TaskDetail;
+        mainActivity.SetActionBarMenuItems();
         TaskDetailAdapter taskDetailAdapter = new TaskDetailAdapter(mainActivity, R.layout.row_tasklineitem);
         ListView lstTaskDetail = (ListView) getActivity().findViewById(R.id.lstTaskDetail);
         setListAdapter(taskDetailAdapter);

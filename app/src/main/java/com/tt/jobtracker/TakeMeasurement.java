@@ -18,7 +18,7 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.example.sstracker.R;
+import com.tt.jobtracker.R;
 import com.google.gson.Gson;
 import com.tt.data.MeasurementPhoto;
 import com.tt.enumerations.ServerResult;
