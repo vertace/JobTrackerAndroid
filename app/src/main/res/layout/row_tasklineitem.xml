@@ -2,7 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/listcompleted_selector"
     android:orientation="horizontal"
     android:padding="5dip">
 
@@ -35,27 +34,5 @@
         android:text="@string/shopAddress"
         android:textColor="#343434"
         android:textSize="15sp" />
-
-    <ImageView
-        android:id="@+id/imgBeforeImage"
-        android:layout_width="32dip"
-        android:layout_height="32dip"
-        android:layout_alignLeft="@+id/tvInstruction"
-        android:layout_alignTop="@+id/imgAfterImage"
-        android:layout_marginLeft="40dp"
-        android:contentDescription="@string/app_name"
-        android:onClick="ViewBeforeImage"
-        android:src="@drawable/camera" />
-
-    <ImageView
-        android:id="@+id/imgAfterImage"
-        android:layout_width="32dip"
-        android:layout_height="32dip"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/tvInstruction"
-        android:layout_marginRight="40dp"
-        android:contentDescription="@string/app_name"
-        android:onClick="ViewAfterImage"
-        android:src="@drawable/camera" />
 
 </RelativeLayout>
