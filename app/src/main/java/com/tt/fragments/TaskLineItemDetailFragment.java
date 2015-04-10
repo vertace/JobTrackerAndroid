@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -46,6 +47,8 @@ public class TaskLineItemDetailFragment extends Fragment {
 
     }
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -59,6 +62,7 @@ public class TaskLineItemDetailFragment extends Fragment {
 //            }
 //
 //        });
+
 
         MainActivity mainActivity = (MainActivity) getActivity();
         GridView gridview = (GridView) view.findViewById(R.id.gridview);
@@ -80,12 +84,36 @@ public class TaskLineItemDetailFragment extends Fragment {
             }
         });
 
-
+        setHasOptionsMenu(true);
         mainActivity.CurrentScreen = JobTrackerScreen.TaskLineItemDetail;
         mainActivity.SetActionBarMenuItems();
 
         super.onCreate(savedInstanceState);
         return view;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.action_tasklineitem_takephoto:
+                takephoto();
+                return true;
+            case R.id.action_search:
+
+                break;
+
+            case R.id.mnuMap:
+
+
+                break;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return false;
+    }
+    public void takephoto() {
+        mCallback.onTaskLineItemPhotoClickInitiated(taskLineItemViewModel);
     }
 
     public void updateImageAdapter() {
