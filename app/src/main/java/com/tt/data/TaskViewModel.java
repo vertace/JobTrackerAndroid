@@ -27,4 +27,7 @@ public class TaskViewModel implements Serializable {
     public String StartTime;
     public boolean ShopPhotoUploaded;
 
+    public boolean IsPending;
+    public int MinimumPhoto;
+
 }

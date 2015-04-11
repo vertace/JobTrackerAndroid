@@ -46,6 +46,9 @@ public class TaskLineItemViewModel implements Serializable {
 
     public String NotDoneReason;
 
+    public boolean isminimumPhotoAchieved;
+    public int TaskLineItemPhotoCount;
+
     public ArrayList<TaskLineItemPhotoViewModel> TaskLineItemPhotoViewModelList;
 
 }
