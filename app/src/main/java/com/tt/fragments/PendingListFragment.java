@@ -82,12 +82,17 @@ public class PendingListFragment extends ListFragment {
         super.onListItemClick(l, v, position, id);
     }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
+
     public void ShowTaskList(View rootView) {
         MainActivity mainActivity = (MainActivity) getActivity();
         DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
 
         String condition = " EmployeeID = "
-                + String.valueOf(Shared.LoggedInUser.ID);
+                + String.valueOf(Shared.LoggedInUser.ID+" AND TaskRequest.IsPending = 0");
         if (mainActivity.SearchText != "") {
             condition = condition + " AND TaskRequest.ShopName like '%" + mainActivity.SearchText + "%'";
         }
