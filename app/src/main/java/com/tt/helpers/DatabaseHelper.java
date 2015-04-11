@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.google.android.gms.drive.realtime.internal.event.ValuesAddedDetails;
 import com.tt.data.EmployeeViewModel;
 import com.tt.data.MeasurementPhoto;
 import com.tt.data.TaskLineItemPhotoViewModel;
@@ -33,7 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + "EmployeeName TEXT," + "EmployeeID INTEGER,"
                 + "TaskStatus TEXT," + "IsMeasurement INTEGER,"
                 + "PhotoID TEXT," + "StartTime TEXT,"
-                + "ShopPhotoUploaded INTEGER)";
+                + "ShopPhotoUploaded INTEGER,"+"IsPending INTEGER)";
         database.execSQL(query);
         Log.d(LOGCAT, "TaskRequest Created");
 
@@ -45,7 +46,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + "Form TEXT," + "Photo TEXT," + "Status TEXT,"
                 + "Remove TEXT," + "Lat TEXT," + "Lon TEXT," + "PhotoID TEXT,"
                 + "Measurement TEXT," + "Time TEXT, OldTakenNow INT,"
-                + "NotDoneReason TEXT ," + "ShopAddress TEXT)";
+                + "NotDoneReason TEXT ," + "ShopAddress TEXT,"+"TaskLineItemPhotoCount INTEGER)";
         database.execSQL(query);
         Log.d(LOGCAT, "TaskLineItemRequest Created");
 
@@ -149,6 +150,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         database.close();
         return taskLineItemPhotoList;
     }
+    public TaskLineItemPhotoViewModel getTaskLineItemPhotos(String taskLineItemID) {
+        TaskLineItemPhotoViewModel taskLineItemPhoto = new TaskLineItemPhotoViewModel();
+        SQLiteDatabase database = this.getReadableDatabase();
+        String selectQuery = "SELECT * FROM TaskLineItemPhoto where TaskLineItemID = " + taskLineItemID;
+        Cursor cursor = database.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                taskLineItemPhoto.ID = Integer.parseInt(cursor.getString(0));
+                taskLineItemPhoto.TaskLineItemID = Integer.parseInt(cursor.getString(1));
+                taskLineItemPhoto.PhotoID = cursor.getString(2);
+                taskLineItemPhoto.Time = cursor.getString(3);
+                taskLineItemPhoto.Lat = cursor.getString(4);
+                taskLineItemPhoto.Lon = cursor.getString(5);
+            } while (cursor.moveToNext());
+        }
+        database.close();
+        return taskLineItemPhoto;
+    }
 
     public ArrayList<String> getAllTaskLineItemPhotoUri(String taskLineItemID) {
         ArrayList<String> taskLineItemPhotoUriList = new ArrayList<String>();
@@ -215,6 +234,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("WallID", taskLineItem.WallID);
         values.put("Measurement", taskLineItem.Measurement);
         values.put("ShopAddress", taskLineItem.ShopAddress);
+        values.put("TaskLineItemPhotoCount",taskLineItem.TaskLineItemPhotoCount);
         database.insert("TaskLineItemRequest", null, values);
         database.close();
     }
@@ -242,7 +262,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("TaskID", taskLineItem.TaskID);
         values.put("WallID", taskLineItem.WallID);
         values.put("ShopAddress", taskLineItem.ShopAddress);
-
+        values.put("TaskLineItemPhotoCount",taskLineItem.TaskLineItemPhotoCount);
         values.put("OldTakenNow", taskLineItem.OldTakenNow ? 1 : 0);
         if (includePhoneUpdates) {
 
@@ -314,6 +334,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 taskLineItem.OldTakenNow = cursor.getString(23).equals("1") ? true : false;
                 taskLineItem.ShopAddress = cursor.getString(25);
                 taskLineItem.NotDoneReason = cursor.getString(24);
+                taskLineItem.TaskLineItemPhotoCount=Integer.parseInt(cursor.getString(26));
                 taskLineItemList.add(taskLineItem);
             } while (cursor.moveToNext());
         }
@@ -356,6 +377,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         : false;
                 taskLineItem.NotDoneReason = cursor.getString(24);
                 taskLineItem.ShopAddress = cursor.getString(25);
+                taskLineItem.TaskLineItemPhotoCount=Integer.parseInt(cursor.getString(26));
             } while (cursor.moveToNext());
         }
         database.close();
@@ -399,7 +421,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 taskLineItem.OldTakenNow = cursor.getString(23).equals("1") ? true
                         : false;
                 taskLineItem.NotDoneReason = cursor.getString(24);
-
+                taskLineItem.TaskLineItemPhotoCount=Integer.parseInt(cursor.getString(26));
                 taskLineItemList.add(taskLineItem);
             } while (cursor.moveToNext());
         }
@@ -420,6 +442,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("TaskStatus", task.TaskStatus);
         values.put("ShopID", task.ShopID);
         values.put("IsMeasurement", task.IsMeasurement ? 1 : 0);
+        values.put("IsPending", task.IsPending?1:0);
         database.insert("TaskRequest", null, values);
         database.close();
     }
@@ -427,7 +450,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public int updateTask(TaskViewModel task, boolean includePhoneUpdates) {
         SQLiteDatabase database = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("EmployeeName", task.EmployeeName);
+        if (!task.IsPending)
+        {
+            values.put("EmployeeName", task.EmployeeName);
         values.put("ShopAddress", task.ShopAddress);
         values.put("ShopBranch", task.ShopBranch);
         values.put("ShopName", task.ShopName);
@@ -435,12 +460,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("ShopRegion", task.ShopRegion);
         values.put("TaskStatus", task.TaskStatus);
         values.put("ShopID", task.ShopID);
+        values.put("IsPending", task.IsPending ? 1 : 0);
         values.put("IsMeasurement", task.IsMeasurement ? 1 : 0);
         if (includePhoneUpdates) {
             values.put("StartTime", task.StartTime);
             values.put("PhotoID", task.PhotoID);
             values.put("ShopPhotoUploaded", task.ShopPhotoUploaded ? 1 : 0);
         }
+    }
+    else
+    {
+        values.put("IsPending", task.IsPending ? 1 : 0);
+    }
         int result = database.update("TaskRequest", values, "TaskID" + " = ?",
                 new String[]{String.valueOf(task.ID)});
         database.close();
@@ -484,6 +515,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 task.PhotoID = cursor.getString(11);
                 task.StartTime = cursor.getString(12);
                 temp = cursor.getString(13);
+                task.IsPending= Integer.parseInt(cursor.getString(14)) == 1 ? true: false;
                 if (temp == null || temp.isEmpty())
                     task.ShopPhotoUploaded = false;
                 else
@@ -523,6 +555,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         : false;
                 task.PhotoID = cursor.getString(11);
                 task.StartTime = cursor.getString(12);
+                task.IsPending= Integer.parseInt(cursor.getString(14)) == 1 ? true: false;
                 temp = cursor.getString(13);
                 if (temp == null || temp.isEmpty())
                     task.ShopPhotoUploaded = false;
@@ -565,6 +598,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         : false;
                 task.PhotoID = cursor.getString(11);
                 task.StartTime = cursor.getString(12);
+                task.IsPending= Integer.parseInt(cursor.getString(14)) == 1 ? true: false;
                 temp = cursor.getString(13);
                 if (temp == null || temp.isEmpty())
                     task.ShopPhotoUploaded = false;
@@ -610,7 +644,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             : false;
                     task.PhotoID = cursor.getString(11);
                     task.StartTime = cursor.getString(12);
-
+                    task.IsPending= Integer.parseInt(cursor.getString(14)) == 1 ? true: false;
                     temp = cursor.getString(13);
                     if (temp == null || temp.isEmpty())
                         task.ShopPhotoUploaded = false;
