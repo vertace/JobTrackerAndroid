@@ -50,7 +50,9 @@ import com.tt.data.TaskLineItemViewModel;
 import com.tt.data.TaskViewModel;
 import com.tt.enumerations.JobTrackerScreen;
 import com.tt.enumerations.ServerResult;
+import com.tt.fragments.DoneListFragment;
 import com.tt.fragments.PendingListFragment;
+import com.tt.fragments.SettingsFragment;
 import com.tt.fragments.TaskDetailFragment;
 import com.tt.fragments.TaskLineItemDetailFragment;
 import com.tt.fragments.TaskLineItemFragment;
@@ -58,7 +60,6 @@ import com.tt.fragments.TaskListFragment;
 import com.tt.helpers.CameraHelper;
 import com.tt.helpers.DatabaseHelper;
 import com.tt.helpers.Utility;
-
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -105,7 +106,7 @@ import java.util.List;
  * overlay on top of the current content.
  * </p>
  */
-public class MainActivity extends ActionBarActivity implements PendingListFragment.OnTaskSelected, TaskDetailFragment.OnFragmentInteractionListener, TaskLineItemFragment.OnTaskLineItemSelected, TaskLineItemDetailFragment.OnTaskLineItemPhotoClickInitiated {
+public class MainActivity extends ActionBarActivity implements PendingListFragment.OnTaskSelected, DoneListFragment.OnTaskSelected, TaskDetailFragment.OnFragmentInteractionListener, TaskLineItemFragment.OnTaskLineItemSelected, TaskLineItemDetailFragment.OnTaskLineItemPhotoClickInitiated {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -143,6 +144,7 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
             GetRegID obj = new GetRegID(this);
             obj.execute();
         }
+        startService(new Intent(this, BackgroundService.class));
     }
 
     private void storeRegistrationId(Context context, String regId,
@@ -412,7 +414,7 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
             showTaskListMenu(true);
             fragment = new TaskListFragment();
         } else if (position == 1) {
-            fragment = null;
+            fragment = new SettingsFragment();
         } else if (position == 2) {
             fragment = null;
         }
@@ -545,6 +547,7 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
         startActivityForResult(intent, CAPTURE_TASKLINEITEM_IMAGE_ACTIVITY_REQUEST_CODE);
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
@@ -582,18 +585,26 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
     }
 
     private void AddTaskLineItemPhoto() {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
         TaskLineItemPhotoViewModel taskLineItemPhotoViewModel = new TaskLineItemPhotoViewModel();
-
         taskLineItemPhotoViewModel.PhotoID = fileUri.getPath();
         taskLineItemPhotoViewModel.TaskLineItemID = tlvm.ID;
         taskLineItemPhotoViewModel.Lat = String.valueOf(Shared.lat);
         taskLineItemPhotoViewModel.Lon = String.valueOf(Shared.lon);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         taskLineItemPhotoViewModel.Time = sdf.format(new Date());
-
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.insertTaskLineItemPhoto(taskLineItemPhotoViewModel);
-
+        updateTaskLineItemPhotoCount();
         //processFinish(null);
+    }
+    private void updateTaskLineItemPhotoCount()
+    {
+        int photocount;
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        TaskLineItemViewModel taskilneItem=new TaskLineItemViewModel();
+        TaskLineItemViewModel taskbeforePhotoCount= dbHelper.getTaskLineItemInfo(String.valueOf(tlvm.ID));
+        photocount=taskbeforePhotoCount.TaskLineItemPhotoCount;
+        taskilneItem.TaskLineItemPhotoCount=photocount+1;
+        dbHelper.updateTaskLineItem(taskilneItem,true);
     }
 }
