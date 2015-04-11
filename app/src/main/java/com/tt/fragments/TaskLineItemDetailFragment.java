@@ -96,7 +96,7 @@ public class TaskLineItemDetailFragment extends Fragment {
         switch (item.getItemId()) {
 
             case R.id.action_tasklineitem_takephoto:
-                takephoto();
+                takephoto_TaskDeatilLineItem();
                 return true;
             case R.id.action_search:
 
@@ -112,7 +112,7 @@ public class TaskLineItemDetailFragment extends Fragment {
         }
         return false;
     }
-    public void takephoto() {
+    public void takephoto_TaskDeatilLineItem() {
         mCallback.onTaskLineItemPhotoClickInitiated(taskLineItemViewModel);
     }
 
