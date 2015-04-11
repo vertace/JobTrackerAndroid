@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.tt.adapters.TaskDetailAdapter;
 import com.tt.data.Shared;
@@ -17,6 +19,9 @@ import com.tt.enumerations.JobTrackerScreen;
 import com.tt.helpers.DatabaseHelper;
 import com.tt.jobtracker.MainActivity;
 import com.tt.jobtracker.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class TaskLineItemFragment extends ListFragment {
@@ -49,10 +54,56 @@ public class TaskLineItemFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        MainActivity mainActivity = (MainActivity) getActivity();
         View view = inflater.inflate(R.layout.fragment_list_tasklineitem, container, false);
 
         ShowTaskLineItems();
+        setHasOptionsMenu(true);
+        mainActivity.CurrentScreen = JobTrackerScreen.TaskDetail;
+        mainActivity.SetActionBarMenuItems();
+
+        super.onCreate(savedInstanceState);
         return view;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.action_task_done:
+                moveto_donetask();
+                return true;
+            case R.id.action_search:
+
+                break;
+
+            case R.id.mnuMap:
+
+
+                break;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return false;
+    }
+
+    private void moveto_donetask() {
+        int t=task.ID;
+        MainActivity mainActivity = (MainActivity) getActivity();
+        DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
+        Shared.TaskDetail = dbHelper.getTaskLineItems(" TaskID = " + String.valueOf(task.ID));
+        Shared.SelectedTask=dbHelper.getTaskInfo(String.valueOf(task.ID));
+      //  TaskLineItemViewModel task=dbHelper.getTaskLineItemInfo(String.valueOf(t));
+       // final ArrayList<String> imageList = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(task.ID));
+
+        //List <TaskLineItemViewModel> tasklineitems=dbHelper.getTaskLineItems(" TaskID = " + String.valueOf(task.ID));
+
+        TaskViewModel taskViewModel= Shared.SelectedTask;
+
+        taskViewModel.IsPending=true;
+        dbHelper.saveTask(taskViewModel, true);
+
+        Toast.makeText(getActivity(), " Moved to done list", Toast.LENGTH_LONG).show();
     }
 
     private void ShowTaskLineItems() {
@@ -74,6 +125,7 @@ public class TaskLineItemFragment extends ListFragment {
         super.onAttach(activity);
         try {
             mCallback = (OnTaskLineItemSelected) activity;
+
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
