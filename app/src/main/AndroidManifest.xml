@@ -180,7 +180,10 @@
             </intent-filter>
         </receiver>
         <service android:name="com.tt.Notifications.GcmIntentService" />
-
+        <service android:name="BackgroundService"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_name">
+        </service>
     </application>
 
 </manifest>
