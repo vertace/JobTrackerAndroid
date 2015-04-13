@@ -1,26 +1,51 @@
 package com.tt.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.tt.helpers.SstAlert;
+import com.tt.jobtracker.DirectionsJSONParser;
 import com.tt.jobtracker.R;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -28,31 +53,39 @@ import java.util.List;
  */
 public class MapSingleShopFragment extends Fragment {
     private GoogleMap mMap;
-    LatLng latLng,currentlang;
-    String addressText,currenttext;
+    LatLng latLng, currentlang;
+    String addressText, currenttext;
     LocationManager mlocManager;
     LocationListener mlocListener;
-    List<Address> addresses=null;
-    Geocoder geocoder ;
+    List<Address> addresses = null;
+    Geocoder geocoder;
     String latlngShop[];
     Button btndirection;
-    int temp=0;
-    boolean isGPSEnabled=false;
-    boolean isNetworkEnabled=false;
-/*
+    int temp = 0;
+    boolean isGPSEnabled = false;
+    boolean isNetworkEnabled = false;
 
+
+   /* public MapSingleShopFragment() {
+        super();
+    }*/
+   /*public void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+   }*/
+    public MapSingleShopFragment() {
+        // Empty constructor required for fragment subclasses
+    }
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                Bundle savedInstanceState)
-    {
-        View rootView = inflater.inflate(R.layout.map, container, false);
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
 
-        btndirection=(Button)getActivity().findViewById(R.id.btn_direction);
+       // btndirection = (Button) getActivity().findViewById(R.id.btn_direction);
 
         btndirection.setVisibility(View.GONE);
 
-
-        mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+        mMap = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+        // mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         geocoder = new Geocoder(getActivity());
 //		 latlngShop=new String[Shared.SelectedTask.size()];
@@ -71,7 +104,7 @@ public class MapSingleShopFragment extends Fragment {
             // Creating an instance of GeoPoint, to display in Google Map
             latLng = new LatLng(address.getLatitude(), address.getLongitude());
 //	             latlngShop[k]=String.valueOf(address.getLatitude())+","+String.valueOf(address.getLongitude());
-            addressText= String.format("%s, %s",
+            addressText = String.format("%s, %s",
                     address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
                     address.getCountryName());
 
@@ -83,7 +116,6 @@ public class MapSingleShopFragment extends Fragment {
 //	         }
 
 
-
             Marker ciu = mMap.addMarker(new MarkerOptions().position(latLng).title("Address"));
             ciu.setTitle(addressText);
 
@@ -92,35 +124,35 @@ public class MapSingleShopFragment extends Fragment {
 
 //			}
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             // TODO Auto-generated catch block
 
             e.printStackTrace();
-            SstAlert.Show(MapSingleShopFragment.getActivity(), "Error",
-                    "Some Problem occured");
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+            alertDialogBuilder.setTitle("Error?");
+            alertDialogBuilder.setMessage("Some Problem occured");
+            // SstAlert.Show(MapSingleShopFragment.getActivity(), "Error","Some Problem occured");
         }
 
-        mlocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        mlocManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
         mlocListener = new MyMapLocationListener();
         isGPSEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         isNetworkEnabled = mlocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        if(isGPSEnabled)
-        {
-            mlocManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 35000, 0, mlocListener);
-        }
-        else
-        {
-            mlocManager.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, 35000, 0, mlocListener);
+        if (isGPSEnabled) {
+            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 35000, 0, mlocListener);
+        } else {
+            mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 35000, 0, mlocListener);
         }
         //  mlocManager.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, 3000, 0, mlocListener);
         //  ((MyLocationListener) mlocListener).DrawRoute();
         //final LatLng CIU = new LatLng(35.21843892856462, 33.41662287712097);
         //	Marker ciu = mMap.addMarker(new MarkerOptions() .position(CIU).title("My Office"));
+        return rootView;
     }
 
 
-    public void btnNavigationClick(View v)
+    /*public void btnNavigationClick(View v)
     {
         if(Shared.html_instructions!=null)
         {
@@ -141,14 +173,14 @@ public class MapSingleShopFragment extends Fragment {
 
         }
 
-    }
+    }*/
 
     private String GetShA() {
         PackageInfo info;
         String hash_key="";
         try {
 
-            info = getPackageManager().getPackageInfo(
+            info = getActivity().getPackageManager().getPackageInfo(
                     "info.tekguc.umut.googlemapsmapsandroidv2", PackageManager.GET_SIGNATURES);
 
             for (Signature signature : info.signatures) {
@@ -158,14 +190,14 @@ public class MapSingleShopFragment extends Fragment {
                 hash_key = new String(Base64.encode(md.digest(), 0));
             }
 
-        } catch (NameNotFoundException e1) {
+        } catch (PackageManager.NameNotFoundException e1) {
         } catch (NoSuchAlgorithmException e) {
         } catch (Exception e) {
         }
         return hash_key;
     }
 
-    @Override
+  /*  @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.mapmenu, menu);
@@ -187,7 +219,7 @@ public class MapSingleShopFragment extends Fragment {
                 return super.onOptionsItemSelected(item);
         }
         return false;
-    }
+    }*/
 
 
 
@@ -221,13 +253,13 @@ public class MapSingleShopFragment extends Fragment {
         @Override
         public void onProviderDisabled(String provider)
         {
-            Toast.makeText( getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT ).show();
+            Toast.makeText(getActivity().getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onProviderEnabled(String provider)
         {
-            Toast.makeText( getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
+            Toast.makeText( getActivity().getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -305,14 +337,14 @@ public class MapSingleShopFragment extends Fragment {
                 br.close();
 
             }catch(Exception e){
-                Log.d("Exception while downloading url", e.toString());
+                Log.d("Exception while", e.toString());
             }finally{
                 iStream.close();
                 urlConnection.disconnect();
             }
             return data;
         }
-        public class DownloadTask extends AsyncTask<String, Void, String>{
+        public class DownloadTask extends AsyncTask<String, Void, String> {
 
             // Downloading data in non-ui thread
             protected String doInBackground(String... url) {
@@ -406,5 +438,5 @@ public class MapSingleShopFragment extends Fragment {
 
 
 
-*/
+
 }

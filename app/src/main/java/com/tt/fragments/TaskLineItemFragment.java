@@ -2,6 +2,9 @@ package com.tt.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -72,8 +75,15 @@ public class TaskLineItemFragment extends ListFragment {
             case R.id.action_task_done:
                 moveto_donetask();
                 return true;
-            case R.id.action_search:
+            case R.id.action_task_shopmap:
+                Fragment fragment = null;
+                fragment = new MapSingleShopFragment();
 
+              /*  MapSingleShopFragment fragment2 = new MapSingleShopFragment();
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.list_item, fragment2);
+                fragmentTransaction.commit();*/
                 break;
 
             case R.id.mnuMap:
