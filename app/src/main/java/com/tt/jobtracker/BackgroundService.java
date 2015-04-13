@@ -10,6 +10,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -23,8 +25,10 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.tt.data.Shared;
 import com.tt.data.TaskLineItemPhotoViewModel;
@@ -40,45 +44,72 @@ public class BackgroundService extends Service {
 
     public static BackgroundService backgroundService;
     DatabaseHelper dbHelper = new DatabaseHelper(this);
+    final Handler handler = new Handler();
+    Timer timer = new Timer();
 
     @Override
     public void onCreate() {
+
         backgroundService = this;
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
         //check wifi is on in mobile
-
+        SharedPreferences WifionSatusInMobile = getApplicationContext().getSharedPreferences(Shared.sharedprefs_uploadstatus, 0);
+        final SharedPreferences uploadonWifibynuser = getApplicationContext().getSharedPreferences(Shared.sharedprefs_switchstatus, 0);
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         String status;
-        SharedPreferences WifionSatusInMobile = getApplicationContext().getSharedPreferences(Shared.sharedprefs_uploadstatus, 0);
-        final SharedPreferences uploadonWifibynuser = getApplicationContext().getSharedPreferences(Shared.sharedprefs_switchstatus, 0);
+
         if (mWifi.isConnected()) {
 
             SharedPreferences.Editor editor = WifionSatusInMobile.edit();
-            editor.putBoolean("status", true); // Storing string
+            editor.putString("status", "true"); // Storing string
             editor.commit(); // commit changes
         }
         else {
             SharedPreferences.Editor editor = WifionSatusInMobile.edit();
-            editor.putBoolean("status", false); // Storing string
+            editor.putString("status", "false"); // Storing string
             editor.commit();
         }
-        boolean WifiOnStatusInMobile= WifionSatusInMobile.getBoolean("status", false); // getting String
-        boolean UserOnWifiStatus= uploadonWifibynuser.getBoolean("status", false); // getting String
 
+        TimerTask doAsynchronousTask = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    // @SuppressWarnings("unchecked")
+                    public void run() {
+                        try {
+                            String condition = " EmployeeID = " + String.valueOf(Shared.LoggedInUser.ID + " AND TaskRequest.IsPending = 1");
+                            List<TaskViewModel> taskViewModel = dbHelper.getPendingTasks(condition);
+                            if(taskViewModel.size()>0)
+                            {
+                                uploadasych();
+                            }
+                            //  Intent myIntent = new Intent(MainActivity.this, BackgroundService.class);
+                            //  MainActivity.this.startService(myIntent);
+                            //startService(new Intent(this,BackgroundService.class));
+                            //  Toast.makeText(getApplicationContext(), "msg msg", Toast.LENGTH_SHORT).show();
+                        }
+                        catch (Exception e) {
+                            Toast.makeText(getApplicationContext(), "Exception msg", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        };
+        timer.schedule(doAsynchronousTask, 0, 1000 * 180);        //ProcessUpload();
 
-
-        if(UserOnWifiStatus)
-        {
-            if(WifiOnStatusInMobile) {
+    }
+    private void uploadasych() {
+        SharedPreferences WifionSatusInMobile = getApplicationContext().getSharedPreferences(Shared.sharedprefs_uploadstatus, 0);
+        final SharedPreferences uploadonWifibynuser = getApplicationContext().getSharedPreferences(Shared.sharedprefs_switchstatus, 0);
+        String WifiOnStatusInMobile= WifionSatusInMobile.getString("status", null); // getting String
+        String UserOnWifiStatus= uploadonWifibynuser.getString("status", null); // getting String
+        if (UserOnWifiStatus == "true") {
+            if (WifiOnStatusInMobile == "true") {
                 String condition = " EmployeeID = " + String.valueOf(Shared.LoggedInUser.ID + " AND TaskRequest.IsPending = 1");
                 List<TaskViewModel> taskViewModel = dbHelper.getPendingTasks(condition);
                 for (TaskViewModel t : taskViewModel) {
-                    List<TaskLineItemViewModel> tasklineitems = dbHelper.getTaskLineItems("ID="+String.valueOf(t.ID));
-                    for( TaskLineItemViewModel tl:tasklineitems) {
+                    List<TaskLineItemViewModel> tasklineitems = dbHelper.getTaskLineItems("ID=" + String.valueOf(t.ID));
+                    for (TaskLineItemViewModel tl : tasklineitems) {
                         ArrayList<TaskLineItemPhotoViewModel> tdl = dbHelper.getAllTaskLineItemPhotos(String.valueOf(tl.ID));
                         for (TaskLineItemPhotoViewModel tlp : tdl) {
                             // UploadMultiplePhotos(s, s.PhotoID);
@@ -90,14 +121,12 @@ public class BackgroundService extends Service {
                 }
             }
 
-        }
-        else
-        {
+        } else {
             String condition = " EmployeeID = " + String.valueOf(Shared.LoggedInUser.ID + " AND TaskRequest.IsPending = 1");
             List<TaskViewModel> taskViewModel = dbHelper.getPendingTasks(condition);
             for (TaskViewModel t : taskViewModel) {
-                List<TaskLineItemViewModel> tasklineitems = dbHelper.getTaskLineItems("TaskID="+String.valueOf(t.ID));
-                for( TaskLineItemViewModel tl:tasklineitems) {
+                List<TaskLineItemViewModel> tasklineitems = dbHelper.getTaskLineItems("TaskID=" + String.valueOf(t.ID));
+                for (TaskLineItemViewModel tl : tasklineitems) {
                     ArrayList<TaskLineItemPhotoViewModel> tdl = dbHelper.getAllTaskLineItemPhotos(String.valueOf(tl.ID));
                     for (TaskLineItemPhotoViewModel tlp : tdl) {
                         // UploadMultiplePhotos(s, s.PhotoID);
@@ -108,7 +137,10 @@ public class BackgroundService extends Service {
                 }
             }
         }
-        //ProcessUpload();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
         return START_STICKY;
     }
 
@@ -135,16 +167,16 @@ public class BackgroundService extends Service {
 //	}
 //UploadMultiplePhotos(null, null);
 // }
-    private void ProcessUpload() {
+  /*  private void ProcessUpload() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         String condition = "IsDone=True";
         ArrayList<TaskLineItemPhotoViewModel> tdl = dbHelper.getAllTaskLineItemPhotos(String.valueOf(40197));
         for (TaskLineItemPhotoViewModel s : tdl) {
             UploadMultiplePhotos(s, s.PhotoID);
         }
-    }
+    }*/
 
-    public String UploadMultiplePhotos(TaskLineItemPhotoViewModel taskLineItemphotos, String path) {
+  /*  public String UploadMultiplePhotos(TaskLineItemPhotoViewModel taskLineItemphotos, String path) {
 
         // String path = taskLineItem.PhotoID;
         String fileName = new File(path).getName();
@@ -250,7 +282,7 @@ public class BackgroundService extends Service {
             return "-2";
         }
         return sbResult.toString();
-    }
+    }*/
 
 
     class uploadMultipleImage extends AsyncTask<String, Integer, ServerResult> {

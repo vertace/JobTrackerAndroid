@@ -145,6 +145,7 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
             obj.execute();
         }
         startService(new Intent(this, BackgroundService.class));
+
     }
 
     private void storeRegistrationId(Context context, String regId,
@@ -416,7 +417,7 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
         } else if (position == 1) {
             fragment = new SettingsFragment();
         } else if (position == 2) {
-            fragment = null;
+            fragment =null;
         }
 
         if (fragment != null) {
@@ -605,6 +606,7 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
         TaskLineItemViewModel taskbeforePhotoCount= dbHelper.getTaskLineItemInfo(String.valueOf(tlvm.ID));
         photocount=taskbeforePhotoCount.TaskLineItemPhotoCount;
         taskilneItem.TaskLineItemPhotoCount=photocount+1;
-        dbHelper.updateTaskLineItem(taskilneItem,true);
+        int result=dbHelper.updateTaskLineItem(taskilneItem,true);
+        int cv=result;
     }
 }
