@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -17,25 +17,9 @@
         android:id="@+id/map"
         class="com.google.android.gms.maps.MapFragment"
         android:layout_width="match_parent"
-
         android:layout_height="match_parent" />
 
-    <FrameLayout
-        android:id="@+id/fram_map"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-
-        <Button
-            android:id="@+id/btn_direction"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="left|bottom"
-            android:layout_marginRight="11dp"
-            android:layout_marginTop="55dp"
-            android:background="@drawable/direction"
-            android:onClick="btnNavigationClick" />
-
-    </FrameLayout>
+   
 
     <!--  <Button
         android:id="@+id/btnDirection"
@@ -48,4 +32,4 @@
         android:onClick="btnSync_click"
         android:text="@string/SyncButton" />-->
 
-</RelativeLayout><!-- From: file:/D:/Projects/JobTracker/AndroidStudio/app/src/main/res/layout/map.xml -->
+</LinearLayout><!-- From: file:/D:/poovalagan/Projects/JobTrackerAndroid/app/src/main/res/layout/map.xml -->

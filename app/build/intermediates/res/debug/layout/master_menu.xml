@@ -18,4 +18,4 @@
         android:choiceMode="singleChoice"
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp" />
-</android.support.v4.widget.DrawerLayout><!-- From: file:/D:/Projects/JobTracker/AndroidStudio/app/src/main/res/layout/master_menu.xml -->
+</android.support.v4.widget.DrawerLayout><!-- From: file:/D:/poovalagan/Projects/JobTrackerAndroid/app/src/main/res/layout/master_menu.xml -->

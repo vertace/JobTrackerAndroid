@@ -11,4 +11,4 @@
         android:divider="#b5b5b5"
         android:dividerHeight="1dp"
         android:listSelector="@drawable/list_selector"></ListView>
-</LinearLayout><!-- From: file:/D:/Projects/JobTracker/AndroidStudio/app/src/main/res/layout/fragment_list_task_pending.xml -->
+</LinearLayout><!-- From: file:/D:/poovalagan/Projects/JobTrackerAndroid/app/src/main/res/layout/fragment_list_task_pending.xml -->

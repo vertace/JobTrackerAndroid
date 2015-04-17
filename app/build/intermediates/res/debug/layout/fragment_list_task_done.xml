@@ -1,12 +1,15 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="Done List!" />
+        android:divider="#b5b5b5"
+        android:dividerHeight="1dp"
+        android:listSelector="@drawable/list_selector"></ListView>
 
-</RelativeLayout><!-- From: file:/D:/Projects/JobTracker/AndroidStudio/app/src/main/res/layout/fragment_list_task_done.xml -->
+</LinearLayout><!-- From: file:/D:/poovalagan/Projects/JobTrackerAndroid/app/src/main/res/layout/fragment_list_task_done.xml -->

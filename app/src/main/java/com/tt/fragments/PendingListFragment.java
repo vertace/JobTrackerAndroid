@@ -92,7 +92,7 @@ public class PendingListFragment extends ListFragment {
         DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
 
         String condition = " EmployeeID = "
-                + String.valueOf(Shared.LoggedInUser.ID+" AND TaskRequest.IsPending = 0");
+                + String.valueOf(Shared.LoggedInUser.ID+" AND TaskRequest.IsDone = 0");
         if (mainActivity.SearchText != "") {
             condition = condition + " AND TaskRequest.ShopName like '%" + mainActivity.SearchText + "%'";
         }

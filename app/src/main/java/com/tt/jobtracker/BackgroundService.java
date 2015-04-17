@@ -77,7 +77,7 @@ public class BackgroundService extends Service {
                     // @SuppressWarnings("unchecked")
                     public void run() {
                         try {
-                            String condition = " EmployeeID = " + String.valueOf(Shared.LoggedInUser.ID + " AND TaskRequest.IsPending = 1");
+                            String condition = " EmployeeID = " + String.valueOf(Shared.LoggedInUser.ID + " AND TaskRequest.IsDone = 1");
                             List<TaskViewModel> taskViewModel = dbHelper.getPendingTasks(condition);
                             if(taskViewModel.size()>0)
                             {

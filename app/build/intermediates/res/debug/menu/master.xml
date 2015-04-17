@@ -40,4 +40,4 @@
         android:showAsAction="ifRoom"
         android:title="@string/action_logout"></item>
 
-</menu><!-- From: file:/D:/Projects/JobTracker/AndroidStudio/app/src/main/res/menu/master.xml -->
+</menu><!-- From: file:/D:/poovalagan/Projects/JobTrackerAndroid/app/src/main/res/menu/master.xml -->

@@ -107,13 +107,18 @@ public class TaskLineItemFragment extends ListFragment {
        // final ArrayList<String> imageList = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(task.ID));
 
         //List <TaskLineItemViewModel> tasklineitems=dbHelper.getTaskLineItems(" TaskID = " + String.valueOf(task.ID));
+        if(dbHelper.PhotoUploadCount(task.ID)<=0)
+        {
+            TaskViewModel taskViewModel = Shared.SelectedTask;
 
-        TaskViewModel taskViewModel= Shared.SelectedTask;
+            taskViewModel.IsDone = true;
+            dbHelper.saveTask(taskViewModel, true);
+        }
+        else
+        {
 
-        taskViewModel.IsPending=true;
-        dbHelper.saveTask(taskViewModel, true);
-
-        Toast.makeText(getActivity(), " Moved to done list", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), " Take Minimum Photo", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void ShowTaskLineItems() {

@@ -47,4 +47,4 @@
         android:layout_alignRight="@+id/btnLogin"
         android:layout_alignEnd="@+id/btnLogin" />
 
-</RelativeLayout><!-- From: file:/D:/Projects/JobTracker/AndroidStudio/app/src/main/res/layout/activity_login.xml -->
+</RelativeLayout><!-- From: file:/D:/poovalagan/Projects/JobTrackerAndroid/app/src/main/res/layout/activity_login.xml -->

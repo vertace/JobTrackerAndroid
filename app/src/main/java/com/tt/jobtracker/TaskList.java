@@ -132,12 +132,12 @@ public class TaskList extends Activity {
                 getApplicationContext().startActivity(intent);
                 break;
 
-            case R.id.mnuMap:
+           /* case R.id.mnuMap:
                 intent = new Intent(TaskList.this, mapactivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 getApplicationContext().startActivity(intent);
 
-                break;
+                break;*/
 
             case R.id.mnuAdminLogout:
             case R.id.mnuLogout:

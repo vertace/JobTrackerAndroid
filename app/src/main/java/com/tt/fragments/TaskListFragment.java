@@ -5,7 +5,9 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTabHost;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,11 +45,11 @@ public class TaskListFragment extends Fragment {
     GetTaskList taskRetriever;
     private FragmentTabHost mTabHost;
     private ProgressDialog m_ProgressDialog = null;
-
+    MainActivity mainActivity;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        MainActivity mainActivity = (MainActivity) getActivity();
+         mainActivity = (MainActivity) getActivity();
         mTabHost = new FragmentTabHost(mainActivity);
         mTabHost.setup(mainActivity, getChildFragmentManager(), R.id.realtabcontent);
 
@@ -59,7 +61,7 @@ public class TaskListFragment extends Fragment {
                 UploadedListFragment.class, null);
 
         setHasOptionsMenu(true);
-
+       // mTabHost.setCurrentTab(0);
         mainActivity.CurrentScreen = JobTrackerScreen.TaskList;
         mainActivity.SetActionBarMenuItems();
         return mTabHost;
@@ -177,6 +179,14 @@ public class TaskListFragment extends Fragment {
                         zipFilename = zipFilename.substring(lastDotPosition + 1);
                     }
                     imageDownloader.execute(Shared.OldImagesFile, zipFilename);
+                  //  mTabHost.onTabChanged("PendingListFragment");
+
+//                    mTabHost.setCurrentTab(0);
+                  /*  PendingListFragment fragment2 = new PendingListFragment();
+                    FragmentManager fragmentManager = getFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                   // fragmentTransaction.replace(R.id.fragment2, fragment2);
+                    fragmentTransaction.commit();*/
 
                     break;
                 case NoTasks:

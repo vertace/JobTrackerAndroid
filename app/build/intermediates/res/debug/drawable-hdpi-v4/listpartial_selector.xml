@@ -5,4 +5,4 @@
     <item android:drawable="@drawable/gradient_bg_hover" android:state_pressed="true" />
     <item android:drawable="@drawable/gradient_bg_hover" android:state_pressed="false" android:state_selected="true" />
 
-</selector><!-- From: file:/D:/Projects/JobTracker/AndroidStudio/app/src/main/res/drawable-hdpi/listpartial_selector.xml -->
+</selector><!-- From: file:/D:/poovalagan/Projects/JobTrackerAndroid/app/src/main/res/drawable-hdpi/listpartial_selector.xml -->

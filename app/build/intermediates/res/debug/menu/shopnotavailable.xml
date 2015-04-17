@@ -13,4 +13,4 @@
         android:id="@+id/mnuAddressWrong"
         android:showAsAction="always"
         android:title="@string/jn_addressWrong"></item>
-</menu><!-- From: file:/D:/Projects/JobTracker/AndroidStudio/app/src/main/res/menu/shopnotavailable.xml -->
+</menu><!-- From: file:/D:/poovalagan/Projects/JobTrackerAndroid/app/src/main/res/menu/shopnotavailable.xml -->
