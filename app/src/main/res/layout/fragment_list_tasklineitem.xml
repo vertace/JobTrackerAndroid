@@ -1,12 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="com.tt.fragments.TaskLineItemFragment">
+<GridLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:rowCount="3"
+    android:columnCount="1"
+    android:layout_gravity="center_horizontal"
+    android:id="@+id/grid"
+    android:layout_weight="0.04"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ListView android:id="@android:id/list" android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <TextView
+        android:id="@+id/ShopName"
+        android:layout_column="0"
+        android:layout_row="0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dip"
+        android:paddingBottom="10dip"
+        android:text="@string/shopName"
+        android:textColor="#040404"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:typeface="sans" />
+    <!-- Address-->
+    <TextView
+        android:id="@+id/ShopAddress"
+        android:layout_column="0"
+        android:layout_row="1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tvShopName"
+        android:layout_below="@+id/tvShopName"
+        android:layout_centerHorizontal="true"
+        android:paddingTop="0dip"
+        android:text="@string/shopAddress"
+        android:textColor="#777777"
+        android:textSize="15sp" />
 
-    <TextView android:id="@android:id/empty" android:layout_width="match_parent"
-        android:layout_height="match_parent" android:gravity="center" />
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="match_parent" tools:context="com.tt.fragments.TaskLineItemFragment"
+        android:layout_column="0"
+        android:layout_row="2">
 
-</FrameLayout>
+        <ListView android:id="@android:id/list" android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView android:id="@android:id/empty" android:layout_width="match_parent"
+            android:layout_height="match_parent" android:gravity="center" />
+
+    </FrameLayout>
+
+</GridLayout>

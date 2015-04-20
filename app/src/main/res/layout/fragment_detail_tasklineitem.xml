@@ -4,6 +4,31 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <TextView
+        android:id="@+id/wallType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dip"
+        android:paddingBottom="10dip"
+        android:text="@string/shopName"
+        android:textColor="#040404"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:typeface="sans" />
+    <!-- Address-->
+    <TextView
+        android:id="@+id/wallDetail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tvShopName"
+        android:layout_below="@+id/tvShopName"
+        android:layout_centerHorizontal="true"
+        android:paddingTop="0dip"
+        android:text="@string/shopAddress"
+        android:textColor="#777777"
+        android:textSize="15sp" />
+
     <GridView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/gridview"
         android:layout_width="match_parent"
