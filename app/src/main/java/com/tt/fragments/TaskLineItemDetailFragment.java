@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import com.tt.adapters.ImageAdapter;
 import com.tt.data.TaskLineItemViewModel;
@@ -26,6 +27,8 @@ public class TaskLineItemDetailFragment extends Fragment {
 
     private OnTaskLineItemPhotoClickInitiated mCallback;
     ImageAdapter adapter;
+    TextView Walltype;
+    TextView WallDetail;
 
     public interface OnTaskLineItemPhotoClickInitiated {
         void onTaskLineItemPhotoClickInitiated(TaskLineItemViewModel taskLineItemViewModel);
@@ -52,8 +55,17 @@ public class TaskLineItemDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        MainActivity mainActivity = (MainActivity) getActivity();
+        DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
         View view = inflater.inflate(R.layout.fragment_detail_tasklineitem, container, false);
+        Walltype = (TextView) view.findViewById(R.id.wallType);
+        WallDetail = (TextView) view.findViewById(R.id.wallDetail);
+        TaskLineItemViewModel tasklineitemviewmodel = new TaskLineItemViewModel();
 
+         tasklineitemviewmodel= dbHelper.getTaskLineItemInfo(String.valueOf(taskLineItemViewModel.ID));
+        Walltype.setText(tasklineitemviewmodel.Type.toString());
+        // Walltype.setText(String.valueOf(tasklineitemviewmodel.Type));
+        WallDetail.setText(tasklineitemviewmodel.Instruction.toString());
 //        Button button = (Button) view.findViewById(R.id.btnTakePhoto);
 //        button.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -64,11 +76,11 @@ public class TaskLineItemDetailFragment extends Fragment {
 //        });
 
 
-        MainActivity mainActivity = (MainActivity) getActivity();
+
         GridView gridview = (GridView) view.findViewById(R.id.gridview);
         adapter = new ImageAdapter(mainActivity);
         gridview.setAdapter(adapter);
-        DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
+
 
         final ArrayList<String> imageList = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(taskLineItemViewModel.ID));
         adapter.addAll(imageList);

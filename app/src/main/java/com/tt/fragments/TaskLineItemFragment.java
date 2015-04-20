@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tt.adapters.TaskDetailAdapter;
@@ -59,6 +60,11 @@ public class TaskLineItemFragment extends ListFragment {
                              Bundle savedInstanceState) {
         MainActivity mainActivity = (MainActivity) getActivity();
         View view = inflater.inflate(R.layout.fragment_list_tasklineitem, container, false);
+
+        TextView taskName = (TextView) view.findViewById(R.id.ShopName);
+        TextView taskAddress = (TextView) view.findViewById(R.id.ShopAddress);
+        taskName.setText(task.ShopName.toString());
+        taskAddress.setText(task.ShopAddress.toString());
 
         ShowTaskLineItems();
         setHasOptionsMenu(true);

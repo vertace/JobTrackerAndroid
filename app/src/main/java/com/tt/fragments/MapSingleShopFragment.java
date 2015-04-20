@@ -14,6 +14,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -64,7 +65,7 @@ public class MapSingleShopFragment extends Fragment {
     int temp = 0;
     boolean isGPSEnabled = false;
     boolean isNetworkEnabled = false;
-
+    private SupportMapFragment fragment;
 
    /* public MapSingleShopFragment() {
         super();
@@ -77,14 +78,22 @@ public class MapSingleShopFragment extends Fragment {
     }
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        FragmentManager fm = getChildFragmentManager();
+        fragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
+        if (fragment == null) {
+            fragment = SupportMapFragment.newInstance();
+            fm.beginTransaction().replace(R.id.map, fragment).commit();
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
 
        // btndirection = (Button) getActivity().findViewById(R.id.btn_direction);
 
-        btndirection.setVisibility(View.GONE);
+      //  btndirection.setVisibility(View.GONE);
 
-        mMap = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+       // mMap = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         // mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         geocoder = new Geocoder(getActivity());
@@ -94,7 +103,7 @@ public class MapSingleShopFragment extends Fragment {
 //			for(int k=0;k<Shared.TaskList.size();k++)
 //			{
 //				latlngShop[k]=new String();
-            //addresses= geocoder.getFromLocationName(Shared.SelectedTask.ShopAddress, 5);
+            addresses= geocoder.getFromLocationName("velachery", 5);
 
 //			 for(int i=0;i<addresses.size();i++)
 //			 {
