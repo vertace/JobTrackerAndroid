@@ -34,7 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + "EmployeeName TEXT," + "EmployeeID INTEGER,"
                 + "TaskStatus TEXT," + "IsMeasurement INTEGER,"
                 + "PhotoID TEXT," + "StartTime TEXT,"
-                + "ShopPhotoUploaded INTEGER,"+"IsDone INTEGER,"+"MinimumPhotoCount int)";
+                + "ShopPhotoUploaded INTEGER,"+"IsDone INTEGER,"+"MinimumPhotoCount int,"+"Name TEXT)";
         database.execSQL(query);
         Log.d(LOGCAT, "TaskRequest Created");
 
@@ -444,6 +444,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("IsMeasurement", task.IsMeasurement ? 1 : 0);
         values.put("IsDone", task.IsDone?1:0);
         values.put("MinimumPhotoCount",task.MinimumPhoto);
+        values.put("Name",task.Name);
         database.insert("TaskRequest", null, values);
         database.close();
     }
@@ -454,26 +455,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (!task.IsDone)
         {
             values.put("EmployeeName", task.EmployeeName);
-        values.put("ShopAddress", task.ShopAddress);
-        values.put("ShopBranch", task.ShopBranch);
-        values.put("ShopName", task.ShopName);
-        values.put("EmployeeID", task.EmployeeID);
-        values.put("ShopRegion", task.ShopRegion);
-        values.put("TaskStatus", task.TaskStatus);
-        values.put("ShopID", task.ShopID);
-        values.put("IsDone", task.IsDone ? 1 : 0);
-        values.put("IsMeasurement", task.IsMeasurement ? 1 : 0);
+            values.put("ShopAddress", task.ShopAddress);
+            values.put("ShopBranch", task.ShopBranch);
+            values.put("ShopName", task.ShopName);
+            values.put("EmployeeID", task.EmployeeID);
+            values.put("ShopRegion", task.ShopRegion);
+            values.put("TaskStatus", task.TaskStatus);
+            values.put("ShopID", task.ShopID);
+            values.put("IsDone", task.IsDone ? 1 : 0);
+            values.put("IsMeasurement", task.IsMeasurement ? 1 : 0);
             values.put("MinimumPhotoCount",task.MinimumPhoto);
-        if (includePhoneUpdates) {
-            values.put("StartTime", task.StartTime);
-            values.put("PhotoID", task.PhotoID);
-            values.put("ShopPhotoUploaded", task.ShopPhotoUploaded ? 1 : 0);
+            values.put("Name",task.Name);
+            if (includePhoneUpdates) {
+                values.put("StartTime", task.StartTime);
+                values.put("PhotoID", task.PhotoID);
+                values.put("ShopPhotoUploaded", task.ShopPhotoUploaded ? 1 : 0);
+            }
         }
-    }
-    else
-    {
-        values.put("IsDone", task.IsDone ? 1 : 0);
-    }
+        else
+        {
+            values.put("IsDone", task.IsDone ? 1 : 0);
+        }
         int result = database.update("TaskRequest", values, "TaskID" + " = ?",
                 new String[]{String.valueOf(task.ID)});
         database.close();
@@ -560,6 +562,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 task.StartTime = cursor.getString(12);
                 task.IsDone= Integer.parseInt(cursor.getString(14)) == 1 ? true: false;
                 task.MinimumPhoto=Integer.parseInt(cursor.getString(15));
+                task.Name=cursor.getString(16);
                 temp = cursor.getString(13);
                 if (temp == null || temp.isEmpty())
                     task.ShopPhotoUploaded = false;
@@ -604,6 +607,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 task.StartTime = cursor.getString(12);
                 task.IsDone= Integer.parseInt(cursor.getString(14)) == 1 ? true: false;
                 task.MinimumPhoto=Integer.parseInt(cursor.getString(15));
+                task.Name=cursor.getString(16);
                 temp = cursor.getString(13);
                 if (temp == null || temp.isEmpty())
                     task.ShopPhotoUploaded = false;
@@ -651,6 +655,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     task.StartTime = cursor.getString(12);
                     task.IsDone= Integer.parseInt(cursor.getString(14)) == 1 ? true: false;
                     task.MinimumPhoto=Integer.parseInt(cursor.getString(15));
+                    task.Name=cursor.getString(16);
                     temp = cursor.getString(13);
                     if (temp == null || temp.isEmpty())
                         task.ShopPhotoUploaded = false;
@@ -677,13 +682,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //String selectQuery = "SELECT COUNT(*) FROM TaskLineItem AS TI WHERE TI.TaskID = '"+taskLineItem.ID+"'";
         //String selectQuery1 = "(SELECT COUNT(*) FROM TaskLineItemPhoto AS TP WHERE TP.TaskID= '"+taskLineItem.ID+"')< TI.TaskLineItemPhotoCount";
         String selectQuery = "SELECT COUNT(*) FROM TaskLineItemRequest AS TI WHERE TI.TaskID = '"+id+"' AND (SELECT COUNT(*) FROM TaskLineItemPhoto AS TP WHERE TP.TaskLineItemID=TI.ID)< (Select MinimumPhotoCount  from TaskRequest where TaskID='"+id+"')";
-                    Cursor cursor = database.rawQuery(selectQuery, null);
-            if(cursor!=null)
-            {
-                cursor.moveToFirst();
+        Cursor cursor = database.rawQuery(selectQuery, null);
+        if(cursor!=null)
+        {
+            cursor.moveToFirst();
 
-            }
-            return cursor.getInt(0);
+        }
+        return cursor.getInt(0);
 
     }
 
@@ -722,6 +727,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 task.PhotoID = cursor.getString(11);
                 task.StartTime = cursor.getString(12);
                 task.MinimumPhoto=Integer.parseInt(cursor.getString(15));
+                task.Name=cursor.getString(16);
                 temp = cursor.getString(13);
                 if (temp == null || temp.isEmpty())
                     task.ShopPhotoUploaded = false;
