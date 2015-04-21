@@ -2,6 +2,7 @@ package com.tt.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -27,6 +29,8 @@ import com.tt.helpers.DatabaseHelper;
 import com.tt.helpers.SstAlert;
 import com.tt.jobtracker.DownloadFileAsync;
 import com.tt.jobtracker.MainActivity;
+import com.tt.jobtracker.MapForMultipleShop;
+import com.tt.jobtracker.MapForSingleShop;
 import com.tt.jobtracker.R;
 import com.tt.sync.SyncHelperExecution;
 
@@ -80,9 +84,14 @@ public class TaskListFragment extends Fragment {
 
                 break;
 
-            case R.id.mnuMap:
+            case R.id.action_home_map:
+                MainActivity mainActivity = (MainActivity) getActivity();
+                String condition = " EmployeeID = " + String.valueOf(Shared.LoggedInUser.ID);
 
-
+                DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
+                Shared.TaskList = dbHelper.getPendingTasks(condition);
+                Intent myIntent = new Intent(getActivity(), MapForMultipleShop.class);
+                getActivity().startActivity(myIntent);
                 break;
 
             default:

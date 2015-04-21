@@ -1,6 +1,7 @@
 package com.tt.fragments;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -22,6 +23,7 @@ import com.tt.data.TaskViewModel;
 import com.tt.enumerations.JobTrackerScreen;
 import com.tt.helpers.DatabaseHelper;
 import com.tt.jobtracker.MainActivity;
+import com.tt.jobtracker.MapForSingleShop;
 import com.tt.jobtracker.R;
 
 import java.util.ArrayList;
@@ -63,6 +65,8 @@ public class TaskLineItemFragment extends ListFragment {
 
         TextView taskName = (TextView) view.findViewById(R.id.ShopName);
         TextView taskAddress = (TextView) view.findViewById(R.id.ShopAddress);
+        TextView branchname = (TextView) view.findViewById(R.id.Branch);
+        branchname.setText(task.ShopBranch.toString());
         taskName.setText(task.ShopName.toString());
         taskAddress.setText(task.ShopAddress.toString());
 
@@ -82,10 +86,13 @@ public class TaskLineItemFragment extends ListFragment {
                 moveto_donetask();
                 return true;
             case R.id.action_task_shopmap:
-                Fragment fragment = null;
-                fragment = new MapSingleShopFragment();
+                MainActivity mainActivity = (MainActivity) getActivity();
+                DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
+                Shared.SelectedTask=dbHelper.getTaskInfo(String.valueOf(task.ID));
+                Intent myIntent = new Intent(getActivity(), MapForSingleShop.class);
+                getActivity().startActivity(myIntent);
 
-              /*  MapSingleShopFragment fragment2 = new MapSingleShopFragment();
+              /*MapSingleShopFragment fragment2 = new MapSingleShopFragment();
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.list_item, fragment2);
@@ -93,7 +100,6 @@ public class TaskLineItemFragment extends ListFragment {
                 break;
 
             case R.id.mnuMap:
-
 
                 break;
 
@@ -104,7 +110,6 @@ public class TaskLineItemFragment extends ListFragment {
     }
 
     private void moveto_donetask() {
-        int t=task.ID;
         MainActivity mainActivity = (MainActivity) getActivity();
         DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
         Shared.TaskDetail = dbHelper.getTaskLineItems(" TaskID = " + String.valueOf(task.ID));
