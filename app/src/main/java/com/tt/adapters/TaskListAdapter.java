@@ -37,7 +37,8 @@ public final class TaskListAdapter extends ArrayAdapter<TaskViewModel> {
         final TaskViewModel entry = getItem(position);
         //viewHolder.imgMap.setTag(position);
         // Setting the title view is straightforward
-        viewHolder.txtShopName.setText(entry.ShopName);
+        viewHolder.txtShopName.setText(entry.Name);
+        viewHolder.txtShopBranch.setText(entry.ShopBranch);
         viewHolder.txtShopAddress.setText(entry.ShopAddress);
 
         /**viewHolder.imgMap.setOnClickListener(new OnClickListener()
@@ -98,6 +99,8 @@ public final class TaskListAdapter extends ArrayAdapter<TaskViewModel> {
 
             viewHolder.txtShopName = (TextView) workingView
                     .findViewById(R.id.tvShopName);
+            viewHolder.txtShopBranch = (TextView) workingView
+                    .findViewById(R.id.tvShopBranch);
             viewHolder.txtShopAddress = (TextView) workingView
                     .findViewById(R.id.tvAddress);
             // viewHolder.imgMap=(ImageView)workingView.findViewById(R.id.imgmap);
@@ -117,6 +120,7 @@ public final class TaskListAdapter extends ArrayAdapter<TaskViewModel> {
      */
     private static class ViewHolder {
         public TextView txtShopName;
+        public TextView txtShopBranch;
         public TextView txtShopAddress;
         //public ImageView imgMap;
     }
