@@ -51,6 +51,7 @@ import com.tt.data.TaskViewModel;
 import com.tt.enumerations.JobTrackerScreen;
 import com.tt.enumerations.ServerResult;
 import com.tt.fragments.DoneListFragment;
+import com.tt.fragments.MapSingleShopFragment;
 import com.tt.fragments.PendingListFragment;
 import com.tt.fragments.SettingsFragment;
 import com.tt.fragments.TaskDetailFragment;
@@ -107,6 +108,7 @@ import java.util.List;
  * </p>
  */
 public class MainActivity extends ActionBarActivity implements PendingListFragment.OnTaskSelected, DoneListFragment.OnTaskSelected, TaskDetailFragment.OnFragmentInteractionListener, TaskLineItemFragment.OnTaskLineItemSelected, TaskLineItemDetailFragment.OnTaskLineItemPhotoClickInitiated {
+    public static FragmentManager fragmentManager;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -145,7 +147,7 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
             obj.execute();
         }
         startService(new Intent(this, BackgroundService.class));
-
+        fragmentManager = getSupportFragmentManager();
     }
 
     private void storeRegistrationId(Context context, String regId,
@@ -416,8 +418,11 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
             fragment = new TaskListFragment();
         } else if (position == 1) {
             fragment = new SettingsFragment();
+
         } else if (position == 2) {
-            fragment =null;
+
+         //   fragment=new MapSingleShopFragment();
+           // fragment =null;
         }
 
         if (fragment != null) {
