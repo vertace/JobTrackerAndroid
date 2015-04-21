@@ -10,8 +10,8 @@ public class Shared {
 
     //public static String WebAPI = "http://sunsigns.azurewebsites.net/";
     //public static String WebAPI = "http://emtracker.specialeffect.co.in/";
-    public static String WebAPI = "http://192.168.0.105:1989/";
-   // public static String WebAPI = "http://jobtrack.azurewebsites.net/";
+   // public static String WebAPI = "http://192.168.0.113:1989/";
+    public static String WebAPI = "http://jobtrack.azurewebsites.net/";
     public static String LoginAPI = WebAPI + "/Employee/Login";
     public static String TaskListAPI = WebAPI + "/Task/GetTasksForEmployeeNew";
     public static String TaskDetailAPI = WebAPI + "/Task/GetTaskDetail";
@@ -55,6 +55,7 @@ public class Shared {
     public static String sharedprefs_uploadstatus="Uploadonwifi";
 
     public static String sharedprefs_switchstatus="WifiOnOff";
+
 
 
     public static String GCM_SENDER_ID = "85852809473";

@@ -11,6 +11,7 @@ public class TaskViewModel implements Serializable {
     public int EmployeeID;
 
     public String ShopName;
+    public String Name;
     public String ShopBranch;
     public String ShopRegion;
     public String ShopCity;
