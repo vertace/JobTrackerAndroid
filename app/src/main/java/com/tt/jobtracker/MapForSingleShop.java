@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.graphics.Color;
 import android.location.Address;
+import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
@@ -80,9 +81,17 @@ public class MapForSingleShop extends FragmentActivity{
 
         btndirection.setVisibility(View.GONE);
 
+                SupportMapFragment map = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
-        SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mMap = fm.getMap();
+                    mMap = map.getMap();
+        if (mMap == null) {
+            Toast.makeText(getApplicationContext(), "Update the google play services",
+                    Toast.LENGTH_LONG).show();
+
+                }
+
+     //   SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+       // mMap = fm.getMap();
 
         //  mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -137,7 +146,13 @@ public class MapForSingleShop extends FragmentActivity{
         if (addresses != null && addresses.size() > 0) {
             mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-            mlocListener = new MyMapLocationListener();
+            Criteria criteria = new Criteria();
+            String provider = mlocManager.getBestProvider(criteria, true);
+            Location location = mlocManager.getLastKnownLocation(provider);
+            if(location!=null){
+                mlocListener = new MyMapLocationListener();
+            }
+
             isGPSEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             isNetworkEnabled = mlocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
             if (isGPSEnabled) {
@@ -158,7 +173,7 @@ public class MapForSingleShop extends FragmentActivity{
             alertDialog.setTitle("Alert Dialog");
 
             // Setting Dialog Message
-            alertDialog.setMessage("Address is Not Valid");
+            alertDialog.setMessage("Some Error Occured");
 
             // Setting Icon to Dialog
             alertDialog.setIcon(R.drawable.ic_launcher);

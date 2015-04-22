@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -37,7 +38,9 @@ public class Login extends Activity {
     EditText un, pw;
     GetEmployeeList employeeRetriever;
     private ProgressDialog m_ProgressDialog = null;
-
+    SharedPreferences sh_Pref;
+    SharedPreferences.Editor toEdit;
+    String username, password;
     public Login() {
     }
 
@@ -51,20 +54,47 @@ public class Login extends Activity {
 
         un = (EditText) findViewById(R.id.txtUsername);
         pw = (EditText) findViewById(R.id.txtPassword);
+        SharedPreference();
     }
-
+    public void SharedPreference() {
+        sh_Pref = getSharedPreferences("Login Credentials", MODE_PRIVATE);
+        toEdit = sh_Pref.edit();
+        toEdit.putString("Username", un.getText().toString());
+        toEdit.putString("Password", pw.getText().toString());
+        toEdit.commit();
+        String  user=sh_Pref.getString("Username","0");
+        String pas=sh_Pref.getString("Password","0");
+        EmployeeViewModel employee ;
+        employee   = dbHelper.AuthenticateUser(user, pas);
+        if(employee!=null)
+        CheckDefaultLogin(employee);
+    }
     public void btnLogin_click(View view) {
 
         m_ProgressDialog = ProgressDialog.show(Login.this, "Please wait...",
                 "Logging  in...", true);
 
         // new LoginToServer().execute();
-        EmployeeViewModel employee = dbHelper.AuthenticateUser(un.getText().toString(), pw.getText()
+        EmployeeViewModel employee ;
+       String  user=sh_Pref.getString("Username","0");
+        String pas=sh_Pref.getString("Password","0");
+        employee   = dbHelper.AuthenticateUser(un.getText().toString(), pw.getText()
                 .toString());
+        SharedPreference();
         m_ProgressDialog.dismiss();
         if (employee == null) {
-            SstAlert.Show(Login.this, "Login Failed",
-                    "Wrong username/password");
+            employeeRetriever = new GetEmployeeList(this);
+            employeeRetriever.execute();
+            employee = dbHelper.AuthenticateUser(un.getText().toString(), pw.getText()
+                    .toString());
+            if(employee!=null)
+            {
+                CheckDefaultLogin(employee);
+            }
+            else {
+                SstAlert.Show(Login.this, "Login Failed",
+                        "Wrong username/password");
+            }
         } else {
             Shared.LoggedInUser = employee;
 
@@ -75,7 +105,13 @@ public class Login extends Activity {
             finish();
         }
     }
-
+    public void CheckDefaultLogin( EmployeeViewModel employee) {
+        Shared.LoggedInUser = employee;
+        Intent intent = new Intent(Login.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getApplicationContext().startActivity(intent);
+        finish();
+    }
     public void btnSync_click(View view) {
         m_ProgressDialog = ProgressDialog.show(Login.this,
                 "Please wait...", "Downloading employee list...", true);

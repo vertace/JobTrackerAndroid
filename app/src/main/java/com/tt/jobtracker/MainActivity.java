@@ -420,9 +420,12 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
             fragment = new SettingsFragment();
 
         } else if (position == 2) {
-
-         //   fragment=new MapSingleShopFragment();
-           // fragment =null;
+            Intent intent;
+            finish();
+            Shared.LoggedInUser = null;
+            intent = new Intent(MainActivity.this, Login.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getApplicationContext().startActivity(intent);
         }
 
         if (fragment != null) {
