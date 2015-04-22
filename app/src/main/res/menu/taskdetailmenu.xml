@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/mnuTaskList"
-        android:icon="@drawable/list"
+        android:icon="@drawable/done"
         android:showAsAction="always"
         android:title="@string/taskList"></item>
 
