@@ -56,7 +56,8 @@ public class Shared {
 
     public static String sharedprefs_switchstatus="WifiOnOff";
 
-
+    public static String Username;
+    public static String Password;
 
     public static String GCM_SENDER_ID = "85852809473";
 
