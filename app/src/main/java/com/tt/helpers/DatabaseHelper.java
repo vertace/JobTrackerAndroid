@@ -294,9 +294,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void DeleteRelatedJobPhoto(String taskLineitemId) {
-        TaskLineItemViewModel taskLineItemViewModel = getTaskLineItemInfo(taskLineitemId);
-        PhotoDeleteHelper.DeletePhoto(taskLineItemViewModel.OldImage);
-        PhotoDeleteHelper.DeletePhoto(taskLineItemViewModel.NewImage);
+        //   TaskLineItemViewModel taskLineItemViewModel = getTaskLineItemInfo(taskLineitemId);
+        TaskLineItemPhotoViewModel taskLineItemViewModel1 = getTaskLineItemPhotos(taskLineitemId);
+        PhotoDeleteHelper.DeletePhoto(taskLineItemViewModel1.PhotoID);
+        //   PhotoDeleteHelper.DeletePhoto(taskLineItemViewModel.NewImage);
     }
 
     public ArrayList<TaskLineItemViewModel> getAllTaskLineItems() {
