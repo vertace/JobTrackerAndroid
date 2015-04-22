@@ -126,7 +126,7 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
     public static final String PROPERTY_FbUserID = "fbUserID";
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
-
+    public TaskLineItemViewModel taskLineItemViewModel;
 
     public JobTrackerScreen CurrentScreen = JobTrackerScreen.TaskList;
 
@@ -420,6 +420,15 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
             fragment = new SettingsFragment();
 
         } else if (position == 2) {
+
+            final SharedPreferences username = getApplicationContext().getSharedPreferences(Shared.Username, 0);
+            final SharedPreferences password = getApplicationContext().getSharedPreferences(Shared.Password, 0);
+            SharedPreferences.Editor editor = username.edit();
+            editor.putString("Loginuser",null); // Storing string
+            editor.commit();
+            SharedPreferences.Editor editor1 = password.edit();
+            editor1.putString("LoginPass",null); // Storing string
+            editor1.commit();
             Intent intent;
             finish();
             Shared.LoggedInUser = null;
@@ -506,17 +515,48 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
         }
     }
 
-    public void onTaskSelected(TaskViewModel task) {
+    public void onTaskSelected(TaskViewModel task)
+    {
+        if(task.IsMeasurement)
+        {
+            //call measurement fragment
 
-        Fragment fragment = new TaskDetailFragment();
-        if (fragment != null) {
-            Bundle args = new Bundle();
-            args.putSerializable("Task", task);
-            fragment.setArguments(args);
+            Shared.MeasurementTaskID = task.ID;
+            Intent intent = new Intent(MainActivity.this,
+                    TakeMeasurementList.class);
+            DatabaseHelper dbHelper = new DatabaseHelper(this);
+            Shared.SelectedTask=dbHelper.getTaskInfo(String.valueOf(task.ID));
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("TaskID", String.valueOf(task.ID));
+            intent.putExtra("ShopID",
+                    String.valueOf(task.ShopID));
+            intent.putExtra("ShopName",
+                    String.valueOf(task.ShopName));
+            intent.putExtra("ShopAddress",
+                    String.valueOf(task.ShopAddress));
+            getApplicationContext().startActivity(intent);
 
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.content_frame, fragment).addToBackStack("tasklist").commit();
+            // Intent myIntent = new Intent(MainActivity.this, TakeMeasurement.class);
+            //myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            // myIntent.putExtra("PhotoID",taskLineItemViewModel.PhotoID);
+            // getApplicationContext().startActivity(myIntent);
+            // finish();
+
+        }
+
+        else {
+            //call execution fragment
+
+            Fragment fragment = new TaskDetailFragment();
+            if (fragment != null) {
+                Bundle args = new Bundle();
+                args.putSerializable("Task", task);
+                fragment.setArguments(args);
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.content_frame, fragment).addToBackStack("tasklist").commit();
+            }
         }
     }
 
@@ -583,6 +623,12 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
 //                Toast.makeText(this, "Image saved to:\n" + fileUri,
 //                        Toast.LENGTH_LONG).show();
                 AddTaskLineItemPhoto();
+                //Intent myIntent = new Intent(MainActivity.this, TakeMeasurement.class);
+                //myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                //myIntent.putExtra("PhotoID",taskLineItemViewModel.PhotoID);
+                //getApplicationContext().startActivity(myIntent);
+                //finish();
+
                 taskLineItemDetailFragment.updateImageAdapter();
                 //markTaskStart();
             } else if (resultCode == RESULT_CANCELED) {

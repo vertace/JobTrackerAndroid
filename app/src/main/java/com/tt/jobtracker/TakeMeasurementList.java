@@ -18,6 +18,8 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.tt.data.TaskViewModel;
+import com.tt.fragments.TaskLineItemFragment;
 import com.tt.jobtracker.R;
 import com.tt.adapters.MeasurementPhotoListAdapter;
 import com.tt.data.MeasurementPhoto;
@@ -111,12 +113,20 @@ public class TakeMeasurementList extends Activity {
                 TakePhoto();
                 break;
             case R.id.mnuTaskList:
-                finish();
+                //finish();
                 // startActivity(getIntent());
+                //Intent intent = new Intent(TakeMeasurementList.this,
+                //  TaskLineItemFragment.class);
+                // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                // intent.putExtra("Data", "True");
+                //intent.putExtra("TaskID", TaskID);
+                TaskeMeasdurementPhoto();
+                // TaskLineItemFragment tlif = new TaskLineItemFragment();
+                // tlif.moveto_donetask(true,TaskID.toString());
 
-                Intent intent = new Intent(TakeMeasurementList.this, TaskList.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                getApplicationContext().startActivity(intent);
+                // Intent intent = new Intent(TakeMeasurementList.this, TaskList.class);
+                // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                // getApplicationContext().startActivity(intent);
 
                 break;
             case R.id.mnuCheckin:
@@ -145,7 +155,13 @@ public class TakeMeasurementList extends Activity {
         }
         return false;
     }
+    private void TaskeMeasdurementPhoto()
+    {
+        TaskViewModel taskviewmeasurement=Shared.SelectedTask;
 
+        taskviewmeasurement.IsDone = true;
+        dbHelper.saveTask(taskviewmeasurement, true);
+    }
     private void TakePhoto() {
 
         // create Intent to take a picture and return control to the

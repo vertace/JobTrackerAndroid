@@ -51,36 +51,40 @@ public class Login extends Activity {
         Utility.getLocation(this);
 
         setContentView(R.layout.activity_login);
-
         un = (EditText) findViewById(R.id.txtUsername);
         pw = (EditText) findViewById(R.id.txtPassword);
-        SharedPreference();
+
+        final SharedPreferences username = getApplicationContext().getSharedPreferences(Shared.Username, 0);
+        final SharedPreferences password = getApplicationContext().getSharedPreferences(Shared.Password, 0);
+        String username1= username.getString("Loginuser", null); // getting String
+        String password1= password.getString("LoginPass", null);
+        if(username1!=null && password1!=null)
+        {
+            EmployeeViewModel employee ;
+            employee   = dbHelper.AuthenticateUser(username1, password1);
+            CheckDefaultLogin(employee);
+            //String userValue=
+        }
+
+
+
+        //SharedPreference();
     }
-    public void SharedPreference() {
-        sh_Pref = getSharedPreferences("Login Credentials", MODE_PRIVATE);
-        toEdit = sh_Pref.edit();
-        toEdit.putString("Username", un.getText().toString());
-        toEdit.putString("Password", pw.getText().toString());
-        toEdit.commit();
-        String  user=sh_Pref.getString("Username","0");
-        String pas=sh_Pref.getString("Password","0");
-        EmployeeViewModel employee ;
-        employee   = dbHelper.AuthenticateUser(user, pas);
-        if(employee!=null)
-        CheckDefaultLogin(employee);
-    }
+
     public void btnLogin_click(View view) {
 
         m_ProgressDialog = ProgressDialog.show(Login.this, "Please wait...",
                 "Logging  in...", true);
 
         // new LoginToServer().execute();
+        final SharedPreferences username = getApplicationContext().getSharedPreferences(Shared.Username, 0);
+        final SharedPreferences password = getApplicationContext().getSharedPreferences(Shared.Password, 0);
         EmployeeViewModel employee ;
-       String  user=sh_Pref.getString("Username","0");
-        String pas=sh_Pref.getString("Password","0");
+      // String  user=sh_Pref.getString("Username",null);
+      //  String pas=sh_Pref.getString("Password",null);
         employee   = dbHelper.AuthenticateUser(un.getText().toString(), pw.getText()
                 .toString());
-        SharedPreference();
+      //  SharedPreference();
         m_ProgressDialog.dismiss();
         if (employee == null) {
             employeeRetriever = new GetEmployeeList(this);
@@ -89,6 +93,12 @@ public class Login extends Activity {
                     .toString());
             if(employee!=null)
             {
+                SharedPreferences.Editor editor = username.edit();
+                editor.putString("Loginuser",un.getText().toString() ); // Storing string
+                editor.commit();
+                SharedPreferences.Editor editor1 = password.edit();
+                editor1.putString("LoginPass",pw.getText().toString() ); // Storing string
+                editor1.commit();
                 CheckDefaultLogin(employee);
             }
             else {
@@ -96,13 +106,13 @@ public class Login extends Activity {
                         "Wrong username/password");
             }
         } else {
-            Shared.LoggedInUser = employee;
-
-
-            Intent intent = new Intent(Login.this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            getApplicationContext().startActivity(intent);
-            finish();
+            SharedPreferences.Editor editor = username.edit();
+            editor.putString("Loginuser",un.getText().toString() ); // Storing string
+            editor.commit();
+            SharedPreferences.Editor editor1 = password.edit();
+            editor1.putString("LoginPass",pw.getText().toString() ); // Storing string
+            editor1.commit();
+            CheckDefaultLogin(employee);
         }
     }
     public void CheckDefaultLogin( EmployeeViewModel employee) {

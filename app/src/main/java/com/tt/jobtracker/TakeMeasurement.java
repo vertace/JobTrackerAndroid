@@ -17,7 +17,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.tt.helpers.PhotoDeleteHelper;
 import com.tt.jobtracker.R;
 import com.google.gson.Gson;
 import com.tt.data.MeasurementPhoto;
@@ -36,6 +38,7 @@ public class TakeMeasurement extends Activity implements AsyncResponse {
     Paint paint;
     int CanvasWidth;
     int CanvasHeight;
+    String DeletePhotoID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,7 @@ public class TakeMeasurement extends Activity implements AsyncResponse {
         setContentView(R.layout.activity_takemeasurement);
 
         String PhotoID = getIntent().getStringExtra("PhotoID");
+        DeletePhotoID = getIntent().getStringExtra("PhotoID");
         LoadMeasurementPhoto(PhotoID);
 
     }
@@ -86,6 +90,9 @@ public class TakeMeasurement extends Activity implements AsyncResponse {
                             }
                         });
                 newDialog.show();
+                break;
+            case R.id.mnuDiscard:
+                ImageDiscardFromSD(DeletePhotoID);
                 break;
             case R.id.mnuDelete:
                 mView.RemoveLastPoint();
@@ -157,6 +164,23 @@ public class TakeMeasurement extends Activity implements AsyncResponse {
         }
     }
 
+    public void ImageDiscardFromSD(String DeletePhotoID)
+    {
+        final String path=DeletePhotoID;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder
+                .setTitle("Delete")
+                .setMessage("Are you sure? Delete this Photo.")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Yes button clicked, do something
+                        PhotoDeleteHelper.DeletePhoto(path);
+                        Toast.makeText(getApplicationContext(), "Image Deleted",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }).setNegativeButton("No", null).show();
+    }
     private void LoadMeasurementPhoto(String photoID) {
         Bitmap bitmap = BitmapFactory.decodeFile(new File(photoID).getPath());
         MeasurementView i = (MeasurementView) findViewById(R.id.imgMeasurementImage);

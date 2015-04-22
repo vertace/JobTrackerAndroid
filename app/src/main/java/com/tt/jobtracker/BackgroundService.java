@@ -17,7 +17,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 
-
+import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -36,6 +36,7 @@ import com.tt.data.TaskLineItemViewModel;
 import com.tt.data.TaskViewModel;
 import com.tt.enumerations.ServerResult;
 import com.tt.helpers.AppConstant;
+import com.tt.helpers.AsycResponse;
 import com.tt.helpers.DatabaseHelper;
 import com.tt.helpers.Utility;
 
@@ -78,18 +79,28 @@ public class BackgroundService extends Service {
         obj.execute();
     }
 
+    private void UploadMeasurementPhoto()
+    {
+        // PendingMeasurementUpload objx = new PendingMeasurementUpload();
+        //objx.ShowPendingList();
+        Intent intent;
+        intent = new Intent(this, PendingMeasurementUpload.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getApplicationContext().startActivity(intent);
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         TimerTask doAsynchronousTask = new TimerTask() {
             @Override
             public void run() {
+
                 handler.post(new Runnable() {
                     public void run() {
 
                         String condition = " EmployeeID = " + String.valueOf(Shared.LoggedInUser.ID + " AND TaskRequest.IsDone = 1");
                         List<TaskViewModel> taskViewModel = dbHelper.getPendingTasks(condition);
-                        if(taskViewModel.size()>0)
-                        {
+                        if (taskViewModel.size() > 0) {
                             uploadasych();
                         }
                     }
@@ -158,9 +169,15 @@ public class BackgroundService extends Service {
                         }
                         dbHelper.deleteTaskLineItem(String.valueOf(t.ID));
                         List<TaskLineItemViewModel> tasklineitems1 = dbHelper.getTaskLineItems("TaskID=" + String.valueOf(t.ID));
-                        if(tasklineitems1.size()==0)
-                        {
+                        if(tasklineitems.size()==1) {
                             dbHelper.deleteTask(String.valueOf(t.ID));
+                        }
+                        else
+                        {
+                            if(tasklineitems1.size()==0)
+                            {
+                                dbHelper.deleteTask(String.valueOf(t.ID));
+                            }
                         }
                     }
                 }
@@ -175,8 +192,12 @@ public class BackgroundService extends Service {
                     Taskid=t.ID;
                     List<TaskLineItemViewModel> tasklineitems = dbHelper.getTaskLineItems("TaskID=" + String.valueOf(t.ID));
                     for (TaskLineItemViewModel tl : tasklineitems) {
-                        if(t.IsMeasurement=true && tl.PhotoID!=null) {
-                            UploadShopPhoto(tl,tl.PhotoID);
+                        if(t.IsMeasurement=true) {
+                            //&& tl.PhotoID!=null
+                            //UploadShopPhoto(tl,tl.PhotoID);
+                            // PendingMeasurementUpload obj = new PendingMeasurementUpload()(this);
+                            //obj.
+                            UploadMeasurementPhoto();
                         }
                         ArrayList<TaskLineItemPhotoViewModel> tdl = dbHelper.getAllTaskLineItemPhotos(String.valueOf(tl.ID));
                         for (TaskLineItemPhotoViewModel tlp : tdl) {
@@ -188,9 +209,15 @@ public class BackgroundService extends Service {
                     }
                     dbHelper.deleteTaskLineItem(String.valueOf(t.ID));
                     List<TaskLineItemViewModel> tasklineitems1 = dbHelper.getTaskLineItems("TaskID=" + String.valueOf(t.ID));
-                    if(tasklineitems1.size()==0)
-                    {
+                    if(tasklineitems.size()==1) {
                         dbHelper.deleteTask(String.valueOf(t.ID));
+                    }
+                    else
+                    {
+                        if(tasklineitems1.size()==0)
+                        {
+                            dbHelper.deleteTask(String.valueOf(t.ID));
+                        }
                     }
                 }
             }
@@ -308,6 +335,10 @@ public class BackgroundService extends Service {
         }
 
     }
+
+    // public class PendingMeasurementUpload implements AsycResponse.AsyncResponse {
+    //
+    // }
     private String UploadShopPhoto(TaskLineItemViewModel taskLineItem,String path)
     {
         // String path = taskLineItem.PhotoID;
