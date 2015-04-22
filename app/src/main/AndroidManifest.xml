@@ -44,7 +44,7 @@
             android:value="com.tt.jobtracker.MainActivity" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-        android:value="AIzaSyC2Q4qSKGqB8ZCqDK9GLz1T179du61xIwk"/>
+        android:value="AIzaSyCK7KhKHL4Wj6_h2oJNpdhXdmPIcV6sB2I"/>
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
         <activity
             android:name="com.tt.jobtracker.Login"
