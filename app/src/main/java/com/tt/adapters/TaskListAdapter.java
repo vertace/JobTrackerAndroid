@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.tt.data.Shared;
 import com.tt.jobtracker.R;
 import com.tt.data.TaskViewModel;
 
@@ -37,9 +38,20 @@ public final class TaskListAdapter extends ArrayAdapter<TaskViewModel> {
         final TaskViewModel entry = getItem(position);
         //viewHolder.imgMap.setTag(position);
         // Setting the title view is straightforward
+       /*  TaskViewModel showUploadModel=Shared.ShowProgressForselectedTask;
+        if(entry.IsDone && entry.ID==showUploadModel.ID) {
+            viewHolder.txtStatus.setText("Up");
+        }*/
         viewHolder.txtShopName.setText(entry.Name);
         viewHolder.txtShopBranch.setText(entry.ShopBranch);
         viewHolder.txtShopAddress.setText(entry.ShopAddress);
+        if (entry.IsMeasurement) {
+            viewHolder.txtStatus.setText("M");
+        }
+        else
+        {
+            viewHolder.txtStatus.setText("E");
+        }
 
         /**viewHolder.imgMap.setOnClickListener(new OnClickListener()
          {
@@ -103,6 +115,8 @@ public final class TaskListAdapter extends ArrayAdapter<TaskViewModel> {
                     .findViewById(R.id.tvShopBranch);
             viewHolder.txtShopAddress = (TextView) workingView
                     .findViewById(R.id.tvAddress);
+            viewHolder.txtStatus = (TextView) workingView
+                    .findViewById(R.id.status);
             // viewHolder.imgMap=(ImageView)workingView.findViewById(R.id.imgmap);
 
             workingView.setTag(viewHolder);
@@ -122,6 +136,7 @@ public final class TaskListAdapter extends ArrayAdapter<TaskViewModel> {
         public TextView txtShopName;
         public TextView txtShopBranch;
         public TextView txtShopAddress;
+        public TextView txtStatus;
         //public ImageView imgMap;
     }
 
