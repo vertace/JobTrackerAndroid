@@ -2,6 +2,7 @@ package com.tt.jobtracker;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -19,6 +20,7 @@ import android.text.format.DateUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -49,6 +51,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 /**
  * Created by BS-308 on 4/21/2015.
  */
@@ -89,6 +94,8 @@ public class MapForMultipleShop extends FragmentActivity {
                 latlngShop[k]=new String();
 
                 addresses= geocoder.getFromLocationName(Shared.TaskList.get(k).ShopAddress, 5);
+
+              //  Map<String, String> treeMap = new TreeMap<String, String>(addresses);
 if(addresses!=null && addresses.size()>0)
 {
     for (int i = 0; i < addresses.size(); i++) {
@@ -193,7 +200,51 @@ if(addresses!=null && addresses.size()>0)
         }
         return hash_key;
     }
+    @Override
+         public boolean onCreateOptionsMenu(Menu menu) {
+           // Inflate the menu; this adds items to the action bar if it is present.
+           getMenuInflater().inflate(R.menu.mapmenu, menu);
+           return true;
+       }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
+        switch (item.getItemId()) {
+            case R.id.mnuBack:
+                ShopShortList();
+                // startActivity(getIntent());
 
+               // intent = new Intent(this, TaskList.class);
+              //  intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                //getApplicationContext().startActivity(intent);
+
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return false;
+    }
+   private void  ShopShortList()
+    {
+        if(Shared.end_address!=null)
+        {
+            AlertDialog.Builder builderSingle = new AlertDialog.Builder(
+                    MapForMultipleShop.this);
+            builderSingle.setIcon(R.drawable.ic_launcher);
+            builderSingle.setTitle("Directions");
+            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MapForMultipleShop.this,android.R.layout.simple_list_item_1);
+
+            arrayAdapter.addAll(Shared.end_address);
+            builderSingle.setAdapter(arrayAdapter, null);
+            builderSingle.show();
+        }
+        else
+        {
+            SstAlert.Show(MapForMultipleShop.this, "Error",
+                    "Please wait");
+
+        }
+
+    }
     private Handler mHandler = new Handler();
     private Runnable onRequestLocation = new Runnable() {
         @Override

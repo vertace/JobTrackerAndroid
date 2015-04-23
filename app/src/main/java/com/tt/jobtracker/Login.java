@@ -58,6 +58,8 @@ public class Login extends Activity {
         final SharedPreferences password = getApplicationContext().getSharedPreferences(Shared.Password, 0);
         String username1= username.getString("Loginuser", null); // getting String
         String password1= password.getString("LoginPass", null);
+        //   username1="bal";
+        // password1="123";
         if(username1!=null && password1!=null)
         {
             EmployeeViewModel employee ;
@@ -70,7 +72,28 @@ public class Login extends Activity {
 
         //SharedPreference();
     }
+    private void LoginProcess( )
+    {
+        EmployeeViewModel employee = dbHelper.AuthenticateUser(un.getText().toString(), pw.getText()
+                .toString());
+        if(employee!=null)
+        {
+            final SharedPreferences username = getApplicationContext().getSharedPreferences(Shared.Username, 0);
+            final SharedPreferences password = getApplicationContext().getSharedPreferences(Shared.Password, 0);
 
+            SharedPreferences.Editor editor = username.edit();
+            editor.putString("Loginuser",un.getText().toString() ); // Storing string
+            editor.commit();
+            SharedPreferences.Editor editor1 = password.edit();
+            editor1.putString("LoginPass",pw.getText().toString() ); // Storing string
+            editor1.commit();
+            CheckDefaultLogin(employee);
+        }
+        else {
+            SstAlert.Show(Login.this, "Login Failed",
+                    "Wrong username/password");
+        }
+    }
     public void btnLogin_click(View view) {
 
         m_ProgressDialog = ProgressDialog.show(Login.this, "Please wait...",
@@ -80,31 +103,18 @@ public class Login extends Activity {
         final SharedPreferences username = getApplicationContext().getSharedPreferences(Shared.Username, 0);
         final SharedPreferences password = getApplicationContext().getSharedPreferences(Shared.Password, 0);
         EmployeeViewModel employee ;
-      // String  user=sh_Pref.getString("Username",null);
-      //  String pas=sh_Pref.getString("Password",null);
-        employee   = dbHelper.AuthenticateUser(un.getText().toString(), pw.getText()
-                .toString());
-      //  SharedPreference();
-        m_ProgressDialog.dismiss();
-        if (employee == null) {
+        // String  user=sh_Pref.getString("Username",null);
+        employee   = dbHelper.AuthenticateUser(un.getText().toString(), pw.getText().toString());
+        //  SharedPreference();-
+
+
+        if (employee == null)
+        {
+
             employeeRetriever = new GetEmployeeList(this);
             employeeRetriever.execute();
-            employee = dbHelper.AuthenticateUser(un.getText().toString(), pw.getText()
-                    .toString());
-            if(employee!=null)
-            {
-                SharedPreferences.Editor editor = username.edit();
-                editor.putString("Loginuser",un.getText().toString() ); // Storing string
-                editor.commit();
-                SharedPreferences.Editor editor1 = password.edit();
-                editor1.putString("LoginPass",pw.getText().toString() ); // Storing string
-                editor1.commit();
-                CheckDefaultLogin(employee);
-            }
-            else {
-                SstAlert.Show(Login.this, "Login Failed",
-                        "Wrong username/password");
-            }
+            m_ProgressDialog.dismiss();
+
         } else {
             SharedPreferences.Editor editor = username.edit();
             editor.putString("Loginuser",un.getText().toString() ); // Storing string
@@ -171,7 +181,7 @@ public class Login extends Activity {
 
         @Override
         protected void onPostExecute(ServerResult result) {
-            m_ProgressDialog.dismiss();
+            // m_ProgressDialog.dismiss();
 
             switch (result) {
                 case ConnectionFailed:
@@ -213,7 +223,7 @@ public class Login extends Activity {
                 response = CustomHttpClient
                         .executeHttpGet(Shared.EmployeeListAPI);
                 String res = response.toString();
-
+                //  m_ProgressDialog.show();
                 GsonBuilder gsonBuilder = new GsonBuilder();
                 Gson gson = gsonBuilder.create();
                 Type listType = new TypeToken<ArrayList<EmployeeViewModel>>() {
@@ -259,8 +269,8 @@ public class Login extends Activity {
                     for (EmployeeViewModel employee : Shared.EmployeeList) {
                         dbHelper.saveEmployee(employee);
                     }
+                    LoginProcess();
                     m_ProgressDialog.dismiss();
-
                     break;
                 case NoTasks:
                     SstAlert.Show(Login.this, "No Tasks", "No employees");

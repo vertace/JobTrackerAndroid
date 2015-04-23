@@ -146,12 +146,12 @@ public class MapForSingleShop extends FragmentActivity{
         if (addresses != null && addresses.size() > 0) {
             mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-            Criteria criteria = new Criteria();
-            String provider = mlocManager.getBestProvider(criteria, true);
-            Location location = mlocManager.getLastKnownLocation(provider);
-            if(location!=null){
+           // Criteria criteria = new Criteria();
+           // String provider = mlocManager.getBestProvider(criteria, true);
+           // Location location = mlocManager.getLastKnownLocation(provider);
+          //  if(location!=null){
                 mlocListener = new MyMapLocationListener();
-            }
+          //  }
 
             isGPSEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             isNetworkEnabled = mlocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
