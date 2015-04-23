@@ -124,6 +124,7 @@ public class TaskLineItemFragment extends ListFragment {
 
             taskViewModel.IsDone = true;
             dbHelper.saveTask(taskViewModel, true);
+            Toast.makeText(getActivity(), " Moved to Done Task", Toast.LENGTH_LONG).show();
         }
         else
         {
