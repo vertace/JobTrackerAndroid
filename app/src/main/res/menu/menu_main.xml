@@ -19,11 +19,7 @@
             android:icon="@drawable/map"
             android:title="@string/map"
             app:showAsAction="always" />
-        <item
-            android:id="@+id/action_home_group"
-            android:icon="@drawable/group"
-            android:title="@string/group"
-            app:showAsAction="always" />
+
         <item
             android:id="@+id/action_home_sort"
             android:icon="@drawable/sort"
@@ -55,16 +51,7 @@
 
     </group>
     <group android:id="@+id/actionbar_group_tasklineitem_detail">
-        <item
-            android:id="@+id/action_tasklineitem_done"
-            android:icon="@drawable/done"
-            android:title="@string/done"
-            app:showAsAction="always" />
-        <item
-            android:id="@+id/action_tasklineitem_notdone"
-            android:icon="@drawable/notdone"
-            android:title="@string/notDone"
-            app:showAsAction="always" />
+
         <item
             android:id="@+id/action_tasklineitem_takephoto"
             android:icon="@drawable/camera"
