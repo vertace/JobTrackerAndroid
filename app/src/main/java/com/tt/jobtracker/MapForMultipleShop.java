@@ -87,6 +87,8 @@ public class MapForMultipleShop extends FragmentActivity {
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         geocoder = new Geocoder(this);
         latlngShop=new String[Shared.TaskList.size()];
+
+
         try {
 
             for(int k=0;k<Shared.TaskList.size();k++)
@@ -98,12 +100,14 @@ public class MapForMultipleShop extends FragmentActivity {
               //  Map<String, String> treeMap = new TreeMap<String, String>(addresses);
 if(addresses!=null && addresses.size()>0)
 {
-    for (int i = 0; i < addresses.size(); i++) {
+    for (int i = 0; i < addresses.size(); i++)
+    {
 
         android.location.Address address = (android.location.Address) addresses.get(i);
 
         // Creating an instance of GeoPoint, to display in Google Map
         latLng = new LatLng(address.getLatitude(), address.getLongitude());
+
         latlngShop[k] = String.valueOf(address.getLatitude()) + "," + String.valueOf(address.getLongitude());
         addressText = String.format("%s, %s",
                 address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
@@ -121,7 +125,8 @@ if(addresses!=null && addresses.size()>0)
     mMap.setMyLocationEnabled(true);
     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
 }
-
+                Double result= distance(12.9265533, 80.10782879999999,12.9908401,80.21827569999999);
+                double value=result;
 
 
 
@@ -134,6 +139,7 @@ if(addresses!=null && addresses.size()>0)
             SstAlert.Show(MapForMultipleShop.this, "Error",
                     "Some Problem occured");
         }
+
         if(addresses!=null && addresses.size()>0) {
             mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -154,6 +160,26 @@ if(addresses!=null && addresses.size()>0)
             Toast.makeText(getApplicationContext(), "Network is slow wait...", Toast.LENGTH_SHORT).show();
         }
     }
+
+
+
+
+    private double distance(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        return (dist);
+    }
+
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+    private double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
+    }
+
 
 
     public void btnNavigationClick(View v)
@@ -472,4 +498,5 @@ if(addresses!=null && addresses.size()>0)
             mMap.addPolyline(lineOptions);
         }
     }
+
 }

@@ -3,6 +3,7 @@ package com.tt.jobtracker;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 import android.location.Location;
@@ -130,9 +131,11 @@ public class TakeMeasurementList extends Activity {
 
                 break;
             case R.id.mnuCheckin:
-
-
-                Utility.getLocation(this);
+                Intent intent;
+                intent = new Intent(TakeMeasurementList.this, MapForSingleShop.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getApplicationContext().startActivity(intent);
+               // Utility.getLocation(this);
 
                 /**   mlocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
@@ -157,10 +160,41 @@ public class TakeMeasurementList extends Activity {
     }
     private void TaskeMeasdurementPhoto()
     {
-        TaskViewModel taskviewmeasurement=Shared.SelectedTask;
+        final TaskViewModel taskviewmeasurement=Shared.SelectedTask;
 
         taskviewmeasurement.IsDone = true;
-        dbHelper.saveTask(taskviewmeasurement, true);
+        // MainActivity mainActivity = (MainActivity) TakeMeasurementList;
+        MeasurementPhoto measurementPhoto = dbHelper.getMeasurementPhotoValidate(String.valueOf(taskviewmeasurement.ID));
+        if(measurementPhoto.PhotoID!=null)
+        {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder
+                    .setTitle("Alert")
+                    .setMessage("Are you sure? want to be finish this...")
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            dbHelper.saveTask(taskviewmeasurement, true);
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            Intent intent = new Intent(TakeMeasurementList.this, MainActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            getApplicationContext().startActivity(intent);
+                            finish();
+                        }
+                    })                        //Do nothing on no
+                    .show();
+
+        }
+        else
+        {
+            Toast.makeText(this, " Take Minimum one Measurement Photo", Toast.LENGTH_LONG).show();
+        }
     }
     private void TakePhoto() {
 

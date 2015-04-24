@@ -148,6 +148,16 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
         }
         startService(new Intent(this, BackgroundService.class));
         fragmentManager = getSupportFragmentManager();
+        /*context = getApplicationContext();
+        regid = getRegistrationId(context);
+        Shared.LoggedInUser.RegID=regid;
+        if (regid.isEmpty())
+        {
+
+            registerInBackground();
+            GetRegID  obj = new GetRegID(this);
+            obj.execute();
+        }*/
     }
 
     private void storeRegistrationId(Context context, String regId,

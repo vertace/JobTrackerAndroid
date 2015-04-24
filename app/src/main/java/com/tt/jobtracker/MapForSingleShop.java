@@ -111,7 +111,7 @@ public class MapForSingleShop extends FragmentActivity{
 
                 // Creating an instance of GeoPoint, to display in Google Map
                 latLng = new LatLng(address.getLatitude(), address.getLongitude());
-//	             latlngShop[k]=String.valueOf(address.getLatitude())+","+String.valueOf(address.getLongitude());
+	      //       latlngShop[k]=String.valueOf(address.getLatitude())+","+String.valueOf(address.getLongitude());
                 addressText = String.format("%s, %s",
                         address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
                         address.getCountryName());
@@ -130,7 +130,6 @@ public class MapForSingleShop extends FragmentActivity{
                 mMap.setMyLocationEnabled(true);
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
             }
-
 
 
 //			}
@@ -190,6 +189,8 @@ public class MapForSingleShop extends FragmentActivity{
             alertDialog.show();
         }
     }
+
+
 
 
     public void btnNavigationClick(View v)

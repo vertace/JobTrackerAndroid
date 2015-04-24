@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -67,9 +68,6 @@ public class Login extends Activity {
             CheckDefaultLogin(employee);
             //String userValue=
         }
-
-
-
         //SharedPreference();
     }
     private void LoginProcess( )
@@ -100,6 +98,9 @@ public class Login extends Activity {
                 "Logging  in...", true);
 
         // new LoginToServer().execute();
+        InputMethodManager inputMethodManager = (InputMethodManager)this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
+
         final SharedPreferences username = getApplicationContext().getSharedPreferences(Shared.Username, 0);
         final SharedPreferences password = getApplicationContext().getSharedPreferences(Shared.Password, 0);
         EmployeeViewModel employee ;
@@ -107,10 +108,15 @@ public class Login extends Activity {
         employee   = dbHelper.AuthenticateUser(un.getText().toString(), pw.getText().toString());
         //  SharedPreference();-
 
-
+        m_ProgressDialog = ProgressDialog.show(Login.this, "Please wait...",
+                "Logging  in...", true);
         if (employee == null)
         {
 
+            final SharedPreferences taskSync = getApplicationContext().getSharedPreferences(Shared.TaskSync, 0);
+            SharedPreferences.Editor editor = taskSync.edit();
+            editor.putString("tasksync","True"); // Storing string
+            editor.commit();
             employeeRetriever = new GetEmployeeList(this);
             employeeRetriever.execute();
             m_ProgressDialog.dismiss();
@@ -122,10 +128,15 @@ public class Login extends Activity {
             SharedPreferences.Editor editor1 = password.edit();
             editor1.putString("LoginPass",pw.getText().toString() ); // Storing string
             editor1.commit();
+            m_ProgressDialog.dismiss();
             CheckDefaultLogin(employee);
         }
     }
     public void CheckDefaultLogin( EmployeeViewModel employee) {
+        final SharedPreferences taskSync = getApplicationContext().getSharedPreferences(Shared.TaskSync, 0);
+        SharedPreferences.Editor editor = taskSync.edit();
+        editor.putString("tasksync","True"); // Storing string
+        editor.commit();
         Shared.LoggedInUser = employee;
         Intent intent = new Intent(Login.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -219,6 +230,7 @@ public class Login extends Activity {
         protected ServerResult doInBackground(String... loginData) {
 
             String response = null;
+
             try {
                 response = CustomHttpClient
                         .executeHttpGet(Shared.EmployeeListAPI);
@@ -249,7 +261,7 @@ public class Login extends Activity {
         }
 
         protected void onPostExecute(ServerResult result) {
-            m_ProgressDialog.dismiss();
+            // m_ProgressDialog.dismiss();
 
             switch (result) {
                 case ConnectionFailed:
@@ -269,8 +281,9 @@ public class Login extends Activity {
                     for (EmployeeViewModel employee : Shared.EmployeeList) {
                         dbHelper.saveEmployee(employee);
                     }
-                    LoginProcess();
                     m_ProgressDialog.dismiss();
+                    LoginProcess();
+                    //m_ProgressDialog.dismiss();
                     break;
                 case NoTasks:
                     SstAlert.Show(Login.this, "No Tasks", "No employees");
