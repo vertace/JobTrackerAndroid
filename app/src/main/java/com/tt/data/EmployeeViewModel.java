@@ -10,4 +10,5 @@ public class EmployeeViewModel {
     public String Password;
     public String Username;
     public String GcmRegID;
+    public String RegID;
 }

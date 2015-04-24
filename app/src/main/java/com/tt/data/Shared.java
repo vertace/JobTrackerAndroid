@@ -10,7 +10,7 @@ public class Shared {
 
     //public static String WebAPI = "http://sunsigns.azurewebsites.net/";
     //public static String WebAPI = "http://emtracker.specialeffect.co.in/";
-   // public static String WebAPI = "http://192.168.0.113:1989/";
+   // public static String WebAPI = "http://192.168.0.112:1989/";
     public static String WebAPI = "http://jobtrack.azurewebsites.net/";
     public static String LoginAPI = WebAPI + "/Employee/Login";
     public static String TaskListAPI = WebAPI + "/Task/GetTasksForEmployeeNew";
@@ -38,6 +38,7 @@ public class Shared {
     public static int MeasurementTaskID;
     public static Bitmap MeasurementBitmap;
 
+    public static MeasurementPhoto MeasurementUploadPhoto;
     public static List<MeasurementPhoto> MeasurementPhotoList;
 
     public static List<EmployeeViewModel> EmployeeList;
@@ -50,6 +51,8 @@ public class Shared {
 
     public static ArrayList<String> html_instructions;
 
+    public static ArrayList<String> end_address;
+
     public static String selectedShopAddress;
 
     public static String sharedprefs_uploadstatus="Uploadonwifi";
@@ -58,8 +61,14 @@ public class Shared {
 
     public static String Username;
     public static String Password;
+    public static String TaskSync;
 
     public static String GCM_SENDER_ID = "85852809473";
+
+    public static TaskViewModel ShowProgressForselectedTask;
+
+
+    public static String OrderByTask;
 
     static {
         LoggedInUser = new EmployeeViewModel();
