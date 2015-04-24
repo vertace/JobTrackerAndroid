@@ -14,11 +14,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.tt.adapters.TaskListAdapter;
 import com.tt.data.Shared;
 import com.tt.data.TaskListResponse;
 import com.tt.data.TaskViewModel;
@@ -40,20 +42,27 @@ import org.apache.http.message.BasicNameValuePair;
 import java.lang.reflect.Type;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 
 public class TaskListFragment extends Fragment {
     DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
-    ListView listView;
+    //ListView listView;
     GetTaskList taskRetriever;
     private FragmentTabHost mTabHost;
     private ProgressDialog m_ProgressDialog = null;
     MainActivity mainActivity;
+    View menuItemView;
+    ListView listView,listview1;
+    View rootView;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-         mainActivity = (MainActivity) getActivity();
+        //rootView = inflater.inflate(R.layout.fragment_list_task_pending, container, false);
+
+        mainActivity = (MainActivity) getActivity();
         mTabHost = new FragmentTabHost(mainActivity);
         mTabHost.setup(mainActivity, getChildFragmentManager(), R.id.realtabcontent);
 
@@ -61,16 +70,57 @@ public class TaskListFragment extends Fragment {
                 PendingListFragment.class, null);
         mTabHost.addTab(mTabHost.newTabSpec("DoneListFragment").setIndicator("Done List"),
                 DoneListFragment.class, null);
-        mTabHost.addTab(mTabHost.newTabSpec("UploadedListFragment").setIndicator("Uploaded List"),
-                UploadedListFragment.class, null);
+       // mTabHost.addTab(mTabHost.newTabSpec("UploadedListFragment").setIndicator("Uploaded List"),UploadedListFragment.class, null);
 
         setHasOptionsMenu(true);
-       // mTabHost.setCurrentTab(0);
+        // mTabHost.setCurrentTab(0);
         mainActivity.CurrentScreen = JobTrackerScreen.TaskList;
         mainActivity.SetActionBarMenuItems();
         return mTabHost;
     }
 
+    public void popup_window() {
+
+        PopupMenu popupMenu = new PopupMenu(getActivity(), getActivity().findViewById(R.id.action_home_sort));
+        popupMenu.getMenuInflater().inflate(R.menu.popupmenu, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.shop:
+
+                        Toast.makeText(getActivity().getApplicationContext(), "sort by shop", Toast.LENGTH_LONG).show();
+
+                        MainActivity mainActivity = (MainActivity) getActivity();
+                        DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
+
+                        String condition ="ORDER BY ShopName";
+                        if (mainActivity.SearchText != "") {
+                            condition = condition + " AND TaskRequest.ShopName like '%" + mainActivity.SearchText + "%'";
+                        }
+                        Shared.TaskList = dbHelper.getPendingTasks(condition);
+                        /*listView = (ListView)rootView.FindViewById (R.id.list);
+                        taskAdapter = new TaskListAdapter (rootView.Context, Resource.Layout.homescreen_list);
+                        taskAdapter.AddAll (SunSignSharedProject.Token.TaskList);
+                        listView.Adapter = taskAdapter;
+                        TaskListAdapter taskListAdapter = new TaskListAdapter(getActivity(), R.layout.row_task);
+                        //setListAdapter(taskListAdapter);
+                        taskListAdapter.addAll(Shared.TaskList);
+                      //  PendingListFragment.ShowTaskListsort();*/
+                        break;
+
+                    case R.id.branch:
+                        Toast.makeText(getActivity().getApplicationContext(), "sort by branch", Toast.LENGTH_LONG).show();
+                        break;
+
+                    default:
+                        break;
+
+                }
+                return true;
+            }
+        });
+        popupMenu.show();
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -82,6 +132,9 @@ public class TaskListFragment extends Fragment {
                 return true;
             case R.id.action_search:
 
+                break;
+            case R.id.action_home_sort:
+                popup_window();
                 break;
 
             case R.id.action_home_map:
@@ -188,7 +241,7 @@ public class TaskListFragment extends Fragment {
                         zipFilename = zipFilename.substring(lastDotPosition + 1);
                     }
                     imageDownloader.execute(Shared.OldImagesFile, zipFilename);
-                  //  mTabHost.onTabChanged("PendingListFragment");
+                    //  mTabHost.onTabChanged("PendingListFragment");
 
 //                    mTabHost.setCurrentTab(0);
                   /*  PendingListFragment fragment2 = new PendingListFragment();
