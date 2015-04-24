@@ -2,6 +2,7 @@ package com.tt.fragments;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
@@ -18,7 +19,8 @@ import com.tt.jobtracker.MainActivity;
 import com.tt.jobtracker.R;
 
 
-public class PendingListFragment extends ListFragment {
+public class PendingListFragment extends ListFragment
+{
 
     private ProgressDialog m_ProgressDialog = null;
 
@@ -30,13 +32,16 @@ public class PendingListFragment extends ListFragment {
     }
 
 
-    public PendingListFragment() {
+
+    public PendingListFragment()
+    {
         // Empty constructor required for fragment subclasses
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             Bundle savedInstanceState)
+    {
         View rootView = inflater.inflate(R.layout.fragment_list_task_pending, container, false);
 
         try {
@@ -90,20 +95,58 @@ public class PendingListFragment extends ListFragment {
     public void ShowTaskList(View rootView) {
         MainActivity mainActivity = (MainActivity) getActivity();
         DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
+        final SharedPreferences oderByTaskList = getActivity().getApplicationContext().getSharedPreferences(Shared.OrderByTask, 0);
+        String orderBySearch= oderByTaskList.getString("sorting", null);
+        String condition;
+        if(orderBySearch=="OrderByShop")
+        {
+            condition = " EmployeeID = "
+                    + String.valueOf(Shared.LoggedInUser.ID+" AND TaskRequest.IsDone = 0 ORDER BY ShopName ASC");
+            Shared.TaskList = dbHelper.getPendingTasksOrderBy(condition);
+            TaskListAdapter taskListAdapter = new TaskListAdapter(mainActivity, R.layout.row_task);
+            setListAdapter(taskListAdapter);
+            taskListAdapter.addAll(Shared.TaskList);
+            SharedPreferences.Editor editor = oderByTaskList.edit();
+            editor.putString("sorting", null); // Storing string
+            editor.commit();
 
-        String condition = " EmployeeID = "
-                + String.valueOf(Shared.LoggedInUser.ID+" AND TaskRequest.IsDone = 0");
-        if (mainActivity.SearchText != "") {
-            condition = condition + " AND TaskRequest.ShopName like '%" + mainActivity.SearchText + "%'";
+            mainActivity.CurrentScreen = JobTrackerScreen.TaskList;
+            mainActivity.SetActionBarMenuItems();
         }
-        Shared.TaskList = dbHelper.getPendingTasks(condition);
+        else if(orderBySearch=="OrderByBranch")
+        {
+            condition = " EmployeeID = "
+                    + String.valueOf(Shared.LoggedInUser.ID+" AND TaskRequest.IsDone = 0 ORDER BY ShopBranch ASC");
+            Shared.TaskList = dbHelper.getPendingTasksOrderBy(condition);
+            TaskListAdapter taskListAdapter = new TaskListAdapter(mainActivity, R.layout.row_task);
+            setListAdapter(taskListAdapter);
+            taskListAdapter.addAll(Shared.TaskList);
+            SharedPreferences.Editor editor = oderByTaskList.edit();
+            editor.putString("sorting", null); // Storing string
+            editor.commit();
 
-        TaskListAdapter taskListAdapter = new TaskListAdapter(mainActivity, R.layout.row_task);
-        setListAdapter(taskListAdapter);
-        taskListAdapter.addAll(Shared.TaskList);
+            mainActivity.CurrentScreen = JobTrackerScreen.TaskList;
+            mainActivity.SetActionBarMenuItems();
 
-        mainActivity.CurrentScreen = JobTrackerScreen.TaskList;
-        mainActivity.SetActionBarMenuItems();
+        }
+        else {
+
+            condition = " EmployeeID = "
+                    + String.valueOf(Shared.LoggedInUser.ID + " AND TaskRequest.IsDone = 0");
+            if (mainActivity.SearchText != "") {
+                condition = condition + " AND TaskRequest.ShopName like '%" + mainActivity.SearchText + "%'";
+            }
+            mainActivity.SearchText="";
+
+            Shared.TaskList = dbHelper.getPendingTasks(condition);
+
+            TaskListAdapter taskListAdapter = new TaskListAdapter(mainActivity, R.layout.row_task);
+            setListAdapter(taskListAdapter);
+            taskListAdapter.addAll(Shared.TaskList);
+
+            mainActivity.CurrentScreen = JobTrackerScreen.TaskList;
+            mainActivity.SetActionBarMenuItems();
+        }
     }
 
 
