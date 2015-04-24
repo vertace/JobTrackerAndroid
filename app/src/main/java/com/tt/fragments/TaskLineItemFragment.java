@@ -171,7 +171,7 @@ public class TaskLineItemFragment extends ListFragment {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder
                     .setTitle("Alert")
-                    .setMessage("Are you sure? want to be finish this...")
+                    .setMessage("Are you sure to mark this as complete?")
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
@@ -180,6 +180,9 @@ public class TaskLineItemFragment extends ListFragment {
 
                             taskViewModel.IsDone = true;
                             dbHelper.saveTask(taskViewModel, true);
+                            Toast.makeText(getActivity(), "Moved to done task", Toast.LENGTH_LONG).show();
+                            Intent myIntent = new Intent(getActivity(), MainActivity.class);
+                            getActivity().startActivity(myIntent);
                         }
                     })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
