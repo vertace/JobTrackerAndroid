@@ -166,7 +166,9 @@ public class TakeMeasurementList extends Activity {
                             editor.putString("mainClassCall", "True"); // Storing string
                             editor.commit();
                             Toast.makeText(getApplicationContext(), " Move to Done list", Toast.LENGTH_LONG).show();
-                            dbHelper.saveTask(taskviewmeasurement, true);
+                            TaskViewModel taskViewModel = Shared.SelectedTask;
+                            taskViewModel.IsDone = true;
+                            dbHelper.saveTask(taskViewModel, true);
                             Intent intent = new Intent(TakeMeasurementList.this, MainActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             getApplicationContext().startActivity(intent);
