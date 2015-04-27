@@ -22,17 +22,22 @@ public class DirectionsJSONParser {
         JSONArray jRoutes = null;
         JSONArray jLegs = null;
         JSONArray jSteps = null;
+        JSONArray jAddress = null;
         String temp;
         try {
 
             jRoutes = jObject.getJSONArray("routes");
             Shared.html_instructions = new ArrayList<String>();
+           // jRoutes = jObject.getJSONArray("end_address");
+            //Shared.end_address = new ArrayList<String>();
 
             /** Traversing all routes */
             for (int i = 0; i < jRoutes.length(); i++) {
 
                 jLegs = ((JSONObject) jRoutes.get(i)).getJSONArray("legs");
                 List path = new ArrayList<HashMap<String, String>>();
+
+
 
                 /** Traversing all legs */
                 for (int j = 0; j < jLegs.length(); j++) {
