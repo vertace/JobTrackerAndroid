@@ -202,7 +202,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void deleteTaskLineItemPhoto(String id) {
         Log.d(LOGCAT, "delete");
         SQLiteDatabase database = this.getWritableDatabase();
-        String deleteQuery = "DELETE FROM TaskLineItemPhoto where ID=" + id;
+        String deleteQuery = "DELETE FROM TaskLineItemPhoto where PhotoID=" + id;
         Log.d("query", deleteQuery);
         database.execSQL(deleteQuery);
         database.close();
