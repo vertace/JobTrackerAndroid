@@ -55,6 +55,7 @@ public class BackgroundService extends Service {
     DatabaseHelper dbHelper = new DatabaseHelper(this);
     final Handler handler = new Handler();
     Timer timer = new Timer();
+    int count;
     PendingMeasurementListAdapter pendingMeasurementListAdapter;
     int Taskid;
     String[] photopath={};
@@ -129,6 +130,10 @@ public class BackgroundService extends Service {
         ProcessUpload();
         return null;
     }
+    public interface OnTaskCompleted{
+        void onTaskCompleted(String values);
+
+    }
 
     private void ProcessUpload() {
 
@@ -180,17 +185,22 @@ public class BackgroundService extends Service {
 
     class uploadMultipleImage extends AsyncTask<String, Integer, ServerResult> {
         Context context;
+        private OnTaskCompleted listener;
+        public ArrayList<TaskLineItemPhotoViewModel> imageList;
+        final SharedPreferences uploadResponse = getApplicationContext().getSharedPreferences(Shared.UploadResponse, 0);
 
         public uploadMultipleImage(Context _context) {
             context = _context;
 
         }
 
+
         public uploadMultipleImage(AsyncTask<Void, Void, String> asyncTask) {
             // TODO Auto-generated constructor stub
         }
 
         protected ServerResult doInBackground(String... params) {
+
             SharedPreferences WifionSatusInMobile = getApplicationContext().getSharedPreferences(Shared.sharedprefs_uploadstatus, 0);
             final SharedPreferences uploadonWifibynuser = getApplicationContext().getSharedPreferences(Shared.sharedprefs_switchstatus, 0);
             String WifiOnStatusInMobile= WifionSatusInMobile.getString("status", null); // getting String
@@ -199,31 +209,49 @@ public class BackgroundService extends Service {
                 if (WifiOnStatusInMobile == "true") {
                     String condition = " EmployeeID = " + String.valueOf(Shared.LoggedInUser.ID + " AND TaskRequest.IsDone = 1");
                     List<TaskViewModel> taskViewModel = dbHelper.getPendingTasks(condition);
-                    for (TaskViewModel t : taskViewModel) {
+
+                    for (TaskViewModel t : taskViewModel)
+                    {
                         Taskid=t.ID;
-                        List<TaskLineItemViewModel> tasklineitems = dbHelper.getTaskLineItems("ID=" + String.valueOf(t.ID));
+                        List<TaskLineItemViewModel> tasklineitems = dbHelper.getTaskLineItems("TaskID=" + String.valueOf(t.ID));
                         for (TaskLineItemViewModel tl : tasklineitems) {
-                            if(t.IsMeasurement=true) {
-
+                            if(t.IsMeasurement==true) {
                                 ShowPendingList();
-
                             }
                             ArrayList<TaskLineItemPhotoViewModel> tdl = dbHelper.getAllTaskLineItemPhotos(String.valueOf(tl.ID));
                             for (TaskLineItemPhotoViewModel tlp : tdl) {
                                 Shared.SelecteduploadTasklineitemPhotos = tlp;
                                 doinmenthod(tlp);
-                                dbHelper.DeleteRelatedJobPhoto(String.valueOf(tl.ID));
+                                String result= uploadResponse.getString("uploadResponse", null);
+                                if(result=="True")
+                                {
+                                    SharedPreferences.Editor editor = uploadResponse.edit();
+                                    editor.putString("uploadResponse", null); // Storing string
+                                    editor.commit();
+                                    dbHelper.DeleteRelatedJobPhoto(String.valueOf(tl.ID));
+                                    dbHelper.deleteTaskLineItemPhoto(String.valueOf(tlp.PhotoID));
+                                }
                             }
-                            dbHelper.deleteTaskLineItemPhoto(String.valueOf(tl.ID));
+                            imageList = dbHelper.getAllTaskLineItemPhotos(String.valueOf(tl.ID));
+                            //final ArrayList<String>imagecount=dbHelper.deleteTaskLineItemPhoto(String.valueOf());
+                            //final ArrayList<String> imageList = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(tl.ID));
+                            count=imageList.size();
+                            if(count==0)
+                            {
+                                dbHelper.deleteTaskLineItem(String.valueOf(tl.ID));
+                            }
                         }
-                        dbHelper.deleteTaskLineItem(String.valueOf(t.ID));
-                        List<TaskLineItemViewModel> tasklineitems1 = dbHelper.getTaskLineItems("TaskID=" + String.valueOf(t.ID));
-                        if(tasklineitems.size()==1) {
+                        //imageList = dbHelper.getAllTaskLineItemPhotos(String.valueOf(t.ID));
+                        String Condition="TaskID=" + String.valueOf(t.ID);
+                        List<TaskLineItemViewModel> tasklineitems1 = dbHelper.getTaskLineItems(Condition);
+                        int lineItemCount=tasklineitems.size();
+                        if(lineItemCount==1 && count==0) {
                             dbHelper.deleteTask(String.valueOf(t.ID));
                         }
                         else
                         {
-                            if(tasklineitems1.size()==0)
+                            int taskLineItemCount=tasklineitems1.size();
+                            if(taskLineItemCount==0)
                             {
                                 dbHelper.deleteTask(String.valueOf(t.ID));
                             }
@@ -237,31 +265,46 @@ public class BackgroundService extends Service {
 
                 for (TaskViewModel t : taskViewModel)
                 {
-
                     Taskid=t.ID;
                     List<TaskLineItemViewModel> tasklineitems = dbHelper.getTaskLineItems("TaskID=" + String.valueOf(t.ID));
                     for (TaskLineItemViewModel tl : tasklineitems) {
-                        if(t.IsMeasurement=true) {
-
+                        if(t.IsMeasurement==true) {
                             ShowPendingList();
-
                         }
                         ArrayList<TaskLineItemPhotoViewModel> tdl = dbHelper.getAllTaskLineItemPhotos(String.valueOf(tl.ID));
                         for (TaskLineItemPhotoViewModel tlp : tdl) {
                             Shared.SelecteduploadTasklineitemPhotos = tlp;
                             doinmenthod(tlp);
-                            dbHelper.DeleteRelatedJobPhoto(String.valueOf(tl.ID));
+                            String result= uploadResponse.getString("uploadResponse", null);
+                            if(result=="True")
+                            {
+                                SharedPreferences.Editor editor = uploadResponse.edit();
+                                editor.putString("uploadResponse", null); // Storing string
+                                editor.commit();
+                                dbHelper.DeleteRelatedJobPhoto(String.valueOf(tl.ID));
+                                dbHelper.deleteTaskLineItemPhoto(String.valueOf(tlp.PhotoID));
+                            }
                         }
-                        dbHelper.deleteTaskLineItemPhoto(String.valueOf(tl.ID));
+                        imageList = dbHelper.getAllTaskLineItemPhotos(String.valueOf(tl.ID));
+                        //final ArrayList<String>imagecount=dbHelper.deleteTaskLineItemPhoto(String.valueOf());
+                        //final ArrayList<String> imageList = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(tl.ID));
+                        count=imageList.size();
+                        if(count==0)
+                        {
+                            dbHelper.deleteTaskLineItem(String.valueOf(tl.ID));
+                        }
                     }
-                    dbHelper.deleteTaskLineItem(String.valueOf(t.ID));
-                    List<TaskLineItemViewModel> tasklineitems1 = dbHelper.getTaskLineItems("TaskID=" + String.valueOf(t.ID));
-                    if(tasklineitems.size()==1) {
+                    //imageList = dbHelper.getAllTaskLineItemPhotos(String.valueOf(t.ID));
+                    String Condition="TaskID=" + String.valueOf(t.ID);
+                    List<TaskLineItemViewModel> tasklineitems1 = dbHelper.getTaskLineItems(Condition);
+                    int lineItemCount=tasklineitems.size();
+                    if(lineItemCount==1 && count==0) {
                         dbHelper.deleteTask(String.valueOf(t.ID));
                     }
                     else
                     {
-                        if(tasklineitems1.size()==0)
+                        int taskLineItemCount=tasklineitems1.size();
+                        if(taskLineItemCount==0)
                         {
                             dbHelper.deleteTask(String.valueOf(t.ID));
                         }
@@ -403,6 +446,39 @@ public class BackgroundService extends Service {
         //**********************************************************************
 
 
+        protected void onPostExecute(String sResponse) {
+            listener.onTaskCompleted(sResponse);
+            try {
+                if (sResponse.startsWith("TASKID:")) {
+                    String taskId = sResponse.replace("TASKID:", "");
+                    dbHelper.shopPhotoUploaded(taskId);
+                } else if (sResponse.startsWith("MISSING_SHOP_PHOTO:")) {
+                    String taskId = sResponse.replace("MISSING_SHOP_PHOTO:", "");
+                    dbHelper.shopPhotoUploaded(taskId);
+                } else if (sResponse.startsWith("MISSING_WALL_PHOTO:")) {
+                    String taskLineItemID = sResponse.replace("MISSING_WALL_PHOTO:", "");
+                    dbHelper.WallPhotoMissing(taskLineItemID);
+                } else {
+                    dbHelper.deleteTaskLineItem(sResponse);
+                }
+                if (sResponse != null) {
+                    if (sResponse.equals("-1") || sResponse.equals("-2"))
+                    {
+                        //processFinish(ServerResult.ConnectionFailed);
+                    }
+
+                    else
+                    {
+                        //delegate.processFinish(ServerResult.UploadSuccess);
+                    }
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
         public ServerResult doinmenthod(TaskLineItemPhotoViewModel tlp) {
             TaskLineItemPhotoViewModel tasklineItemPhotos=Shared.SelecteduploadTasklineitemPhotos;
             // String path = taskLineItem.PhotoID;
@@ -494,6 +570,13 @@ public class BackgroundService extends Service {
                 dos.flush();
                 dos.close();
 
+                final SharedPreferences uploadResponse = getApplicationContext().getSharedPreferences(Shared.UploadResponse, 0);
+                SharedPreferences.Editor editor = uploadResponse.edit();
+                editor.putString("uploadResponse", "True"); // Storing string
+                editor.commit();
+                return ServerResult.UploadSuccess;
+
+
             } catch (MalformedURLException ex) {
 
                 ex.printStackTrace();
@@ -508,9 +591,10 @@ public class BackgroundService extends Service {
                         "Exception : " + e.getMessage(), e);
                 return ServerResult.ConnectionFailed;
             }
-            String result=sbResult.toString();
+            // String result=sbResult.toString();
 
-            return ServerResult.UploadSuccess;
+
+
         }
 
     }
