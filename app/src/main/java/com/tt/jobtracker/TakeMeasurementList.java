@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationListener;
@@ -12,6 +13,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.FragmentTabHost;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,6 +47,7 @@ public class TakeMeasurementList extends Activity {
     String ShopID, ShopName, ShopAddress;
     LocationManager mlocManager;
     LocationListener mlocListener;
+    private FragmentTabHost mTabHost;
     boolean isGPSEnabled = false;
     boolean isNetworkEnabled = false;
     private Uri fileUri;
@@ -114,28 +117,12 @@ public class TakeMeasurementList extends Activity {
                 TakePhoto();
                 break;
             case R.id.mnuTaskList:
-                //finish();
-                // startActivity(getIntent());
-                //Intent intent = new Intent(TakeMeasurementList.this,
-                //  TaskLineItemFragment.class);
-                // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                // intent.putExtra("Data", "True");
-                //intent.putExtra("TaskID", TaskID);
                 TaskeMeasdurementPhoto();
-                // TaskLineItemFragment tlif = new TaskLineItemFragment();
-                // tlif.moveto_donetask(true,TaskID.toString());
-
-                // Intent intent = new Intent(TakeMeasurementList.this, TaskList.class);
-                // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                // getApplicationContext().startActivity(intent);
-
                 break;
             case R.id.mnuCheckin:
-                Intent intent;
-                intent = new Intent(TakeMeasurementList.this, MapForSingleShop.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                getApplicationContext().startActivity(intent);
-               // Utility.getLocation(this);
+
+
+                Utility.getLocation(this);
 
                 /**   mlocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
@@ -161,7 +148,7 @@ public class TakeMeasurementList extends Activity {
     private void TaskeMeasdurementPhoto()
     {
         final TaskViewModel taskviewmeasurement=Shared.SelectedTask;
-
+        final SharedPreferences mainClassCall = getSharedPreferences(Shared.MainClassCall, 0);
         taskviewmeasurement.IsDone = true;
         // MainActivity mainActivity = (MainActivity) TakeMeasurementList;
         MeasurementPhoto measurementPhoto = dbHelper.getMeasurementPhotoValidate(String.valueOf(taskviewmeasurement.ID));
@@ -171,17 +158,27 @@ public class TakeMeasurementList extends Activity {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder
                     .setTitle("Alert")
-                    .setMessage("Are you sure? want to be finish this...")
+                    .setMessage("Are you sure to mark this as complete?")
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-
+                            SharedPreferences.Editor editor = mainClassCall.edit();
+                            editor.putString("mainClassCall", "True"); // Storing string
+                            editor.commit();
+                            Toast.makeText(getApplicationContext(), " Move to Done list", Toast.LENGTH_LONG).show();
                             dbHelper.saveTask(taskviewmeasurement, true);
+                            Intent intent = new Intent(TakeMeasurementList.this, MainActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            getApplicationContext().startActivity(intent);
+                            finish();
                         }
                     })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
 
+                            SharedPreferences.Editor editor = mainClassCall.edit();
+                            editor.putString("mainClassCall", "True"); // Storing string
+                            editor.commit();
                             Intent intent = new Intent(TakeMeasurementList.this, MainActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             getApplicationContext().startActivity(intent);
@@ -195,6 +192,7 @@ public class TakeMeasurementList extends Activity {
         {
             Toast.makeText(this, " Take Minimum one Measurement Photo", Toast.LENGTH_LONG).show();
         }
+
     }
     private void TakePhoto() {
 

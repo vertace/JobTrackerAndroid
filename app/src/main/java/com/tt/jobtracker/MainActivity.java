@@ -120,6 +120,7 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
 
     public String SearchText;
 
+
     Context context;
     String regid;
     GoogleCloudMessaging gcm;
@@ -138,26 +139,35 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
             selectItem(0);
         }
 
-        context = getApplicationContext();
+      /*  context = getApplicationContext();
         regid = getRegistrationId(context);
         Shared.LoggedInUser.GcmRegID = regid;
         if (regid.isEmpty()) {
             registerInBackground();
             GetRegID obj = new GetRegID(this);
             obj.execute();
-        }
-        startService(new Intent(this, BackgroundService.class));
-        fragmentManager = getSupportFragmentManager();
-        /*context = getApplicationContext();
-        regid = getRegistrationId(context);
-        Shared.LoggedInUser.RegID=regid;
-        if (regid.isEmpty())
-        {
-
-            registerInBackground();
-            GetRegID  obj = new GetRegID(this);
-            obj.execute();
         }*/
+
+        final SharedPreferences taskSyncLogin = getSharedPreferences(Shared.TaskSync, 0);
+        String taskDownloadLogin= taskSyncLogin.getString("tasksync", null);
+        if(taskDownloadLogin=="True") {
+
+        }
+
+
+        final SharedPreferences mainClassCall = getSharedPreferences(Shared.MainClassCall, 0);
+        String status= mainClassCall.getString("mainClassCall", null);
+        if(status!="True") {
+            startService(new Intent(this, BackgroundService.class));
+
+        }else if(status=="true")
+        {
+            SharedPreferences.Editor editor = mainClassCall.edit();
+            editor.putString("mainClassCall", null); // Storing string
+            editor.commit();
+        }
+        fragmentManager = getSupportFragmentManager();
+
     }
 
     private void storeRegistrationId(Context context, String regId,
@@ -512,13 +522,31 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
 
         switch (CurrentScreen) {
             case TaskList:
-                menu.setGroupVisible(R.id.actionbar_group_home, true);
+                if(Shared.hideMenu=="true")
+                {
+                    menu.setGroupVisible(R.id.actionbar_group_home, false);
+                }
+                else {
+                    menu.setGroupVisible(R.id.actionbar_group_home, true);
+                }
                 break;
             case TaskDetail:
-                menu.setGroupVisible(R.id.actionbar_group_taskdetail, true);
+                if( Shared.hideMenu=="true")
+                {
+                    menu.setGroupVisible(R.id.actionbar_group_taskdetail, false);
+                }
+                else {
+                    menu.setGroupVisible(R.id.actionbar_group_taskdetail, true);
+                }
                 break;
             case TaskLineItemDetail:
-                menu.setGroupVisible(R.id.actionbar_group_tasklineitem_detail, true);
+                if( Shared.hideMenu=="true")
+                {
+                    menu.setGroupVisible(R.id.actionbar_group_tasklineitem_detail, false);
+                }
+                else {
+                    menu.setGroupVisible(R.id.actionbar_group_tasklineitem_detail, true);
+                }
                 break;
             case Setting:
                 break;
@@ -527,6 +555,9 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
 
     public void onTaskSelected(TaskViewModel task)
     {
+        Shared.hideMenu=String.valueOf(task.IsDone);
+
+
         if(task.IsMeasurement)
         {
             //call measurement fragment

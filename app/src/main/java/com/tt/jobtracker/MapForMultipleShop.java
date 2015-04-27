@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.graphics.Color;
 import android.location.Address;
+import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
@@ -98,20 +99,19 @@ public class MapForMultipleShop extends FragmentActivity {
                 addresses= geocoder.getFromLocationName(Shared.TaskList.get(k).ShopAddress, 5);
 
               //  Map<String, String> treeMap = new TreeMap<String, String>(addresses);
-if(addresses!=null && addresses.size()>0)
-{
-    for (int i = 0; i < addresses.size(); i++)
-    {
+            if(addresses!=null && addresses.size()>0)
+                     {
+                      for (int i = 0; i < addresses.size(); i++)
+                    {
 
-        android.location.Address address = (android.location.Address) addresses.get(i);
+                   android.location.Address address = (android.location.Address) addresses.get(i);
 
-        // Creating an instance of GeoPoint, to display in Google Map
-        latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                     // Creating an instance of GeoPoint, to display in Google Map
+                       latLng = new LatLng(address.getLatitude(), address.getLongitude());
 
-        latlngShop[k] = String.valueOf(address.getLatitude()) + "," + String.valueOf(address.getLongitude());
-        addressText = String.format("%s, %s",
-                address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
-                address.getCountryName());
+                       latlngShop[k] = String.valueOf(address.getLatitude()) + "," + String.valueOf(address.getLongitude());
+                        addressText = String.format("%s, %s", address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
+                                address.getCountryName());
 
 
         //	Marker ciu = mMap.addMarker(new MarkerOptions().position(latLng).title("Address"));
@@ -127,6 +127,7 @@ if(addresses!=null && addresses.size()>0)
 }
                 Double result= distance(12.9265533, 80.10782879999999,12.9908401,80.21827569999999);
                 double value=result;
+               // mMap.setOnMyLocationChangeListener(myLocationChangeListener);
 
 
 
@@ -144,6 +145,8 @@ if(addresses!=null && addresses.size()>0)
             mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
             mlocListener = new MyMapLocationListener();
+
+
             isGPSEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             isNetworkEnabled = mlocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
             if (isGPSEnabled) {
@@ -161,7 +164,16 @@ if(addresses!=null && addresses.size()>0)
         }
     }
 
-
+  /*  private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
+        @Override
+        public void onMyLocationChange(Location location) {
+            LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+            Marker ciu  = mMap.addMarker(new MarkerOptions().position(loc));
+            if(mMap != null){
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
+            }
+        }
+    };*/
 
 
     private double distance(double lat1, double lon1, double lat2, double lon2) {
