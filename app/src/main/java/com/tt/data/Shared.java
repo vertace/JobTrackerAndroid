@@ -10,7 +10,7 @@ public class Shared {
 
     //public static String WebAPI = "http://sunsigns.azurewebsites.net/";
     //public static String WebAPI = "http://emtracker.specialeffect.co.in/";
-   // public static String WebAPI = "http://192.168.0.112:1989/";
+    // public static String WebAPI = "http://192.168.0.107:1989/";
     public static String WebAPI = "http://jobtrack.azurewebsites.net/";
     public static String LoginAPI = WebAPI + "/Employee/Login";
     public static String TaskListAPI = WebAPI + "/Task/GetTasksForEmployeeNew";
@@ -62,8 +62,11 @@ public class Shared {
     public static String Username;
     public static String Password;
     public static String TaskSync;
+    public static String MainClassCall;
+    public static String UploadResponse;
 
     public static String GCM_SENDER_ID = "85852809473";
+    public static String hideMenu;
 
     public static TaskViewModel ShowProgressForselectedTask;
 
