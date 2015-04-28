@@ -10,7 +10,7 @@ public class Shared {
 
     //public static String WebAPI = "http://sunsigns.azurewebsites.net/";
     //public static String WebAPI = "http://emtracker.specialeffect.co.in/";
-    // public static String WebAPI = "http://192.168.0.107:1989/";
+   // public static String WebAPI = "http://192.168.0.108:1989/";
     public static String WebAPI = "http://jobtrack.azurewebsites.net/";
     public static String LoginAPI = WebAPI + "/Employee/Login";
     public static String TaskListAPI = WebAPI + "/Task/GetTasksForEmployeeNew";
@@ -24,12 +24,14 @@ public class Shared {
     public static String EmployeeListAPI = WebAPI + "Employee/AllEmployees";
     public static String UploadShopPhotoAPI = WebAPI + "Task/UploadShopPhotoAzure";
 
+
     public static String SaveRegistrationID=WebAPI+"Task/SaveRegistrationID";
 
     public static EmployeeViewModel LoggedInUser;
     public static List<TaskViewModel> TaskList;
 
     public static List<TaskLineItemViewModel> TaskDetail;
+    public static MeasurementPhoto MeasurementUploadPhoto;
 
     public static TaskLineItemPhotoViewModel SelecteduploadTasklineitemPhotos;
 
@@ -38,7 +40,6 @@ public class Shared {
     public static int MeasurementTaskID;
     public static Bitmap MeasurementBitmap;
 
-    public static MeasurementPhoto MeasurementUploadPhoto;
     public static List<MeasurementPhoto> MeasurementPhotoList;
 
     public static List<EmployeeViewModel> EmployeeList;
@@ -47,12 +48,12 @@ public class Shared {
 
     public static String OldImagesFile;
 
+    public static String OrderByTask;
+
     public static long sharedCheckinID;
 
     public static ArrayList<String> html_instructions;
-
-    public static ArrayList<String> end_address;
-
+    public static ArrayList<String>  end_address;
     public static String selectedShopAddress;
 
     public static String sharedprefs_uploadstatus="Uploadonwifi";
@@ -67,12 +68,6 @@ public class Shared {
 
     public static String GCM_SENDER_ID = "85852809473";
     public static String hideMenu;
-
-    public static TaskViewModel ShowProgressForselectedTask;
-
-
-    public static String OrderByTask;
-
     static {
         LoggedInUser = new EmployeeViewModel();
         LoggedInUser.ID = "2104";
