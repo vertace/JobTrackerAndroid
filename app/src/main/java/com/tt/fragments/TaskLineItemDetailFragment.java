@@ -32,6 +32,7 @@ public class TaskLineItemDetailFragment extends Fragment {
 
     public interface OnTaskLineItemPhotoClickInitiated {
         void onTaskLineItemPhotoClickInitiated(TaskLineItemViewModel taskLineItemViewModel);
+
     }
 
     TaskLineItemViewModel taskLineItemViewModel;
@@ -62,7 +63,7 @@ public class TaskLineItemDetailFragment extends Fragment {
         WallDetail = (TextView) view.findViewById(R.id.wallDetail);
         TaskLineItemViewModel tasklineitemviewmodel = new TaskLineItemViewModel();
 
-         tasklineitemviewmodel= dbHelper.getTaskLineItemInfo(String.valueOf(taskLineItemViewModel.ID));
+        tasklineitemviewmodel= dbHelper.getTaskLineItemInfo(String.valueOf(taskLineItemViewModel.ID));
         Walltype.setText(tasklineitemviewmodel.Type.toString());
         // Walltype.setText(String.valueOf(tasklineitemviewmodel.Type));
         WallDetail.setText(tasklineitemviewmodel.Instruction.toString());
