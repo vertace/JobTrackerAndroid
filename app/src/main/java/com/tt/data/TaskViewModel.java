@@ -31,4 +31,6 @@ public class TaskViewModel implements Serializable {
     public boolean IsDone;
     public int MinimumPhoto;
 
+    public boolean IsShopPhoto;
+
 }

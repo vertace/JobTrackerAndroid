@@ -10,7 +10,7 @@ public class Shared {
 
     //public static String WebAPI = "http://sunsigns.azurewebsites.net/";
     //public static String WebAPI = "http://emtracker.specialeffect.co.in/";
-   // public static String WebAPI = "http://192.168.0.108:1989/";
+   // public static String WebAPI = "http://192.168.0.114:1989/";
     public static String WebAPI = "http://jobtrack.azurewebsites.net/";
     public static String LoginAPI = WebAPI + "/Employee/Login";
     public static String TaskListAPI = WebAPI + "/Task/GetTasksForEmployeeNew";
@@ -32,6 +32,7 @@ public class Shared {
 
     public static List<TaskLineItemViewModel> TaskDetail;
     public static MeasurementPhoto MeasurementUploadPhoto;
+    public static TaskViewModel UploadShopPhoto;
 
     public static TaskLineItemPhotoViewModel SelecteduploadTasklineitemPhotos;
 
