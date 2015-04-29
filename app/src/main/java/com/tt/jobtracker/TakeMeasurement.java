@@ -39,6 +39,7 @@ public class TakeMeasurement extends Activity implements AsyncResponse {
     int CanvasWidth;
     int CanvasHeight;
     String DeletePhotoID;
+    String IsDoneMenuHide;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +48,7 @@ public class TakeMeasurement extends Activity implements AsyncResponse {
 
         String PhotoID = getIntent().getStringExtra("PhotoID");
         DeletePhotoID = getIntent().getStringExtra("PhotoID");
+        IsDoneMenuHide=getIntent().getStringExtra("IsDone");
         LoadMeasurementPhoto(PhotoID);
 
     }
@@ -54,7 +56,12 @@ public class TakeMeasurement extends Activity implements AsyncResponse {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.takemeasurement, menu);
+        if(IsDoneMenuHide.equals("true"))
+        {
+
+        }else {
+            getMenuInflater().inflate(R.menu.takemeasurement, menu);
+        }
         return true;
     }
 
@@ -117,6 +124,7 @@ public class TakeMeasurement extends Activity implements AsyncResponse {
                 intent.putExtra("TaskID", getIntent().getStringExtra("TaskID"));
                 intent.putExtra("ShopID", getIntent().getStringExtra("ShopID"));
                 intent.putExtra("ShopName", getIntent().getStringExtra("ShopName"));
+                intent.putExtra("IsDone", getIntent().getStringExtra("IsDone"));
                 intent.putExtra("ShopAddress", getIntent().getStringExtra("ShopAddress"));
                 getApplicationContext().startActivity(intent);
                 finish();

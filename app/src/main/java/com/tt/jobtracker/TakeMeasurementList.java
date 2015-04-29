@@ -1,5 +1,6 @@
 package com.tt.jobtracker;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -44,6 +45,7 @@ public class TakeMeasurementList extends Activity {
     DatabaseHelper dbHelper = new DatabaseHelper(this);
     ListView listView;
     String TaskID;
+    String IsDoneMenuHide;
     String ShopID, ShopName, ShopAddress;
     LocationManager mlocManager;
     LocationListener mlocListener;
@@ -57,6 +59,12 @@ public class TakeMeasurementList extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_measurementphotolist);
         LoadPhotos();
+    /*    if(IsDoneMenuHide=="true") {
+
+            ActionBar actionBar = getActionBar();
+            actionBar.isShowing();
+        }*/
+        // actionBar.setDisplayShowTitleEnabled(false);
     }
 
     public void LoadPhotos() {
@@ -66,6 +74,7 @@ public class TakeMeasurementList extends Activity {
             ShopID = intent.getStringExtra("ShopID");
             ShopName = intent.getStringExtra("ShopName");
             ShopAddress = intent.getStringExtra("ShopAddress");
+            IsDoneMenuHide=intent.getStringExtra("IsDone");
             ArrayList<MeasurementPhoto> photoList = dbHelper
                     .getMeasurementPhotos(" TaskID='" + TaskID + "'");
             Display display = this.getWindowManager().getDefaultDisplay();
@@ -95,9 +104,13 @@ public class TakeMeasurementList extends Activity {
         try {
             // Inflate the menu; this adds items to the action bar if it is
             // present.
-            getMenuInflater().inflate(R.menu.taskdetailmenu, menu);
-            return true;
+            if(IsDoneMenuHide.equals("true"))
+            {
 
+            }else {
+                getMenuInflater().inflate(R.menu.taskdetailmenu, menu);
+            }
+            return true;
         } catch (Exception e) {
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
             dialog.setTitle("MyException Occured");
@@ -166,9 +179,9 @@ public class TakeMeasurementList extends Activity {
                             editor.putString("mainClassCall", "True"); // Storing string
                             editor.commit();
                             Toast.makeText(getApplicationContext(), " Move to Done list", Toast.LENGTH_LONG).show();
-                            TaskViewModel taskViewModel = Shared.SelectedTask;
-                            taskViewModel.IsDone = true;
-                            dbHelper.saveTask(taskViewModel, true);
+                            //TaskViewModel taskViewModel = Shared.SelectedTask;
+                            taskviewmeasurement.IsDone = true;
+                            dbHelper.saveTask(taskviewmeasurement, true);
                             Intent intent = new Intent(TakeMeasurementList.this, MainActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             getApplicationContext().startActivity(intent);
@@ -242,8 +255,7 @@ public class TakeMeasurementList extends Activity {
                     measurementPhoto.ShopID = ShopID;
                     measurementPhoto.ShopName = ShopName;
                     measurementPhoto.ShopAddress = ShopAddress;
-                    SimpleDateFormat sdf = new SimpleDateFormat(
-                            "yyyyMMdd_HHmmss");
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
                     measurementPhoto.Time = sdf.format(new Date());
                     // dbHelper.deleteMeasurementPhoto("0");
 
@@ -261,6 +273,8 @@ public class TakeMeasurementList extends Activity {
                     intent.putExtra("ShopID", ShopID);
                     intent.putExtra("MID", String.valueOf(MID));
                     intent.putExtra("ShopName", ShopName);
+                    intent.putExtra("IsDone",
+                            String.valueOf(IsDoneMenuHide));
                     intent.putExtra("ShopAddress", ShopAddress);
                     getApplicationContext().startActivity(intent);
 
@@ -289,7 +303,8 @@ public class TakeMeasurementList extends Activity {
                 TakeMeasurement.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("TaskID", TaskID);
-
+        intent.putExtra("IsDone",
+                String.valueOf(IsDoneMenuHide));
         ScaleView sv = (ScaleView) v;
         intent.putExtra("PhotoID", sv.PhotoID);
         intent.putExtra("ShopID", sv.ShopID);

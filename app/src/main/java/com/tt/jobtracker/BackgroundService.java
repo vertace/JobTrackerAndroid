@@ -56,6 +56,7 @@ public class BackgroundService extends Service {
     final Handler handler = new Handler();
     Timer timer = new Timer();
     int count;
+    String taskDelete;
     PendingMeasurementListAdapter pendingMeasurementListAdapter;
     int Taskid;
     String[] photopath={};
@@ -140,6 +141,22 @@ public class BackgroundService extends Service {
         Toast.makeText(getApplicationContext(), "Process Upload", Toast.LENGTH_SHORT).show();
 
     }
+    private void ShopPhotoUploadProcess(TaskViewModel tvm)
+    {
+        Shared.UploadShopPhoto=tvm;
+        uploadMultipleImage objt = new uploadMultipleImage(this);
+        objt.UploadShopPhoto();
+        final SharedPreferences uploadResponse = getApplicationContext().getSharedPreferences(Shared.UploadResponse, 0);
+        String result= uploadResponse.getString("uploadResponse", null);
+        if(result=="True") {
+            SharedPreferences.Editor editor = uploadResponse.edit();
+            editor.putString("uploadResponse", null); // Storing string
+            editor.commit();
+            PhotoDeleteHelper.DeletePhoto(String.valueOf(tvm.PhotoID));
+
+        }
+
+    }
 
     public void ShowPendingList() {
 
@@ -151,16 +168,27 @@ public class BackgroundService extends Service {
         }
     }
     private void UploadAllPendingItems(ArrayList<MeasurementPhoto> pendingList) {
+        final SharedPreferences uploadResponse = getApplicationContext().getSharedPreferences(Shared.UploadResponse, 0);
         try {
             for (MeasurementPhoto taskLineItem : pendingList) {
                 Shared.MeasurementUploadPhoto = taskLineItem;
                 uploadMultipleImage obj = new uploadMultipleImage(this);
                 obj.uploadMeasurmentFile();
                 //  dbHelper.DeleteRelatedJobPhoto(String.valueOf(taskLineItem.ID));
-                PhotoDeleteHelper.DeletePhoto(String.valueOf(taskLineItem.PhotoID));
-                dbHelper.deleteTaskLineItem(String.valueOf(taskLineItem.TaskID));
+                String result= uploadResponse.getString("uploadResponse", null);
+                if(result=="True")
+                {
+                    SharedPreferences.Editor editor = uploadResponse.edit();
+                    editor.putString("uploadResponse", null); // Storing string
+                    editor.commit();
+                    PhotoDeleteHelper.DeletePhoto(String.valueOf(taskLineItem.PhotoID));
+                    dbHelper.deleteMeasurementPhoto(String.valueOf(taskLineItem.ID));
+                    dbHelper.deleteTaskLineItem(String.valueOf(taskLineItem.TaskID));
+                    //String id=dbHelper.deleteTaskLineItem(String.valueOf(taskLineItem.TaskID));
+                    dbHelper.deleteTask(String.valueOf(taskLineItem.TaskID));
+                }
             }
-            dbHelper.deleteTaskLineItem(String.valueOf(pendingList.indexOf(0)));
+            //dbHelper.deleteTaskLineItem(String.valueOf(pendingList.indexOf(0)));
         } catch (Exception e) {
         }
     }
@@ -199,6 +227,62 @@ public class BackgroundService extends Service {
             // TODO Auto-generated constructor stub
         }
 
+        public void ImageUploadProcess()
+        {
+            String condition = " EmployeeID = " + String.valueOf(Shared.LoggedInUser.ID + " AND TaskRequest.IsDone = 1");
+            List<TaskViewModel> taskViewModel = dbHelper.getPendingTasks(condition);
+            for (TaskViewModel t : taskViewModel)
+            {
+                if(t.IsShopPhoto==true && t.PhotoID!=null)
+                {
+                    ShopPhotoUploadProcess(t);
+                }
+                Taskid=t.ID;
+                List<TaskLineItemViewModel> tasklineitems = dbHelper.getTaskLineItems("TaskID=" + String.valueOf(t.ID));
+                for (TaskLineItemViewModel tl : tasklineitems) {
+                    if(t.IsMeasurement==true) {
+                        ShowPendingList();
+                    }
+                    ArrayList<TaskLineItemPhotoViewModel> tdl = dbHelper.getAllTaskLineItemPhotos(String.valueOf(tl.ID));
+                    for (TaskLineItemPhotoViewModel tlp : tdl) {
+                        Shared.SelecteduploadTasklineitemPhotos = tlp;
+                        doinmenthod(tlp);
+                        String result= uploadResponse.getString("uploadResponse", null);
+                        taskDelete=result;
+                        if(result=="True")
+                        {
+                            SharedPreferences.Editor editor = uploadResponse.edit();
+                            editor.putString("uploadResponse", null); // Storing string
+                            editor.commit();
+                            PhotoDeleteHelper.DeletePhoto(String.valueOf(tlp.PhotoID));
+                            dbHelper.deleteTaskLineItemPhoto(String.valueOf(tlp.ID));
+                        }
+                    }
+                    imageList = dbHelper.getAllTaskLineItemPhotos(String.valueOf(tl.ID));
+                    count=imageList.size();
+                    if(count==0 && taskDelete=="True")
+                    {
+                        dbHelper.deleteTaskLineItem(String.valueOf(tl.ID));
+                    }
+                }
+                String Condition="TaskID=" + String.valueOf(t.ID);
+                List<TaskLineItemViewModel> tasklineitems1 = dbHelper.getTaskLineItems(Condition);
+                int lineItemCount=tasklineitems.size();
+                if(lineItemCount==1 && count==0 && taskDelete=="True") {
+                    taskDelete="False";
+                    dbHelper.deleteTask(String.valueOf(t.ID));
+                }
+                else
+                {
+                    int taskLineItemCount=tasklineitems1.size();
+                    if(taskLineItemCount==0)
+                    {
+                        dbHelper.deleteTask(String.valueOf(t.ID));
+                    }
+                }
+            }
+        }
+
         protected ServerResult doInBackground(String... params) {
 
             SharedPreferences WifionSatusInMobile = getApplicationContext().getSharedPreferences(Shared.sharedprefs_uploadstatus, 0);
@@ -207,110 +291,14 @@ public class BackgroundService extends Service {
             String UserOnWifiStatus= uploadonWifibynuser.getString("status", null); // getting String
             if (UserOnWifiStatus == "true") {
                 if (WifiOnStatusInMobile == "true") {
-                    String condition = " EmployeeID = " + String.valueOf(Shared.LoggedInUser.ID + " AND TaskRequest.IsDone = 1");
-                    List<TaskViewModel> taskViewModel = dbHelper.getPendingTasks(condition);
-
-                    for (TaskViewModel t : taskViewModel)
-                    {
-                        Taskid=t.ID;
-                        List<TaskLineItemViewModel> tasklineitems = dbHelper.getTaskLineItems("TaskID=" + String.valueOf(t.ID));
-                        for (TaskLineItemViewModel tl : tasklineitems) {
-                            if(t.IsMeasurement==true) {
-                                ShowPendingList();
-                            }
-                            ArrayList<TaskLineItemPhotoViewModel> tdl = dbHelper.getAllTaskLineItemPhotos(String.valueOf(tl.ID));
-                            for (TaskLineItemPhotoViewModel tlp : tdl) {
-                                Shared.SelecteduploadTasklineitemPhotos = tlp;
-                                doinmenthod(tlp);
-                                String result= uploadResponse.getString("uploadResponse", null);
-                                if(result=="True")
-                                {
-                                    SharedPreferences.Editor editor = uploadResponse.edit();
-                                    editor.putString("uploadResponse", null); // Storing string
-                                    editor.commit();
-                                    dbHelper.DeleteRelatedJobPhoto(String.valueOf(tl.ID));
-                                    dbHelper.deleteTaskLineItemPhoto(String.valueOf(tlp.PhotoID));
-                                }
-                            }
-                            imageList = dbHelper.getAllTaskLineItemPhotos(String.valueOf(tl.ID));
-                            //final ArrayList<String>imagecount=dbHelper.deleteTaskLineItemPhoto(String.valueOf());
-                            //final ArrayList<String> imageList = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(tl.ID));
-                            count=imageList.size();
-                            if(count==0)
-                            {
-                                dbHelper.deleteTaskLineItem(String.valueOf(tl.ID));
-                            }
-                        }
-                        //imageList = dbHelper.getAllTaskLineItemPhotos(String.valueOf(t.ID));
-                        String Condition="TaskID=" + String.valueOf(t.ID);
-                        List<TaskLineItemViewModel> tasklineitems1 = dbHelper.getTaskLineItems(Condition);
-                        int lineItemCount=tasklineitems.size();
-                        if(lineItemCount==1 && count==0) {
-                            dbHelper.deleteTask(String.valueOf(t.ID));
-                        }
-                        else
-                        {
-                            int taskLineItemCount=tasklineitems1.size();
-                            if(taskLineItemCount==0)
-                            {
-                                dbHelper.deleteTask(String.valueOf(t.ID));
-                            }
-                        }
-                    }
-                }
-
-            } else {
-                String condition = " EmployeeID = " + String.valueOf(Shared.LoggedInUser.ID + " AND TaskRequest.IsDone = 1");
-                List<TaskViewModel> taskViewModel = dbHelper.getPendingTasks(condition);
-
-                for (TaskViewModel t : taskViewModel)
-                {
-                    Taskid=t.ID;
-                    List<TaskLineItemViewModel> tasklineitems = dbHelper.getTaskLineItems("TaskID=" + String.valueOf(t.ID));
-                    for (TaskLineItemViewModel tl : tasklineitems) {
-                        if(t.IsMeasurement==true) {
-                            ShowPendingList();
-                        }
-                        ArrayList<TaskLineItemPhotoViewModel> tdl = dbHelper.getAllTaskLineItemPhotos(String.valueOf(tl.ID));
-                        for (TaskLineItemPhotoViewModel tlp : tdl) {
-                            Shared.SelecteduploadTasklineitemPhotos = tlp;
-                            doinmenthod(tlp);
-                            String result= uploadResponse.getString("uploadResponse", null);
-                            if(result=="True")
-                            {
-                                SharedPreferences.Editor editor = uploadResponse.edit();
-                                editor.putString("uploadResponse", null); // Storing string
-                                editor.commit();
-                                dbHelper.DeleteRelatedJobPhoto(String.valueOf(tl.ID));
-                                dbHelper.deleteTaskLineItemPhoto(String.valueOf(tlp.PhotoID));
-                            }
-                        }
-                        imageList = dbHelper.getAllTaskLineItemPhotos(String.valueOf(tl.ID));
-                        //final ArrayList<String>imagecount=dbHelper.deleteTaskLineItemPhoto(String.valueOf());
-                        //final ArrayList<String> imageList = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(tl.ID));
-                        count=imageList.size();
-                        if(count==0)
-                        {
-                            dbHelper.deleteTaskLineItem(String.valueOf(tl.ID));
-                        }
-                    }
-                    //imageList = dbHelper.getAllTaskLineItemPhotos(String.valueOf(t.ID));
-                    String Condition="TaskID=" + String.valueOf(t.ID);
-                    List<TaskLineItemViewModel> tasklineitems1 = dbHelper.getTaskLineItems(Condition);
-                    int lineItemCount=tasklineitems.size();
-                    if(lineItemCount==1 && count==0) {
-                        dbHelper.deleteTask(String.valueOf(t.ID));
-                    }
-                    else
-                    {
-                        int taskLineItemCount=tasklineitems1.size();
-                        if(taskLineItemCount==0)
-                        {
-                            dbHelper.deleteTask(String.valueOf(t.ID));
-                        }
-                    }
+                    ImageUploadProcess();
                 }
             }
+            else
+            {
+                ImageUploadProcess();
+            }
+            taskDelete="False";
             return ServerResult.UploadSuccess;
         }
 
@@ -429,6 +417,11 @@ public class BackgroundService extends Service {
                     fileInputStream.close();
                     dos.flush();
                     dos.close();
+                    final SharedPreferences uploadResponse = getApplicationContext().getSharedPreferences(Shared.UploadResponse, 0);
+                    SharedPreferences.Editor editor = uploadResponse.edit();
+                    editor.putString("uploadResponse", "True"); // Storing string
+                    editor.commit();
+                    //return ServerResult.UploadSuccess;
 
                 } catch (MalformedURLException ex) {
                     return "-2";
@@ -597,134 +590,143 @@ public class BackgroundService extends Service {
 
         }
 
-    }
 
-
-    private String UploadShopPhoto(TaskLineItemViewModel taskLineItem,String path)
-    {
-        // String path = taskLineItem.PhotoID;
-        String fileName = new File(path).getName();
-        StringBuilder sbResult = new StringBuilder();
-        HttpURLConnection conn = null;
-        DataOutputStream dos = null;
-        String lineEnd = "\r\n";
-        String twoHyphens = "--";
-        String boundary = "*****";
-        int bytesRead, bytesAvailable, bufferSize;
-        byte[] buffer;
-        int maxBufferSize = 1*1024*1024;
-        File sourceFile = new File(path);
-
-        if (!sourceFile.isFile() && !path.equals("NOT_DONE"))
+        private String UploadShopPhoto()
         {
+            TaskViewModel taskViewModel=Shared.UploadShopPhoto;
+            // String path = taskLineItem.PhotoID;
+            String fileName = new File(taskViewModel.PhotoID).getName();
+            StringBuilder sbResult = new StringBuilder();
+            HttpURLConnection conn = null;
+            DataOutputStream dos = null;
+            String lineEnd = "\r\n";
+            String twoHyphens = "--";
+            String boundary = "*****";
+            int bytesRead, bytesAvailable, bufferSize;
+            byte[] buffer;
+            int maxBufferSize = 1*1024*1024;
+            File sourceFile = new File(taskViewModel.PhotoID);
 
-            Log.e("uploadFile", "Source File not exist :");
+            if (!sourceFile.isFile() && !taskViewModel.PhotoID.equals("NOT_DONE"))
+            {
 
-            return "MISSING_SHOP_PHOTO:" + Integer.toString(taskLineItem.ID);
+                Log.e("uploadFile", "Source File not exist :");
 
-        }
-        else if (sourceFile.isFile())
-        {
-            int serverResponseCode = 0;
-            try {
+                return "MISSING_SHOP_PHOTO:" + Integer.toString(taskViewModel.ID);
 
-                List<NameValuePair> taskDetailRequest = new ArrayList<NameValuePair>(
-                        5);
-                taskDetailRequest.add(new BasicNameValuePair("TaskID", String
-                        .valueOf(taskLineItem.ID)));
-                taskDetailRequest.add(new BasicNameValuePair("Time",
-                        taskLineItem.Time));
-                taskDetailRequest.add(new BasicNameValuePair("Employee",
-                        Shared.LoggedInUser.ID));
+            }
+            else if (sourceFile.isFile())
+            {
+                int serverResponseCode = 0;
+                try {
 
-                // open a URL connection to the Servlet
-                FileInputStream fileInputStream = new FileInputStream(
-                        sourceFile);
-                URL url = new URL(Shared.UploadShopPhotoAPI + "?"
-                        + Utility.getQuery(taskDetailRequest));
+                    List<NameValuePair> taskDetailRequest = new ArrayList<NameValuePair>(
+                            5);
+                    taskDetailRequest.add(new BasicNameValuePair("TaskID", String
+                            .valueOf(taskViewModel.ID)));
+                    taskDetailRequest.add(new BasicNameValuePair("Time",
+                            taskViewModel.StartTime));
+                    taskDetailRequest.add(new BasicNameValuePair("Employee",
+                            Shared.LoggedInUser.ID));
 
-                // Open a HTTP connection to the URL
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setDoInput(true); // Allow Inputs
-                conn.setDoOutput(true); // Allow Outputs
-                conn.setUseCaches(false); // Don't use a Cached Copy
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Connection", "Keep-Alive");
-                conn.setRequestProperty("ENCTYPE", "multipart/form-data");
-                conn.setRequestProperty("Content-Type",
-                        "multipart/form-data;boundary=" + boundary);
+                    // open a URL connection to the Servlet
+                    FileInputStream fileInputStream = new FileInputStream(
+                            sourceFile);
+                    URL url = new URL(Shared.UploadShopPhotoAPI + "?"
+                            + Utility.getQuery(taskDetailRequest));
 
-                conn.setRequestProperty("uploaded_file",Shared.GetLocationString() + fileName);
+                    // Open a HTTP connection to the URL
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoInput(true); // Allow Inputs
+                    conn.setDoOutput(true); // Allow Outputs
+                    conn.setUseCaches(false); // Don't use a Cached Copy
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("Connection", "Keep-Alive");
+                    conn.setRequestProperty("ENCTYPE", "multipart/form-data");
+                    conn.setRequestProperty("Content-Type",
+                            "multipart/form-data;boundary=" + boundary);
 
-                dos = new DataOutputStream(conn.getOutputStream());
+                    conn.setRequestProperty("uploaded_file",Shared.GetLocationString() + fileName);
 
-                dos.writeBytes(twoHyphens + boundary + lineEnd);
-                dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""
-                        + fileName + "\"" + lineEnd);
+                    dos = new DataOutputStream(conn.getOutputStream());
 
-                dos.writeBytes(lineEnd);
+                    dos.writeBytes(twoHyphens + boundary + lineEnd);
+                    dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""
+                            + fileName + "\"" + lineEnd);
 
-                // create a buffer of maximum size
-                bytesAvailable = fileInputStream.available();
+                    dos.writeBytes(lineEnd);
 
-                bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                buffer = new byte[bufferSize];
-
-                // read file and write it into form...
-                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
-                while (bytesRead > 0)
-                {
-
-                    dos.write(buffer, 0, bufferSize);
+                    // create a buffer of maximum size
                     bytesAvailable = fileInputStream.available();
+
                     bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                    buffer = new byte[bufferSize];
+
+                    // read file and write it into form...
                     bytesRead = fileInputStream.read(buffer, 0, bufferSize);
 
+                    while (bytesRead > 0)
+                    {
+
+                        dos.write(buffer, 0, bufferSize);
+                        bytesAvailable = fileInputStream.available();
+                        bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                        bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+                    }
+
+                    // send multipart form data necesssary after file data...
+                    dos.writeBytes(lineEnd);
+                    dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+                    // Responses from the server (code and message)
+                    serverResponseCode = conn.getResponseCode();
+                    if (serverResponseCode == 200)
+                    {
+                        BufferedReader in = new BufferedReader(
+                                new InputStreamReader(conn.getInputStream()));
+                        String inputLine = "";
+
+                        while ((inputLine = in.readLine()) != null)
+                            sbResult.append(inputLine);
+                        in.close();
+
+                    }
+
+                    // close the streams //
+                    // writer.close();
+                    fileInputStream.close();
+                    dos.flush();
+                    dos.close();
+                    final SharedPreferences uploadResponse = getApplicationContext().getSharedPreferences(Shared.UploadResponse, 0);
+                    SharedPreferences.Editor editor = uploadResponse.edit();
+                    editor.putString("uploadResponse", "True"); // Storing string
+                    editor.commit();
+
+
+                } catch (MalformedURLException ex) {
+
+                    ex.printStackTrace();
+
+                    Log.e("Upload file to server", "error: " + ex.getMessage(), ex);
+                    return "-1";
+                } catch (Exception e) {
+
+                    e.printStackTrace();
+
+                    Log.e("Upload file ","Exception : " + e.getMessage(), e);
+                    return "-2";
                 }
 
-                // send multipart form data necesssary after file data...
-                dos.writeBytes(lineEnd);
-                dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+            } // End else block
 
-                // Responses from the server (code and message)
-                serverResponseCode = conn.getResponseCode();
-                if (serverResponseCode == 200)
-                {
-                    BufferedReader in = new BufferedReader(
-                            new InputStreamReader(conn.getInputStream()));
-                    String inputLine = "";
+            return "TASKID:" + sbResult.toString();
+        }
 
-                    while ((inputLine = in.readLine()) != null)
-                        sbResult.append(inputLine);
-                    in.close();
-
-                }
-
-                // close the streams //
-                // writer.close();
-                fileInputStream.close();
-                dos.flush();
-                dos.close();
-
-            } catch (MalformedURLException ex) {
-
-                ex.printStackTrace();
-
-                Log.e("Upload file to server", "error: " + ex.getMessage(), ex);
-                return "-1";
-            } catch (Exception e) {
-
-                e.printStackTrace();
-
-                Log.e("Upload file ","Exception : " + e.getMessage(), e);
-                return "-2";
-            }
-
-        } // End else block
-
-        return "TASKID:" + sbResult.toString();
     }
+
+
+
 }
 
 

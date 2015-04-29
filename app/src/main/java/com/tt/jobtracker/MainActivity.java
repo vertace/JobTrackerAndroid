@@ -139,14 +139,14 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
             selectItem(0);
         }
 
-      /*  context = getApplicationContext();
+        context = getApplicationContext();
         regid = getRegistrationId(context);
         Shared.LoggedInUser.GcmRegID = regid;
         if (regid.isEmpty()) {
             registerInBackground();
             GetRegID obj = new GetRegID(this);
             obj.execute();
-        }*/
+        }
 
         final SharedPreferences taskSyncLogin = getSharedPreferences(Shared.TaskSync, 0);
         String taskDownloadLogin= taskSyncLogin.getString("tasksync", null);
@@ -522,13 +522,13 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
 
         switch (CurrentScreen) {
             case TaskList:
-                if(Shared.hideMenu=="true")
+               /* if(Shared.hideMenu=="true")
                 {
                     menu.setGroupVisible(R.id.actionbar_group_home, false);
                 }
-                else {
-                    menu.setGroupVisible(R.id.actionbar_group_home, true);
-                }
+                else {*/
+                menu.setGroupVisible(R.id.actionbar_group_home, true);
+                //}
                 break;
             case TaskDetail:
                 if( Shared.hideMenu=="true")
@@ -575,6 +575,8 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
                     String.valueOf(task.ShopName));
             intent.putExtra("ShopAddress",
                     String.valueOf(task.ShopAddress));
+            intent.putExtra("IsDone",
+                    String.valueOf(task.IsDone));
             getApplicationContext().startActivity(intent);
 
             // Intent myIntent = new Intent(MainActivity.this, TakeMeasurement.class);
@@ -621,10 +623,22 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
     }
 
 
+    public void onTaskLineItemShopPhoto(TaskViewModel taskViewModel) {
+        tvm=taskViewModel;
+        tlvm = taskLineItemViewModel;
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        fileUri = CameraHelper.getOutputMediaFileUri(CameraHelper.MEDIA_TYPE_IMAGE); // create
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the
+        startActivityForResult(intent, CAPTURE_TASKLINEITEM_SHOP_IMAGE_ACTIVITY_REQUEST_CODE);
+    }
+
+
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
     private static final int CAPTURE_TASKLINEITEM_IMAGE_ACTIVITY_REQUEST_CODE = 200;
+    private static final int CAPTURE_TASKLINEITEM_SHOP_IMAGE_ACTIVITY_REQUEST_CODE = 300;
     private Uri fileUri;
     private TaskLineItemViewModel tlvm;
+    private TaskViewModel tvm;
 
     @Override
     public void onTaskLineItemPhotoClickInitiated(TaskLineItemViewModel taskLineItemViewModel) {
@@ -656,6 +670,19 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
 //                        .show();
             } else {
                 // Image capture failed, advise user
+            }
+        }
+        if (requestCode == CAPTURE_TASKLINEITEM_SHOP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+//                Toast.makeText(this, "Image saved to:\n" + fileUri,
+//                        Toast.LENGTH_LONG).show();
+                AddTaskShopPhoto();
+                //taskLineItemDetailFragment.updateImageAdapter();
+                //markTaskStart();
+            } else if (resultCode == RESULT_CANCELED) {
+                // User cancelled the video capture
+            } else {
+                // Video capture failed, advise user
             }
         }
 
@@ -691,6 +718,20 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
         taskLineItemPhotoViewModel.Time = sdf.format(new Date());
         dbHelper.insertTaskLineItemPhoto(taskLineItemPhotoViewModel);
         updateTaskLineItemPhotoCount();
+        //processFinish(null);
+    }
+    private void AddTaskShopPhoto() {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        TaskViewModel taskViewModel = dbHelper.getTaskInfo(String.valueOf(tvm.ID));
+        // TaskLineItemViewModel taskLineItemViewModel=new TaskLineItemViewModel();
+        // TaskLineItemPhotoViewModel taskLineItemPhotoViewModel = new TaskLineItemPhotoViewModel();
+        taskViewModel.PhotoID = fileUri.getPath();
+        taskViewModel.ID = tvm.ID;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        taskViewModel.StartTime = sdf.format(new Date());
+        taskViewModel.IsDone=false;
+        dbHelper.saveTask(taskViewModel, true);
+        //updateTaskLineItemPhotoCount();
         //processFinish(null);
     }
     private void updateTaskLineItemPhotoCount()
