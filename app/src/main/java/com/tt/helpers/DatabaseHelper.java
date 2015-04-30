@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.google.android.gms.drive.realtime.internal.event.ValuesAddedDetails;
 import com.tt.data.EmployeeViewModel;
+import com.tt.data.MapShopSortViewModel;
 import com.tt.data.MeasurementPhoto;
 import com.tt.data.TaskLineItemPhotoViewModel;
 import com.tt.data.TaskLineItemViewModel;
@@ -34,7 +35,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + "EmployeeName TEXT," + "EmployeeID INTEGER,"
                 + "TaskStatus TEXT," + "IsMeasurement INTEGER,"
                 + "PhotoID TEXT," + "StartTime TEXT,"
-                + "ShopPhotoUploaded INTEGER,"+"IsDone INTEGER,"+"MinimumPhotoCount int,"+"Name TEXT)";
+                + "ShopPhotoUploaded INTEGER,"+"IsDone INTEGER,"+"MinimumPhotoCount int,"+"Name TEXT,"+"IsShopPhoto INTEGER)";
         database.execSQL(query);
         Log.d(LOGCAT, "TaskRequest Created");
 
@@ -62,6 +63,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         query = "CREATE TABLE Employee (EmpID  INTEGER PRIMARY KEY,"
                 + "Name INTEGER," + "Username TEXT," + "Password TEXT)";
+        database.execSQL(query);
+        Log.d(LOGCAT, "Employee Created");
+        query = "CREATE TABLE MapSortByShopName (ID  INTEGER PRIMARY KEY,"
+                + "ShopName TEXT," + "Lat TEXT," + "Lon TEXT,"+"Distance DECIMAL(10,2))";
         database.execSQL(query);
         Log.d(LOGCAT, "Employee Created");
     }
@@ -444,6 +449,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("ShopID", task.ShopID);
         values.put("IsMeasurement", task.IsMeasurement ? 1 : 0);
         values.put("IsDone", task.IsDone?1:0);
+        values.put("IsShopPhoto", task.IsShopPhoto?1:0);
         values.put("MinimumPhotoCount",task.MinimumPhoto);
         values.put("Name",task.Name);
         database.insert("TaskRequest", null, values);
@@ -464,6 +470,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put("TaskStatus", task.TaskStatus);
             values.put("ShopID", task.ShopID);
             values.put("IsDone", task.IsDone ? 1 : 0);
+            values.put("IsShopPhoto", task.IsShopPhoto?1:0);
             values.put("IsMeasurement", task.IsMeasurement ? 1 : 0);
             values.put("MinimumPhotoCount",task.MinimumPhoto);
             values.put("PhotoID",task.PhotoID);
@@ -522,6 +529,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 task.StartTime = cursor.getString(12);
                 temp = cursor.getString(13);
                 task.IsDone= Integer.parseInt(cursor.getString(14)) == 1 ? true: false;
+                task.IsShopPhoto= Integer.parseInt(cursor.getString(17)) == 1 ? true: false;
                 task.MinimumPhoto=Integer.parseInt(cursor.getString(15));
                 if (temp == null || temp.isEmpty())
                     task.ShopPhotoUploaded = false;
@@ -565,6 +573,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 task.IsDone= Integer.parseInt(cursor.getString(14)) == 1 ? true: false;
                 task.MinimumPhoto=Integer.parseInt(cursor.getString(15));
                 task.Name=cursor.getString(16);
+                task.IsShopPhoto= Integer.parseInt(cursor.getString(17)) == 1 ? true: false;
                 temp = cursor.getString(13);
                 if (temp == null || temp.isEmpty())
                     task.ShopPhotoUploaded = false;
@@ -610,6 +619,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 task.IsDone= Integer.parseInt(cursor.getString(14)) == 1 ? true: false;
                 task.MinimumPhoto=Integer.parseInt(cursor.getString(15));
                 task.Name=cursor.getString(16);
+                task.IsShopPhoto= Integer.parseInt(cursor.getString(17)) == 1 ? true: false;
                 temp = cursor.getString(13);
                 if (temp == null || temp.isEmpty())
                     task.ShopPhotoUploaded = false;
@@ -658,6 +668,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     task.IsDone= Integer.parseInt(cursor.getString(14)) == 1 ? true: false;
                     task.MinimumPhoto=Integer.parseInt(cursor.getString(15));
                     task.Name=cursor.getString(16);
+                    task.IsShopPhoto= Integer.parseInt(cursor.getString(17)) == 1 ? true: false;
                     temp = cursor.getString(13);
                     if (temp == null || temp.isEmpty())
                         task.ShopPhotoUploaded = false;
@@ -758,6 +769,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+
+    public long insertMapSortByShopName(MapShopSortViewModel mapsortByShop) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("ShopName", mapsortByShop.ShopName);
+        values.put("Lat", mapsortByShop.Lat);
+        values.put("Lon", mapsortByShop.Lon);
+        values.put("Distance", mapsortByShop.distance);
+        long id = database.insert("MapSortByShopName", null, values);
+        database.close();
+        return id;
+    }
+    public void updateMapSortByShopName(MapShopSortViewModel mapsortByShop) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("ShopName", mapsortByShop.ShopName);
+        values.put("Lat", mapsortByShop.Lat);
+        values.put("Lon", mapsortByShop.Lon);
+        values.put("Distance", mapsortByShop.distance);
+        int result = database.update("MapSortByShopName", values, "ID" + " = ?",
+                new String[]{String.valueOf(mapsortByShop.TaskID)});
+        database.close();
+    }
+
     public int updateMeasurementPhoto(MeasurementPhoto measurementPhoto,
                                       boolean includePhoneUpdates) {
         SQLiteDatabase database = this.getWritableDatabase();
@@ -782,21 +817,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void deleteMeasurementPhoto(String id) {
 
 
-        String ID[] = id.split(",");
+        // String ID[] = id.split(",");
         Log.d(LOGCAT, "delete");
-        int value = Integer.parseInt(ID[0]);
-        if (value > 0) {
-            DeleteRelatedMeasurementPhoto(ID[0]);
-            SQLiteDatabase database = this.getWritableDatabase();
-            String deleteQuery = "DELETE FROM MeasurementPhoto where ID=" + ID[0];
-            Log.d("query", deleteQuery);
-            database.execSQL(deleteQuery);
-            //database.close();
-            String deleteTaskQuery = "DELETE FROM TaskRequest where TaskID=" + ID[1];//Shared.MeasurementTaskID;
+        //  int value = Integer.parseInt(ID[0]);
+        //  if (value > 0) {
+        // DeleteRelatedMeasurementPhoto(ID[0]);
+        SQLiteDatabase database = this.getWritableDatabase();
+        String deleteQuery = "DELETE FROM MeasurementPhoto where ID=" + id;
+        Log.d("query", deleteQuery);
+        database.execSQL(deleteQuery);
+        //database.close();
+            /*String deleteTaskQuery = "DELETE FROM TaskRequest where TaskID=" + ID[1];//Shared.MeasurementTaskID;
             Log.d("query", deleteTaskQuery);
-            database.execSQL(deleteTaskQuery);
-            database.close();
-        }
+            database.execSQL(deleteTaskQuery);*/
+        database.close();
+        // }
 
 
     }
@@ -805,7 +840,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         MeasurementPhoto photo = getMeasurementPhotoInfo(id);
         PhotoDeleteHelper.DeletePhoto(photo.PhotoID);
     }
+    public ArrayList<MapShopSortViewModel> getAllShopByOrder() {
+        ArrayList<MapShopSortViewModel> mapShopOrderList = new ArrayList<MapShopSortViewModel>();
+        String selectQuery = "SELECT * FROM MapSortByShopName Order By Distance ASC";
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                MapShopSortViewModel mapShopOrder = new MapShopSortViewModel();
 
+                mapShopOrder.ShopName =cursor.getString(1);;
+                mapShopOrder.Lat = Double.parseDouble(cursor.getString(2));
+                mapShopOrder.Lon = Double.parseDouble(cursor.getString(3));
+                mapShopOrder.distance = Double.parseDouble(cursor.getString(4));
+                mapShopOrderList.add(mapShopOrder);
+        } while (cursor.moveToNext());
+    }
+    database.close();
+    return mapShopOrderList;
+    }
     public ArrayList<MeasurementPhoto> getAllMeasurementPhotos() {
         ArrayList<MeasurementPhoto> measurementPhotoList = new ArrayList<MeasurementPhoto>();
         String selectQuery = "SELECT * FROM MeasurementPhoto";
@@ -1100,4 +1153,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return taskList;
     }
+
+
+
 }

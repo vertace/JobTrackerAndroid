@@ -1,6 +1,7 @@
 package com.tt.jobtracker;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -14,6 +15,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import com.tt.helpers.DatabaseHelper;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
@@ -27,6 +29,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -34,8 +38,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.tt.data.MapShopSortViewModel;
 import com.tt.data.Shared;
+import com.tt.data.TaskLineItemPhotoViewModel;
 import com.tt.helpers.DatabaseHelper;
 import com.tt.helpers.SstAlert;
 
@@ -65,16 +72,26 @@ public class MapForMultipleShop extends FragmentActivity {
     LocationManager mlocManager;
     LocationListener mlocListener;
     List<android.location.Address> addresses=null;
+
     Geocoder geocoder ;
     String latlngShop[];
+    String mapShopsort[];
     Button btndirection;
     int temp=0;
     boolean isGPSEnabled=false;
     boolean isNetworkEnabled=false;
+    int globalVar,globalShopOrde;
+    int count,i,modulo;
+    Polyline poly;
+    ArrayList<MapShopSortViewModel> mapShopSortList;
+    MapShopSortViewModel mapshopSingle;
+    public ProgressDialog m_ProgressDialog = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_map);
 
@@ -90,10 +107,18 @@ public class MapForMultipleShop extends FragmentActivity {
         latlngShop=new String[Shared.TaskList.size()];
 
 
-        try {
 
+        m_ProgressDialog = ProgressDialog
+                .show(MapForMultipleShop.this,
+                        "Please wait...",
+                        "Updating the route...",
+                        true);
+
+        try {
+            mapShopSortList=new ArrayList<MapShopSortViewModel>();
             for(int k=0;k<Shared.TaskList.size();k++)
             {
+
                 latlngShop[k]=new String();
 
                 addresses= geocoder.getFromLocationName(Shared.TaskList.get(k).ShopAddress, 5);
@@ -107,9 +132,8 @@ public class MapForMultipleShop extends FragmentActivity {
                    android.location.Address address = (android.location.Address) addresses.get(i);
 
                      // Creating an instance of GeoPoint, to display in Google Map
-                       latLng = new LatLng(address.getLatitude(), address.getLongitude());
-
-                       latlngShop[k] = String.valueOf(address.getLatitude()) + "," + String.valueOf(address.getLongitude());
+                        latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        latlngShop[k] = String.valueOf(address.getLatitude()) + "," + String.valueOf(address.getLongitude());
                         addressText = String.format("%s, %s", address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
                                 address.getCountryName());
 
@@ -119,15 +143,17 @@ public class MapForMultipleShop extends FragmentActivity {
         // Locate the first location
 
     }
+
     Marker ciu = mMap.addMarker(new MarkerOptions().position(latLng).title("Address"));
     ciu.setTitle(addressText);
 
     mMap.setMyLocationEnabled(true);
     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
 }
-                Double result= distance(12.9265533, 80.10782879999999,12.9908401,80.21827569999999);
+
+             /*   Double result= distance(12.9265533, 80.10782879999999,12.9908401,80.21827569999999);
                 double value=result;
-               // mMap.setOnMyLocationChangeListener(myLocationChangeListener);
+               // mMap.setOnMyLocationChangeListener(myLocationChangeListener);*/
 
 
 
@@ -141,6 +167,8 @@ public class MapForMultipleShop extends FragmentActivity {
                     "Some Problem occured");
         }
 
+        ArrayList<MapShopSortViewModel> test=mapShopSortList;
+
         if(addresses!=null && addresses.size()>0) {
             mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -150,9 +178,9 @@ public class MapForMultipleShop extends FragmentActivity {
             isGPSEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             isNetworkEnabled = mlocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
             if (isGPSEnabled) {
-                mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mlocListener);
+                mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 10, mlocListener);
             } else {
-                mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mlocListener);
+                mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 10, mlocListener);
             }
             //  mlocManager.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, 3000, 0, mlocListener);
             //  ((MyLocationListener) mlocListener).DrawRoute();
@@ -162,6 +190,7 @@ public class MapForMultipleShop extends FragmentActivity {
         else{
             Toast.makeText(getApplicationContext(), "Network is slow wait...", Toast.LENGTH_SHORT).show();
         }
+
     }
 
   /*  private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
@@ -176,7 +205,7 @@ public class MapForMultipleShop extends FragmentActivity {
     };*/
 
 
-    private double distance(double lat1, double lon1, double lat2, double lon2) {
+   private double distance(double lat1, double lon1, double lat2, double lon2) {
         double theta = lon1 - lon2;
         double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
         dist = Math.acos(dist);
@@ -263,15 +292,27 @@ public class MapForMultipleShop extends FragmentActivity {
     }
    private void  ShopShortList()
     {
-        if(Shared.end_address!=null)
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        if(globalShopOrde==0)
+        for(MapShopSortViewModel saveShop:Shared.MapSortByShop)
+        {
+            dbHelper.insertMapSortByShopName(saveShop);
+        }globalShopOrde++;
+        if( mapShopsort!=null)
         {
             AlertDialog.Builder builderSingle = new AlertDialog.Builder(
                     MapForMultipleShop.this);
             builderSingle.setIcon(R.drawable.ic_launcher);
-            builderSingle.setTitle("Directions");
+            builderSingle.setTitle("Shop Name Order");
             final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MapForMultipleShop.this,android.R.layout.simple_list_item_1);
-
-            arrayAdapter.addAll(Shared.end_address);
+           ArrayList<MapShopSortViewModel> OrderShopList=dbHelper.getAllShopByOrder();
+            for( int l=0;l<OrderShopList.size();l++)
+            {
+                i=l+1;
+                arrayAdapter.add(i+"."+OrderShopList.get(l).ShopName);
+                i++;
+            }
+          //  arrayAdapter.addAll(Shared.end_address);
             builderSingle.setAdapter(arrayAdapter, null);
             builderSingle.show();
         }
@@ -283,7 +324,7 @@ public class MapForMultipleShop extends FragmentActivity {
         }
 
     }
-    private Handler mHandler = new Handler();
+    /**private Handler mHandler = new Handler();
     private Runnable onRequestLocation = new Runnable() {
         @Override
         public void run() {
@@ -292,7 +333,7 @@ public class MapForMultipleShop extends FragmentActivity {
             // Run this again in an hour
             mHandler.postDelayed(onRequestLocation, DateUtils.HOUR_IN_MILLIS);
         }
-    };
+    };*/
 
 
 
@@ -318,7 +359,35 @@ public class MapForMultipleShop extends FragmentActivity {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentlang, 15));
                 temp++;
             }
-            // mlocManager.removeUpdates(mlocListener);
+            mapShopsort=new String[Shared.TaskList.size()];
+            mapShopSortList=new ArrayList<MapShopSortViewModel>();
+            for(int k=0;k<Shared.TaskList.size();k++)
+            {
+                String Latlanvalue=latlngShop[k];
+                mapShopsort[k]=new String();
+                if(Latlanvalue!=null && !Latlanvalue.isEmpty())
+                {
+
+                    String[] LatLangsplit = Latlanvalue.split(",");
+                    mapshopSingle=new MapShopSortViewModel();
+                    String Lat=LatLangsplit[0];
+                    String Lan=LatLangsplit[1];
+                    double Shoplat=Double.parseDouble(Lat);
+                    double Shoplan=Double.parseDouble(Lan);
+                    mapshopSingle.Lat =Shoplat;
+                    mapshopSingle.Lon=Shoplan;
+                    mapshopSingle.ShopName=Shared.TaskList.get(k).ShopName;
+                    mapshopSingle.TaskID=Shared.TaskList.get(k).ID;
+                    mapShopsort[k]=Shared.TaskList.get(k).ShopName;
+                    mapshopSingle.distance= distance(loc.getLatitude(),loc.getLongitude(),Shoplat,Shoplan);
+                    mapShopSortList.add(mapshopSingle);
+                }
+            }
+            Shared.MapSortByShop= mapShopSortList;
+            globalShopOrde=0;
+
+
+                   // mlocManager.removeUpdates(mlocListener);
             DrawRoute();
             btndirection.setVisibility(View.VISIBLE);
 
@@ -344,28 +413,60 @@ public class MapForMultipleShop extends FragmentActivity {
         }
         public  void DrawRoute()
         {
-            String url = getDirectionsUrl(currentlang, latLng);
-            DownloadTask downloadTask = new DownloadTask();
-            downloadTask.execute(url);
+            if(Shared.TaskList.size()<=8)
+            {
+                String url = getDirectionsUrl(currentlang, latLng);
+                DownloadTask downloadTask = new DownloadTask();
+                downloadTask.execute(url);
+            }
+            else {
+                 count = Shared.TaskList.size() / 8;
+                  modulo=Shared.TaskList.size()%8;
+                for (i = 0; modulo==0?i < count:i <=count; i++)
+                {
+                    String url = getDirectionsUrl(currentlang, latLng);
+                    DownloadTask downloadTask = new DownloadTask();
+                    downloadTask.execute(url);
+                }
+            }
+
         }
         public String getDirectionsUrl(LatLng origin,LatLng dest)
         {
 
             // Origin of route
-            String str_origin = "origin="+origin.latitude+","+origin.longitude;
-
+            String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+            String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
             // Destination of route
-            String str_dest = "destination="+dest.latitude+","+dest.longitude;
+
+
 
             // Sensor enabled
             String sensor = "sensor=false";
             String mode = "mode=driving";
             String waypoints="waypoints=";
-            for(int k=0;k<Shared.TaskList.size();k++)
-            {
+          if(count==i)
+          {
+              for(int k=globalVar;k<globalVar+modulo;k++)
+              {
 
-                waypoints=waypoints+latlngShop[k]+"|";
-            }
+                  waypoints=waypoints+latlngShop[k]+"|";
+
+              }
+              globalVar=0;
+              m_ProgressDialog.dismiss();
+          }
+            else
+          {
+              for(int k=globalVar;k<globalVar+8;k++)
+              {
+
+                  waypoints=waypoints+latlngShop[k]+"|";
+
+              }
+              globalVar=globalVar+8;
+          }
+
             waypoints = waypoints.substring(0, waypoints.length()-1);
 
             //     waypoints=waypoints+"Velacherry,Chennai|Tnagar,Chennai|Tamabam,Chennai";
@@ -442,9 +543,9 @@ public class MapForMultipleShop extends FragmentActivity {
                 super.onPostExecute(result);
 
                 ParserTask parserTask = new ParserTask();
-
                 // Invokes the thread for parsing the JSON data
                 parserTask.execute(result);
+
             }
         }
 
@@ -476,7 +577,14 @@ public class MapForMultipleShop extends FragmentActivity {
 
         // Executes in UI thread, after the parsing process
         @Override
-        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+        protected void onPostExecute(List<List<HashMap<String, String>>> result)
+        {
+
+
+            /* if(poly!=null)
+              {
+                  poly.remove();
+              }*/
             ArrayList<LatLng> points = null;
             PolylineOptions lineOptions = null;
             MarkerOptions markerOptions = new MarkerOptions();
@@ -506,8 +614,11 @@ public class MapForMultipleShop extends FragmentActivity {
                 lineOptions.color(Color.RED);
             }
 
+
             // Drawing polyline in the Google Map for the i-th route
-            mMap.addPolyline(lineOptions);
+            poly=mMap.addPolyline(lineOptions);
+            m_ProgressDialog.dismiss();
+
         }
     }
 

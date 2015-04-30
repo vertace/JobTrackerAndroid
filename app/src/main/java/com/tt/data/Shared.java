@@ -66,6 +66,8 @@ public class Shared {
     public static String TaskSync;
     public static String MainClassCall;
     public static String UploadResponse;
+    public static String ShopUploadResponse;
+    public static ArrayList<MapShopSortViewModel> MapSortByShop;
 
     public static String GCM_SENDER_ID = "85852809473";
     public static String hideMenu;

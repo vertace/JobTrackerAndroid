@@ -57,6 +57,7 @@ public class BackgroundService extends Service {
     Timer timer = new Timer();
     int count;
     String taskDelete;
+    String shopPhotoUploaded;
     PendingMeasurementListAdapter pendingMeasurementListAdapter;
     int Taskid;
     String[] photopath={};
@@ -117,7 +118,7 @@ public class BackgroundService extends Service {
                 });
             }
         };
-        timer.schedule(doAsynchronousTask, 0, 1000 * 180);
+        timer.schedule(doAsynchronousTask, 0, 1000 * 900);
         return START_STICKY;
     }
 
@@ -147,11 +148,16 @@ public class BackgroundService extends Service {
         uploadMultipleImage objt = new uploadMultipleImage(this);
         objt.UploadShopPhoto();
         final SharedPreferences uploadResponse = getApplicationContext().getSharedPreferences(Shared.UploadResponse, 0);
+        final SharedPreferences IshopUloadResponse = getApplicationContext().getSharedPreferences(Shared.ShopUploadResponse, 0);
         String result= uploadResponse.getString("uploadResponse", null);
         if(result=="True") {
             SharedPreferences.Editor editor = uploadResponse.edit();
             editor.putString("uploadResponse", null); // Storing string
             editor.commit();
+            SharedPreferences.Editor editor1 = IshopUloadResponse.edit();
+            editor1.putString("shopUploadResponse", "true"); // Storing string
+            editor1.commit();
+            PhotoDeleteHelper.DeletePhoto(String.valueOf(tvm.PhotoID));
             PhotoDeleteHelper.DeletePhoto(String.valueOf(tvm.PhotoID));
 
         }
@@ -229,6 +235,7 @@ public class BackgroundService extends Service {
 
         public void ImageUploadProcess()
         {
+            final SharedPreferences IshopUloadResponse = getApplicationContext().getSharedPreferences(Shared.ShopUploadResponse, 0);
             String condition = " EmployeeID = " + String.valueOf(Shared.LoggedInUser.ID + " AND TaskRequest.IsDone = 1");
             List<TaskViewModel> taskViewModel = dbHelper.getPendingTasks(condition);
             for (TaskViewModel t : taskViewModel)
@@ -248,6 +255,7 @@ public class BackgroundService extends Service {
                         Shared.SelecteduploadTasklineitemPhotos = tlp;
                         doinmenthod(tlp);
                         String result= uploadResponse.getString("uploadResponse", null);
+                        shopPhotoUploaded=IshopUloadResponse.getString("shopUploadResponse",null);
                         taskDelete=result;
                         if(result=="True")
                         {
@@ -269,17 +277,33 @@ public class BackgroundService extends Service {
                 List<TaskLineItemViewModel> tasklineitems1 = dbHelper.getTaskLineItems(Condition);
                 int lineItemCount=tasklineitems.size();
                 if(lineItemCount==1 && count==0 && taskDelete=="True") {
-                    taskDelete="False";
-                    dbHelper.deleteTask(String.valueOf(t.ID));
+                    if(t.IsShopPhoto && shopPhotoUploaded=="true") {
+                        taskDelete = "False";
+                        dbHelper.deleteTask(String.valueOf(t.ID));
+                    }
+                    else
+                    {
+                        taskDelete = "False";
+                        dbHelper.deleteTask(String.valueOf(t.ID));
+                    }
                 }
                 else
                 {
                     int taskLineItemCount=tasklineitems1.size();
                     if(taskLineItemCount==0)
                     {
-                        dbHelper.deleteTask(String.valueOf(t.ID));
+                        if(t.IsShopPhoto && shopPhotoUploaded=="true") {
+                            dbHelper.deleteTask(String.valueOf(t.ID));
+                        }
+                        else
+                        {
+                            dbHelper.deleteTask(String.valueOf(t.ID));
+                        }
                     }
                 }
+                SharedPreferences.Editor editor = IshopUloadResponse.edit();
+                editor.putString("shopUploadResponse", null); // Storing string
+                editor.commit();
             }
         }
 

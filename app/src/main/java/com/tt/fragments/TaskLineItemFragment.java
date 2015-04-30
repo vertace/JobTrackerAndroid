@@ -314,7 +314,12 @@ public void TaskNotDone()
         TaskViewModel taskForShop=dbHelper.getTaskInfo(String.valueOf(task.ID));
         if(taskForShop.IsShopPhoto && taskForShop.PhotoID!=null) {
             mCallback.onTaskLineItemSelected(taskLineItemViewModel);
-        }else
+        }
+        else if(!taskForShop.IsShopPhoto)
+        {
+            mCallback.onTaskLineItemSelected(taskLineItemViewModel);
+        }
+        else
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setMessage("Take shop photo first.")
