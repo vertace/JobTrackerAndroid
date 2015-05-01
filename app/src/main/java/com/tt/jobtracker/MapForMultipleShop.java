@@ -80,7 +80,7 @@ public class MapForMultipleShop extends FragmentActivity {
     int temp=0;
     boolean isGPSEnabled=false;
     boolean isNetworkEnabled=false;
-    int globalVar,globalShopOrde;
+    int globalVar,globalShopOrder;
     int count,i,modulo;
     Polyline poly;
     ArrayList<MapShopSortViewModel> mapShopSortList;
@@ -293,11 +293,13 @@ public class MapForMultipleShop extends FragmentActivity {
    private void  ShopShortList()
     {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        if(globalShopOrde==0)
-        for(MapShopSortViewModel saveShop:Shared.MapSortByShop)
-        {
-            dbHelper.insertMapSortByShopName(saveShop);
-        }globalShopOrde++;
+        if(globalShopOrder==0) {
+            dbHelper.deleteMapShop();
+            for (MapShopSortViewModel saveShop : Shared.MapSortByShop) {
+                dbHelper.insertMapSortByShopName(saveShop);
+            }
+            globalShopOrder++;
+        }
         if( mapShopsort!=null)
         {
             AlertDialog.Builder builderSingle = new AlertDialog.Builder(
@@ -308,8 +310,10 @@ public class MapForMultipleShop extends FragmentActivity {
            ArrayList<MapShopSortViewModel> OrderShopList=dbHelper.getAllShopByOrder();
             for( int l=0;l<OrderShopList.size();l++)
             {
+
+
                 i=l+1;
-                arrayAdapter.add(i+"."+OrderShopList.get(l).ShopName);
+                arrayAdapter.add(i+". "+OrderShopList.get(l).ShopName);
                 i++;
             }
           //  arrayAdapter.addAll(Shared.end_address);
@@ -384,7 +388,7 @@ public class MapForMultipleShop extends FragmentActivity {
                 }
             }
             Shared.MapSortByShop= mapShopSortList;
-            globalShopOrde=0;
+            globalShopOrder=0;
 
 
                    // mlocManager.removeUpdates(mlocListener);
@@ -445,28 +449,31 @@ public class MapForMultipleShop extends FragmentActivity {
             String sensor = "sensor=false";
             String mode = "mode=driving";
             String waypoints="waypoints=";
-          if(count==i)
-          {
-              for(int k=globalVar;k<globalVar+modulo;k++)
-              {
+            if(Shared.TaskList.size()<=8)
+            {
+                for (int k = 0; k <Shared.TaskList.size(); k++) {
 
-                  waypoints=waypoints+latlngShop[k]+"|";
+                    waypoints = waypoints + latlngShop[k] + "|";
+                }
+            }
+            else {
+                if (count == i) {
+                    for (int k = globalVar; k < globalVar + modulo; k++) {
 
-              }
-              globalVar=0;
-              m_ProgressDialog.dismiss();
-          }
-            else
-          {
-              for(int k=globalVar;k<globalVar+8;k++)
-              {
+                        waypoints = waypoints + latlngShop[k] + "|";
 
-                  waypoints=waypoints+latlngShop[k]+"|";
+                    }
+                    globalVar = 0;
+                    m_ProgressDialog.dismiss();
+                } else {
+                    for (int k = globalVar; k < globalVar + 8; k++) {
 
-              }
-              globalVar=globalVar+8;
-          }
+                        waypoints = waypoints + latlngShop[k] + "|";
 
+                    }
+                    globalVar = globalVar + 8;
+                }
+            }
             waypoints = waypoints.substring(0, waypoints.length()-1);
 
             //     waypoints=waypoints+"Velacherry,Chennai|Tnagar,Chennai|Tamabam,Chennai";
