@@ -39,12 +39,12 @@ public final class TaskDetailAdapter extends
         viewHolder.tvShopWall.setText(entry.ShopWall);
         viewHolder.tvInstruction.setText(entry.Instruction);
         view.setTag(entry);
-
-        setRowColor(view, entry);
+        view.setBackgroundResource(R.drawable.listpartial_selector);
+        //setRowColor(view, entry);
         return view;
     }
 
-    private void setRowColor(View view, TaskLineItemViewModel entry) {
+  /*  private void setRowColor(View view, TaskLineItemViewModel entry) {
         if (entry.OldImage == null || entry.OldImage.isEmpty()) {
             view.setBackgroundResource(R.drawable.listpending_selector);
         } else if (entry.NewImage == null || entry.NewImage.isEmpty()) {
@@ -53,7 +53,7 @@ public final class TaskDetailAdapter extends
             view.setBackgroundResource(R.drawable.listcompleted_selector);
         }
 
-    }
+    }*/
 
     private View getWorkingView(final View convertView) {
         // The workingView is basically just the convertView re-used if possible
