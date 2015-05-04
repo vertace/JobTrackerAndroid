@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/tvShopName"
         android:layout_below="@+id/tvShopName"
-        android:paddingLeft="8dip"
+        android:paddingLeft="13dip"
         android:layout_centerHorizontal="true"
         android:paddingTop="0dip"
         android:text="@string/shopAddress"
