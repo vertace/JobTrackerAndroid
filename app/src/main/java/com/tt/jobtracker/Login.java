@@ -54,7 +54,7 @@ public class Login extends Activity {
 
         Utility.getLocation(this);
 
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.login);
         un = (EditText) findViewById(R.id.txtUsername);
         pw = (EditText) findViewById(R.id.txtPassword);
 
@@ -71,7 +71,7 @@ public class Login extends Activity {
             CheckDefaultLogin(employee);
             //String userValue=
         }
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+       // this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         //SharedPreference();
     }
     private void LoginProcess( )
@@ -93,7 +93,7 @@ public class Login extends Activity {
         }
         else {
             m_ProgressDialog.dismiss();
-            m_ProgressDialog.dismiss();
+
             SstAlert.Show(Login.this, "Login Failed",
                     "Wrong username/password");
 

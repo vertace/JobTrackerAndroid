@@ -7,7 +7,11 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -15,6 +19,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.tt.helpers.DatabaseHelper;
 import android.os.Bundle;
 import android.os.Handler;
@@ -65,9 +71,10 @@ import java.util.TreeMap;
 /**
  * Created by BS-308 on 4/21/2015.
  */
-public class MapForMultipleShop extends FragmentActivity {
+public class MapForMultipleShop extends FragmentActivity
+{
     private GoogleMap mMap;
-    LatLng latLng,currentlang;
+    LatLng latLng,currentlang,latlngShopSort;
     String addressText,currenttext;
     LocationManager mlocManager;
     LocationListener mlocListener;
@@ -86,7 +93,7 @@ public class MapForMultipleShop extends FragmentActivity {
     ArrayList<MapShopSortViewModel> mapShopSortList;
     MapShopSortViewModel mapshopSingle;
     public ProgressDialog m_ProgressDialog = null;
-
+    DatabaseHelper dbHelper = new DatabaseHelper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -108,11 +115,7 @@ public class MapForMultipleShop extends FragmentActivity {
 
 
 
-        m_ProgressDialog = ProgressDialog
-                .show(MapForMultipleShop.this,
-                        "Please wait...",
-                        "Updating the route...",
-                        true);
+      //  m_ProgressDialog = ProgressDialog.show(MapForMultipleShop.this,"Please wait...","Updating the route...",true);
 
         try {
             mapShopSortList=new ArrayList<MapShopSortViewModel>();
@@ -147,6 +150,8 @@ public class MapForMultipleShop extends FragmentActivity {
     Marker ciu = mMap.addMarker(new MarkerOptions().position(latLng).title("Address"));
     ciu.setTitle(addressText);
 
+
+
     mMap.setMyLocationEnabled(true);
     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
 }
@@ -172,7 +177,7 @@ public class MapForMultipleShop extends FragmentActivity {
         if(addresses!=null && addresses.size()>0) {
             mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-            mlocListener = new MyMapLocationListener();
+            mlocListener = new MyMapLocationListener(this);
 
 
             isGPSEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -203,7 +208,13 @@ public class MapForMultipleShop extends FragmentActivity {
             }
         }
     };*/
+  public static int convertToPixels(Context context, int nDP)
+  {
+      final float conversionScale = context.getResources().getDisplayMetrics().density;
 
+      return (int) ((nDP * conversionScale) + 0.5f) ;
+
+  }
 
    private double distance(double lat1, double lon1, double lat2, double lon2) {
         double theta = lon1 - lon2;
@@ -292,14 +303,7 @@ public class MapForMultipleShop extends FragmentActivity {
     }
    private void  ShopShortList()
     {
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
-        if(globalShopOrder==0) {
-            dbHelper.deleteMapShop();
-            for (MapShopSortViewModel saveShop : Shared.MapSortByShop) {
-                dbHelper.insertMapSortByShopName(saveShop);
-            }
-            globalShopOrder++;
-        }
+
         if( mapShopsort!=null)
         {
             AlertDialog.Builder builderSingle = new AlertDialog.Builder(
@@ -307,14 +311,11 @@ public class MapForMultipleShop extends FragmentActivity {
             builderSingle.setIcon(R.drawable.ic_launcher);
             builderSingle.setTitle("Shop Name Order");
             final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MapForMultipleShop.this,android.R.layout.simple_list_item_1);
-           ArrayList<MapShopSortViewModel> OrderShopList=dbHelper.getAllShopByOrder();
-            for( int l=0;l<OrderShopList.size();l++)
+           //ArrayList<MapShopSortViewModel> OrderShopList=dbHelper.getAllShopByOrder();
+            for( int l=0;l< Shared.MapSortByShop.size();l++)
             {
-
-
                 i=l+1;
-                arrayAdapter.add(i+". "+OrderShopList.get(l).ShopName);
-                i++;
+                arrayAdapter.add(i+". "+ Shared.MapSortByShop.get(l).ShopName);
             }
           //  arrayAdapter.addAll(Shared.end_address);
             builderSingle.setAdapter(arrayAdapter, null);
@@ -343,6 +344,11 @@ public class MapForMultipleShop extends FragmentActivity {
 
     public class MyMapLocationListener implements LocationListener
     {
+        Context context;
+  public MyMapLocationListener(Context context)
+  {
+      this.context=context;
+  }
 
         @Override
         public void onLocationChanged(Location loc)
@@ -387,9 +393,40 @@ public class MapForMultipleShop extends FragmentActivity {
                     mapShopSortList.add(mapshopSingle);
                 }
             }
-            Shared.MapSortByShop= mapShopSortList;
-            globalShopOrder=0;
 
+            dbHelper.deleteMapShop();
+            for (MapShopSortViewModel saveShop : mapShopSortList) {
+                dbHelper.insertMapSortByShopName(saveShop);
+            }
+            Shared.MapSortByShop= dbHelper.getAllShopByOrder();
+if(dbHelper!=null)
+{
+    ArrayList<MapShopSortViewModel> OrderShopList=dbHelper.getAllShopByOrder();
+    for( int l=0;l<OrderShopList.size();l++) {
+       int i=l+1;
+        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+        Bitmap bmp = Bitmap.createBitmap(100, 120, conf);
+        Canvas canvas = new Canvas(bmp);
+        Typeface tf = Typeface.create("Helvetica", Typeface.BOLD);
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.BLUE);
+        paint.setTypeface(tf);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTextSize(convertToPixels(context, 11));
+        canvas.drawText(String.valueOf(i), 20, 50, paint); // paint defines the text color, stroke width, size
+        mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(OrderShopList.get(l).Lat, OrderShopList.get(l).Lon))
+                                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker2))
+                        .icon(BitmapDescriptorFactory.fromBitmap(bmp))
+                        .anchor(0.5f, 1)
+        );
+
+    }
+}
+            else {
+    ArrayList<MapShopSortViewModel> OrderShopList=dbHelper.getAllShopByOrder();
+}
 
                    // mlocManager.removeUpdates(mlocListener);
             DrawRoute();
@@ -417,15 +454,15 @@ public class MapForMultipleShop extends FragmentActivity {
         }
         public  void DrawRoute()
         {
-            if(Shared.TaskList.size()<=8)
+            if(Shared.MapSortByShop.size()<=8)
             {
                 String url = getDirectionsUrl(currentlang, latLng);
                 DownloadTask downloadTask = new DownloadTask();
                 downloadTask.execute(url);
             }
             else {
-                 count = Shared.TaskList.size() / 8;
-                  modulo=Shared.TaskList.size()%8;
+                 count = Shared.MapSortByShop.size() / 8;
+                  modulo=Shared.MapSortByShop.size()%8;
                 for (i = 0; modulo==0?i < count:i <=count; i++)
                 {
                     String url = getDirectionsUrl(currentlang, latLng);
@@ -449,27 +486,31 @@ public class MapForMultipleShop extends FragmentActivity {
             String sensor = "sensor=false";
             String mode = "mode=driving";
             String waypoints="waypoints=";
+
             if(Shared.TaskList.size()<=8)
             {
                 for (int k = 0; k <Shared.TaskList.size(); k++) {
 
-                    waypoints = waypoints + latlngShop[k] + "|";
+                  //  waypoints = waypoints + latlngShop[k] + "|";
+                 //  latlngShopSort = Double.parseDouble(OrderShopList.get(k)) + "," + String.valueOf(OrderShopList.get(k));
+                    waypoints = waypoints +  Shared.MapSortByShop.get(k).Lat+","+ Shared.MapSortByShop.get(k).Lon + "|";
                 }
             }
             else {
                 if (count == i) {
                     for (int k = globalVar; k < globalVar + modulo; k++) {
 
-                        waypoints = waypoints + latlngShop[k] + "|";
+                       // waypoints = waypoints + latlngShop[k] + "|";
+                        waypoints = waypoints +  Shared.MapSortByShop.get(k).Lat+","+ Shared.MapSortByShop.get(k).Lon + "|";
 
                     }
                     globalVar = 0;
-                    m_ProgressDialog.dismiss();
+
                 } else {
                     for (int k = globalVar; k < globalVar + 8; k++) {
 
-                        waypoints = waypoints + latlngShop[k] + "|";
-
+                        //waypoints = waypoints + latlngShop[k] + "|";
+                        waypoints = waypoints +  Shared.MapSortByShop.get(k).Lat+","+ Shared.MapSortByShop.get(k).Lon + "|";
                     }
                     globalVar = globalVar + 8;
                 }
@@ -624,9 +665,10 @@ public class MapForMultipleShop extends FragmentActivity {
 
             // Drawing polyline in the Google Map for the i-th route
             poly=mMap.addPolyline(lineOptions);
-            m_ProgressDialog.dismiss();
+           // m_ProgressDialog.dismiss();
 
         }
+
     }
 
 }
