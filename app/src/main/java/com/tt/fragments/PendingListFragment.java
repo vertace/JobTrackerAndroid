@@ -101,7 +101,7 @@ public class PendingListFragment extends ListFragment
         if(orderBySearch=="OrderByShop")
         {
             condition = " EmployeeID = "
-                    + String.valueOf(Shared.LoggedInUser.ID+" AND TaskRequest.IsDone = 0 ORDER BY ShopName ASC");
+                    + String.valueOf(Shared.LoggedInUser.ID+" AND TaskRequest.IsDone = 0 ORDER BY ShopName COLLATE NOCASE ASC");
             Shared.TaskList = dbHelper.getPendingTasksOrderBy(condition);
             TaskListAdapter taskListAdapter = new TaskListAdapter(mainActivity, R.layout.row_task);
             setListAdapter(taskListAdapter);
@@ -116,7 +116,7 @@ public class PendingListFragment extends ListFragment
         else if(orderBySearch=="OrderByBranch")
         {
             condition = " EmployeeID = "
-                    + String.valueOf(Shared.LoggedInUser.ID+" AND TaskRequest.IsDone = 0 ORDER BY ShopBranch ASC");
+                    + String.valueOf(Shared.LoggedInUser.ID+" AND TaskRequest.IsDone = 0 ORDER BY ShopBranch COLLATE NOCASE ASC");
             Shared.TaskList = dbHelper.getPendingTasksOrderBy(condition);
             TaskListAdapter taskListAdapter = new TaskListAdapter(mainActivity, R.layout.row_task);
             setListAdapter(taskListAdapter);
