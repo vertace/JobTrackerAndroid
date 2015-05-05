@@ -52,6 +52,14 @@ import com.tt.data.TaskLineItemPhotoViewModel;
 import com.tt.helpers.DatabaseHelper;
 import com.tt.helpers.SstAlert;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -65,6 +73,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -87,12 +96,14 @@ public class MapForMultipleShop extends FragmentActivity
     int temp=0;
     boolean isGPSEnabled=false;
     boolean isNetworkEnabled=false;
-    int globalVar,globalShopOrder;
+    int globalVar=0;
     int count,i,modulo;
     Polyline poly;
     ArrayList<MapShopSortViewModel> mapShopSortList;
     MapShopSortViewModel mapshopSingle;
     public ProgressDialog m_ProgressDialog = null;
+    String str_origin;
+    String str_dest;
     DatabaseHelper dbHelper = new DatabaseHelper(this);
 
     @Override
@@ -101,7 +112,8 @@ public class MapForMultipleShop extends FragmentActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_map);
-
+        Shared.html_instructions = new ArrayList<String>();
+        Shared.WayPointsShopCount=1;
         btndirection=(Button)findViewById(R.id.btn_Navigation);
 
         btndirection.setVisibility(View.GONE);
@@ -113,68 +125,15 @@ public class MapForMultipleShop extends FragmentActivity
         geocoder = new Geocoder(this);
         latlngShop=new String[Shared.TaskList.size()];
 
-
+        MultipleRoute();
 
       //  m_ProgressDialog = ProgressDialog.show(MapForMultipleShop.this,"Please wait...","Updating the route...",true);
 
-        try {
-            mapShopSortList=new ArrayList<MapShopSortViewModel>();
-            for(int k=0;k<Shared.TaskList.size();k++)
-            {
-
-                latlngShop[k]=new String();
-
-                addresses= geocoder.getFromLocationName(Shared.TaskList.get(k).ShopAddress, 5);
-
-              //  Map<String, String> treeMap = new TreeMap<String, String>(addresses);
-            if(addresses!=null && addresses.size()>0)
-                     {
-                      for (int i = 0; i < addresses.size(); i++)
-                    {
-
-                   android.location.Address address = (android.location.Address) addresses.get(i);
-
-                     // Creating an instance of GeoPoint, to display in Google Map
-                        latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        latlngShop[k] = String.valueOf(address.getLatitude()) + "," + String.valueOf(address.getLongitude());
-                        addressText = String.format("%s, %s", address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
-                                address.getCountryName());
 
 
-        //	Marker ciu = mMap.addMarker(new MarkerOptions().position(latLng).title("Address"));
-        //     ciu.setTitle(addressText);
-        // Locate the first location
+      //  ArrayList<MapShopSortViewModel> test=mapShopSortList;
 
-    }
-
-    Marker ciu = mMap.addMarker(new MarkerOptions().position(latLng).title("Address"));
-    ciu.setTitle(addressText);
-
-
-
-    mMap.setMyLocationEnabled(true);
-    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-}
-
-             /*   Double result= distance(12.9265533, 80.10782879999999,12.9908401,80.21827569999999);
-                double value=result;
-               // mMap.setOnMyLocationChangeListener(myLocationChangeListener);*/
-
-
-
-            }
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-
-            e.printStackTrace();
-            SstAlert.Show(MapForMultipleShop.this, "Error",
-                    "Some Problem occured");
-        }
-
-        ArrayList<MapShopSortViewModel> test=mapShopSortList;
-
-        if(addresses!=null && addresses.size()>0) {
+        if(latlngShop.length>0) {
             mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
             mlocListener = new MyMapLocationListener(this);
@@ -183,7 +142,7 @@ public class MapForMultipleShop extends FragmentActivity
             isGPSEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             isNetworkEnabled = mlocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
             if (isGPSEnabled) {
-                mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 10, mlocListener);
+                    mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 10, mlocListener);
             } else {
                 mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 10, mlocListener);
             }
@@ -197,7 +156,136 @@ public class MapForMultipleShop extends FragmentActivity
         }
 
     }
+private void MultipleRoute()
+{
+    try
+    {
+        mapShopSortList=new ArrayList<MapShopSortViewModel>();
+        for(int k=0;k<Shared.TaskList.size();k++)
+        {
 
+            latlngShop[k]=new String();
+
+            addresses= geocoder.getFromLocationName(Shared.TaskList.get(k).ShopAddress, 5);
+           // addresses= getAddrByWeb(getLocationInfo(Shared.TaskList.get(k).ShopAddress));
+            //  Map<String, String> treeMap = new TreeMap<String, String>(addresses);
+            if(addresses!=null && addresses.size()>0)
+            {
+                for (int i = 0; i < addresses.size(); i++)
+                {
+
+                    android.location.Address address = (android.location.Address) addresses.get(i);
+
+                    // Creating an instance of GeoPoint, to display in Google Map
+                    latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                    latlngShop[k] = String.valueOf(address.getLatitude()) + "," + String.valueOf(address.getLongitude());
+                    addressText = String.format("%s, %s", address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
+                            address.getCountryName());
+
+
+                    //	Marker ciu = mMap.addMarker(new MarkerOptions().position(latLng).title("Address"));
+                    //     ciu.setTitle(addressText);
+                    // Locate the first location
+
+                }
+
+                Marker ciu = mMap.addMarker(new MarkerOptions().position(latLng).title("Address"));
+                ciu.setTitle(addressText);
+
+
+
+                mMap.setMyLocationEnabled(true);
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+            }
+
+             /*   Double result= distance(12.9265533, 80.10782879999999,12.9908401,80.21827569999999);
+                double value=result;
+               // mMap.setOnMyLocationChangeListener(myLocationChangeListener);*/
+
+
+
+        }
+
+    } catch (IOException e) {
+        // TODO Auto-generated catch block
+
+        e.printStackTrace();
+        MultipleRoute();
+        SstAlert.Show(MapForMultipleShop.this, "Error",
+                "Some Problem occured");
+    }
+}
+
+    public static JSONObject getLocationInfo(String address) {
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+
+            address = address.replaceAll(" ","%20");
+
+            HttpPost httppost = new HttpPost("http://maps.google.com/maps/api/geocode/json?address=" + address + "&sensor=false");
+            HttpClient client = new DefaultHttpClient();
+            HttpResponse response;
+            stringBuilder = new StringBuilder();
+
+
+            response = client.execute(httppost);
+            HttpEntity entity = response.getEntity();
+            InputStream stream = entity.getContent();
+            int b;
+            while ((b = stream.read()) != -1) {
+                stringBuilder.append((char) b);
+            }
+        } catch (ClientProtocolException e) {
+        } catch (IOException e) {
+        }
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject = new JSONObject(stringBuilder.toString());
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return jsonObject;
+    }
+    private static List<Address> getAddrByWeb(JSONObject jsonObject){
+        List<Address> res = new ArrayList<Address>();
+        try
+        {
+            JSONArray array = (JSONArray) jsonObject.get("results");
+            for (int i = 0; i < array.length(); i++)
+            {
+                Double lon = new Double(0);
+                Double lat = new Double(0);
+                String name = "";
+                try
+                {
+                    lon = array.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lng");
+
+                    lat = array.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lat");
+                    name = array.getJSONObject(i).getString("formatted_address");
+                    Address addr = new Address(Locale.getDefault());
+                    addr.setLatitude(lat);
+                    addr.setLongitude(lon);
+                    addr.setAddressLine(0, name != null ? name : "");
+                    res.add(addr);
+                }
+                catch (JSONException e)
+                {
+                    e.printStackTrace();
+
+                }
+            }
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+
+        }
+
+        return res;
+    }
   /*  private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
         @Override
         public void onMyLocationChange(Location location) {
@@ -468,6 +556,12 @@ if(dbHelper!=null)
                     String url = getDirectionsUrl(currentlang, latLng);
                     DownloadTask downloadTask = new DownloadTask();
                     downloadTask.execute(url);
+
+
+
+
+
+
                 }
             }
 
@@ -476,8 +570,9 @@ if(dbHelper!=null)
         {
 
             // Origin of route
-            String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
-            String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+          //  String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+            //String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+
             // Destination of route
 
 
@@ -498,21 +593,31 @@ if(dbHelper!=null)
             }
             else {
                 if (count == i) {
+                     str_origin = "origin=" + Shared.MapSortByShop.get(globalVar).Lat + "," + Shared.MapSortByShop.get(globalVar).Lon;
                     for (int k = globalVar; k < globalVar + modulo; k++) {
 
                        // waypoints = waypoints + latlngShop[k] + "|";
                         waypoints = waypoints +  Shared.MapSortByShop.get(k).Lat+","+ Shared.MapSortByShop.get(k).Lon + "|";
 
                     }
+                    str_dest = "destination=" + Shared.MapSortByShop.get(globalVar+modulo-1).Lat + "," + Shared.MapSortByShop.get(globalVar+modulo-1).Lon;
                     globalVar = 0;
 
                 } else {
+                    if(globalVar==0)
+                    {
+                         str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+                    }
+                    else {
+                        str_origin = "origin=" + Shared.MapSortByShop.get(globalVar).Lat + "," + Shared.MapSortByShop.get(globalVar).Lon;
+                    }
                     for (int k = globalVar; k < globalVar + 8; k++) {
 
                         //waypoints = waypoints + latlngShop[k] + "|";
                         waypoints = waypoints +  Shared.MapSortByShop.get(k).Lat+","+ Shared.MapSortByShop.get(k).Lon + "|";
                     }
                     globalVar = globalVar + 8;
+                    str_dest = "destination=" + Shared.MapSortByShop.get(globalVar).Lat + "," + Shared.MapSortByShop.get(globalVar).Lon;
                 }
             }
             waypoints = waypoints.substring(0, waypoints.length()-1);
@@ -580,7 +685,7 @@ if(dbHelper!=null)
                     // Fetching the data from web service
                     data = downloadUrl(url[0]);
                 }catch(Exception e){
-                    Log.d("Background Task",e.toString());
+                    Log.d("Background Task", e.toString());
                 }
                 return data;
             }
@@ -614,7 +719,6 @@ if(dbHelper!=null)
             try{
                 jObject = new JSONObject(jsonData[0]);
                 DirectionsJSONParser parser = new DirectionsJSONParser();
-
                 // Starts parsing data
                 routes = parser.parse(jObject);
             }catch(Exception e){

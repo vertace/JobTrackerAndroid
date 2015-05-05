@@ -27,7 +27,7 @@ public class DirectionsJSONParser {
         try {
 
             jRoutes = jObject.getJSONArray("routes");
-            Shared.html_instructions = new ArrayList<String>();
+          //  Shared.html_instructions = new ArrayList<String>();
            // jRoutes = jObject.getJSONArray("end_address");
             //Shared.end_address = new ArrayList<String>();
 
@@ -45,23 +45,39 @@ public class DirectionsJSONParser {
                     jSteps = ((JSONObject) jLegs.get(j)).getJSONArray("steps");
 
                     /** Traversing all steps */
-                    for (int k = 0; k < jSteps.length(); k++) {
-                        String polyline = "", html_instructions = "";
-                        //  Shared.html_instructions[k]=new String();
-                        polyline = (String) ((JSONObject) ((JSONObject) jSteps.get(k)).get("polyline")).get("points");
-                        temp = (String) (((JSONObject) jSteps.get(k)).get("html_instructions")).toString().replaceAll("\\<.*?>", "");
-                        Shared.html_instructions.add(temp);
-                        List<LatLng> list = decodePoly(polyline);
 
-                        /** Traversing all points */
-                        for (int l = 0; l < list.size(); l++) {
-                            HashMap<String, String> hm = new HashMap<String, String>();
-                            hm.put("lat", Double.toString(((LatLng) list.get(l)).latitude));
-                            hm.put("lng", Double.toString(((LatLng) list.get(l)).longitude));
-                            path.add(hm);
+                            for (int k = 0; k < jSteps.length(); k++) {
+                            int s = k + 1;
+                            String polyline = "", html_instructions = "";
+                             double orginstart,orginend;
+                               // orginend=(String) ((JSONObject) ((JSONObject) jSteps.get(k)).get("end_location")).get("lat");
+                               // if(orginstart!=orginend) {
+                                    //  Shared.html_instructions[k]=new String();
+                                orginstart=(Double) ((JSONObject) ((JSONObject) jSteps.get(k)).get("start_location")).get("lat");
+                                orginend=(Double) ((JSONObject) ((JSONObject) jSteps.get(k)).get("end_location")).get("lat");
+                                if(orginstart!=orginend)
+                                {
+                                    polyline = (String) ((JSONObject) ((JSONObject) jSteps.get(k)).get("polyline")).get("points");
+                                    temp = (String) (((JSONObject) jSteps.get(k)).get("html_instructions")).toString().replaceAll("\\<.*?>", "");
+                                    Shared.html_instructions.add(Shared.WayPointsShopCount + "." + s + ". " + temp);
+
+                                    List<LatLng> list = decodePoly(polyline);
+
+                                    /** Traversing all points */
+                                    for (int l = 0; l < list.size(); l++) {
+                                        HashMap<String, String> hm = new HashMap<String, String>();
+                                        hm.put("lat", Double.toString(((LatLng) list.get(l)).latitude));
+                                        hm.put("lng", Double.toString(((LatLng) list.get(l)).longitude));
+                                        path.add(hm);
+                                    }
+                                }
+                                else{
+                                    Shared.WayPointsShopCount--;
+                                }
                         }
-                    }
-                    routes.add(path);
+                        Shared.WayPointsShopCount++;
+                        routes.add(path);
+
                 }
             }
 

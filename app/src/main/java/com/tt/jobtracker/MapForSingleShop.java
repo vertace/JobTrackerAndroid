@@ -2,6 +2,7 @@ package com.tt.jobtracker;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
@@ -72,6 +73,9 @@ public class MapForSingleShop extends FragmentActivity{
     int temp=0;
     boolean isGPSEnabled=false;
     boolean isNetworkEnabled=false;
+    public ProgressDialog m_ProgressDialog = null;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -155,9 +159,9 @@ public class MapForSingleShop extends FragmentActivity{
             isGPSEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             isNetworkEnabled = mlocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
             if (isGPSEnabled) {
-                mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mlocListener);
+                mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 10, mlocListener);
             } else {
-                mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mlocListener);
+                mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 10, mlocListener);
             }
             //  mlocManager.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, 3000, 0, mlocListener);
             //  ((MyLocationListener) mlocListener).DrawRoute();
@@ -188,6 +192,11 @@ public class MapForSingleShop extends FragmentActivity{
             // Showing Alert Message
             alertDialog.show();
         }
+      /*  m_ProgressDialog = ProgressDialog
+                .show(MapForSingleShop.this,
+                        "Please wait...",
+                        "Updating the route...",
+                        true);*/
     }
 
 
@@ -483,6 +492,7 @@ public class MapForSingleShop extends FragmentActivity{
 
             // Drawing polyline in the Google Map for the i-th route
             mMap.addPolyline(lineOptions);
+            //m_ProgressDialog.dismiss();
         }
     }
 }
