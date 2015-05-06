@@ -10,7 +10,7 @@ public class Shared {
 
     //public static String WebAPI = "http://sunsigns.azurewebsites.net/";
     //public static String WebAPI = "http://emtracker.specialeffect.co.in/";
-   // public static String WebAPI = "http://192.168.0.114:1989/";
+    //public static String WebAPI = "http://192.168.0.104:1989/";
     public static String WebAPI = "http://jobtrack.azurewebsites.net/";
     public static String LoginAPI = WebAPI + "/Employee/Login";
     public static String TaskListAPI = WebAPI + "/Task/GetTasksForEmployeeNew";
@@ -23,12 +23,13 @@ public class Shared {
 
     public static String EmployeeListAPI = WebAPI + "Employee/AllEmployees";
     public static String UploadShopPhotoAPI = WebAPI + "Task/UploadShopPhotoAzure";
-
+public static String RfeListAPI=WebAPI+"Task/GetRfeList";
 
     public static String SaveRegistrationID=WebAPI+"Task/SaveRegistrationID";
 
     public static EmployeeViewModel LoggedInUser;
     public static List<TaskViewModel> TaskList;
+    public static List<RfeViewModel> RfeList;
 
     public static List<TaskLineItemViewModel> TaskDetail;
     public static MeasurementPhoto MeasurementUploadPhoto;
@@ -54,8 +55,9 @@ public class Shared {
     public static long sharedCheckinID;
 
     public static ArrayList<String> html_instructions;
-    public static ArrayList<String>  end_address;
-    public static String selectedShopAddress;
+    public static int WayPointsShopCount;
+
+    public static boolean sychIntiallyTasks;
 
     public static String sharedprefs_uploadstatus="Uploadonwifi";
 
