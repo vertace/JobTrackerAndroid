@@ -11,6 +11,7 @@ import com.google.android.gms.drive.realtime.internal.event.ValuesAddedDetails;
 import com.tt.data.EmployeeViewModel;
 import com.tt.data.MapShopSortViewModel;
 import com.tt.data.MeasurementPhoto;
+import com.tt.data.RfeViewModel;
 import com.tt.data.TaskLineItemPhotoViewModel;
 import com.tt.data.TaskLineItemViewModel;
 import com.tt.data.TaskViewModel;
@@ -62,13 +63,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d(LOGCAT, "MeasurementPhoto Created");
 
         query = "CREATE TABLE Employee (EmpID  INTEGER PRIMARY KEY,"
-                + "Name INTEGER," + "Username TEXT," + "Password TEXT)";
+                + "Name INTEGER," + "Username TEXT," + "Password TEXT,"+"IsAdmin INTEGER)";
         database.execSQL(query);
         Log.d(LOGCAT, "Employee Created");
+
         query = "CREATE TABLE MapSortByShopName (ID  INTEGER PRIMARY KEY,"
                 + "ShopName TEXT," + "Lat TEXT," + "Lon TEXT,"+"Distance DECIMAL(10,2))";
         database.execSQL(query);
-        Log.d(LOGCAT, "Employee Created");
+        Log.d(LOGCAT, "MapSortByShopName Created");
+
+        query = "CREATE TABLE RfeRequest (ID  INTEGER PRIMARY KEY,"
+                + "Name TEXT," + "Code TEXT," + "Description TEXT,"+"RfeID INTEGER)";
+        database.execSQL(query);
+        Log.d(LOGCAT, "RfeRequest Created");
     }
 
     @Override
@@ -95,6 +102,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 user.ID = cursor.getString(0);
                 user.Name = cursor.getString(1);
                 user.Username = cursor.getString(2);
+                user.IsAdmin=cursor.getString(4).equals("1") ? true : false;
             } while (cursor.moveToNext());
         }
         database.close();
@@ -108,6 +116,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("Name", employee.Name);
         values.put("Username", employee.Username);
         values.put("Password", employee.Password);
+        values.put("IsAdmin",employee.IsAdmin);
         database.insert("Employee", null, values);
         database.close();
     }
@@ -119,6 +128,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("Name", employee.Name);
         values.put("Username", employee.Username);
         values.put("Password", employee.Password);
+        values.put("IsAdmin", employee.IsAdmin);
         int result = database.update("Employee", values, "EmpID" + " = ?",
                 new String[]{String.valueOf(employee.ID)});
         database.close();
@@ -770,28 +780,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public long insertMapSortByShopName(MapShopSortViewModel mapsortByShop) {
-        SQLiteDatabase database = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("ShopName", mapsortByShop.ShopName);
-        values.put("Lat", mapsortByShop.Lat);
-        values.put("Lon", mapsortByShop.Lon);
-        values.put("Distance", mapsortByShop.distance);
-        long id = database.insert("MapSortByShopName", null, values);
-        database.close();
-        return id;
-    }
-    public void updateMapSortByShopName(MapShopSortViewModel mapsortByShop) {
-        SQLiteDatabase database = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("ShopName", mapsortByShop.ShopName);
-        values.put("Lat", mapsortByShop.Lat);
-        values.put("Lon", mapsortByShop.Lon);
-        values.put("Distance", mapsortByShop.distance);
-        int result = database.update("MapSortByShopName", values, "ID" + " = ?",
-                new String[]{String.valueOf(mapsortByShop.TaskID)});
-        database.close();
-    }
+
 
     public int updateMeasurementPhoto(MeasurementPhoto measurementPhoto,
                                       boolean includePhoneUpdates) {
@@ -840,25 +829,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         MeasurementPhoto photo = getMeasurementPhotoInfo(id);
         PhotoDeleteHelper.DeletePhoto(photo.PhotoID);
     }
-    public ArrayList<MapShopSortViewModel> getAllShopByOrder() {
-        ArrayList<MapShopSortViewModel> mapShopOrderList = new ArrayList<MapShopSortViewModel>();
-        String selectQuery = "SELECT * FROM MapSortByShopName Order By Distance ASC";
-        SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.rawQuery(selectQuery, null);
-        if (cursor.moveToFirst()) {
-            do {
-                MapShopSortViewModel mapShopOrder = new MapShopSortViewModel();
 
-                mapShopOrder.ShopName =cursor.getString(1);;
-                mapShopOrder.Lat = Double.parseDouble(cursor.getString(2));
-                mapShopOrder.Lon = Double.parseDouble(cursor.getString(3));
-                mapShopOrder.distance = Double.parseDouble(cursor.getString(4));
-                mapShopOrderList.add(mapShopOrder);
-        } while (cursor.moveToNext());
-    }
-    database.close();
-    return mapShopOrderList;
-    }
     public ArrayList<MeasurementPhoto> getAllMeasurementPhotos() {
         ArrayList<MeasurementPhoto> measurementPhotoList = new ArrayList<MeasurementPhoto>();
         String selectQuery = "SELECT * FROM MeasurementPhoto";
@@ -1155,5 +1126,94 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    public long insertMapSortByShopName(MapShopSortViewModel mapsortByShop) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("ShopName", mapsortByShop.ShopName);
+        values.put("Lat", mapsortByShop.Lat);
+        values.put("Lon", mapsortByShop.Lon);
+        values.put("Distance", mapsortByShop.distance);
+        long id = database.insert("MapSortByShopName", null, values);
+        database.close();
+        return id;
+    }
+    public void updateMapSortByShopName(MapShopSortViewModel mapsortByShop) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("ShopName", mapsortByShop.ShopName);
+        values.put("Lat", mapsortByShop.Lat);
+        values.put("Lon", mapsortByShop.Lon);
+        values.put("Distance", mapsortByShop.distance);
+        int result = database.update("MapSortByShopName", values, "ID" + " = ?",
+                new String[]{String.valueOf(mapsortByShop.TaskID)});
+        database.close();
+    }
+    public ArrayList<MapShopSortViewModel> getAllShopByOrder() {
+        ArrayList<MapShopSortViewModel> mapShopOrderList = new ArrayList<MapShopSortViewModel>();
+        String selectQuery = "SELECT * FROM MapSortByShopName Order By Distance ASC";
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                MapShopSortViewModel mapShopOrder = new MapShopSortViewModel();
 
+                mapShopOrder.ShopName =cursor.getString(1);;
+                mapShopOrder.Lat = Double.parseDouble(cursor.getString(2));
+                mapShopOrder.Lon = Double.parseDouble(cursor.getString(3));
+                mapShopOrder.distance = Double.parseDouble(cursor.getString(4));
+                mapShopOrderList.add(mapShopOrder);
+            } while (cursor.moveToNext());
+        }
+        database.close();
+        return mapShopOrderList;
+    }
+    public void deleteMapShop() {
+        Log.d(LOGCAT, "delete");
+        SQLiteDatabase database = this.getWritableDatabase();
+        String deleteQuery = "DELETE FROM MapSortByShopName";
+        Log.d("query", deleteQuery);
+        database.execSQL(deleteQuery);
+        database.close();
+    }
+    public long insertRfeRequest(RfeViewModel rfeList) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("Name", rfeList.FullName);
+        values.put("Code", rfeList.Code);
+        values.put("Description", rfeList.Description);
+        values.put("RfeID", rfeList.ID);
+        long id = database.insert("RfeRequest", null, values);
+        database.close();
+        return id;
+    }
+    public void updateRfeRequest(RfeViewModel rfeList) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("Name", rfeList.FullName);
+        values.put("Code", rfeList.Code);
+        values.put("Description", rfeList.Description);
+        values.put("RfeID", rfeList.ID);
+        int result = database.update("RfeRequest", values, "ID" + " = ?",
+                new String[]{String.valueOf(rfeList.ID)});
+        database.close();
+    }
+    public ArrayList<RfeViewModel> getAllRfeList() {
+        ArrayList<RfeViewModel> rfeList = new ArrayList<RfeViewModel>();
+        String selectQuery = "SELECT * FROM MapSortByShopName Order By Distance ASC";
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                RfeViewModel rfe = new RfeViewModel();
+
+                rfe.FullName =cursor.getString(1);;
+                rfe.Code = cursor.getString(2);
+                rfe.Description = cursor.getString(3);
+                rfe.ID = Integer.parseInt(cursor.getString(4));
+                rfeList.add(rfe);
+            } while (cursor.moveToNext());
+        }
+        database.close();
+        return rfeList;
+    }
 }
