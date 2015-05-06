@@ -80,7 +80,8 @@ public class MapForSingleShop extends FragmentActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_map);
-
+        Shared.html_instructions = new ArrayList<String>();
+        Shared.WayPointsShopCount=1;
         btndirection = (Button) findViewById(R.id.btn_Navigation);
 
         btndirection.setVisibility(View.GONE);

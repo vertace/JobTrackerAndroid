@@ -87,7 +87,7 @@ public class Login extends Activity {
             editor.putString("Loginuser",un.getText().toString() ); // Storing string
             editor.commit();
             SharedPreferences.Editor editor1 = password.edit();
-            editor1.putString("LoginPass",pw.getText().toString() ); // Storing string
+            editor1.putString("LoginPass", pw.getText().toString()); // Storing string
             editor1.commit();
             CheckDefaultLogin(employee);
         }
@@ -113,6 +113,7 @@ public class Login extends Activity {
         //  SharedPreference();-
         m_ProgressDialog = ProgressDialog.show(Login.this, "Please wait...",
                 "Logging  in...");
+        Shared.sychIntiallyTasks=true;
         if (employee == null)
         {
 
@@ -138,12 +139,21 @@ public class Login extends Activity {
     public void CheckDefaultLogin( EmployeeViewModel employee) {
         final SharedPreferences taskSync = getApplicationContext().getSharedPreferences(Shared.TaskSync, 0);
         SharedPreferences.Editor editor = taskSync.edit();
+
         editor.putString("tasksync","True"); // Storing string
         editor.commit();
         Shared.LoggedInUser = employee;
-        Intent intent = new Intent(Login.this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        getApplicationContext().startActivity(intent);
+        if(Shared.LoggedInUser.IsAdmin==true)
+        {
+            Intent intent = new Intent(Login.this, Admin_MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getApplicationContext().startActivity(intent);
+        }
+        else {
+            Intent intent = new Intent(Login.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getApplicationContext().startActivity(intent);
+        }
         finish();
     }
     public void btnSync_click(View view) {

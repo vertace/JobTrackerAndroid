@@ -768,7 +768,7 @@ if(dbHelper!=null)
 
 
             // Drawing polyline in the Google Map for the i-th route
-            poly=mMap.addPolyline(lineOptions);
+         mMap.addPolyline(lineOptions);
            // m_ProgressDialog.dismiss();
 
         }

@@ -139,14 +139,14 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
             selectItem(0);
         }
 
-        context = getApplicationContext();
+       /* context = getApplicationContext();
         regid = getRegistrationId(context);
         Shared.LoggedInUser.GcmRegID = regid;
         if (regid.isEmpty()) {
             registerInBackground();
             GetRegID obj = new GetRegID(this);
             obj.execute();
-        }
+        }*/
 
         final SharedPreferences taskSyncLogin = getSharedPreferences(Shared.TaskSync, 0);
         String taskDownloadLogin= taskSyncLogin.getString("tasksync", null);
