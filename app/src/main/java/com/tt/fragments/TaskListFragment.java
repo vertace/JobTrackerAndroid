@@ -75,12 +75,14 @@ public class TaskListFragment extends Fragment
 
         final SharedPreferences taskSync = getActivity().getApplicationContext().getSharedPreferences(Shared.TaskSync, 0);
         String syncTaskStatus= taskSync.getString("tasksync", null);
-        if(syncTaskStatus=="True")
+        if(syncTaskStatus=="True" && Shared.sychIntiallyTasks==true)
         {
-            DownloadTasksFromServer();
-            SharedPreferences.Editor editor = taskSync.edit();
-            editor.putString("tasksync",null); // Storing string
-            editor.commit();
+            if(Shared.sychIntiallyTasks==true) {
+                DownloadTasksFromServer();
+                SharedPreferences.Editor editor = taskSync.edit();
+                editor.putString("tasksync", null); // Storing string
+                editor.commit();
+            }
         }
         //DownloadTasksFromServer();
 

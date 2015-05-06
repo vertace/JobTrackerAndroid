@@ -132,13 +132,13 @@ public class PendingListFragment extends ListFragment
         else {
 
             condition = " EmployeeID = "
-                    + String.valueOf(Shared.LoggedInUser.ID + " AND TaskRequest.IsDone = 0");
+                    + String.valueOf(Shared.LoggedInUser.ID +" AND TaskRequest.IsDone = 0 ORDER BY ShopName COLLATE NOCASE ASC");
             if (mainActivity.SearchText != "") {
                 condition = condition + " AND TaskRequest.ShopName like '%" + mainActivity.SearchText + "%'";
             }
             mainActivity.SearchText="";
 
-            Shared.TaskList = dbHelper.getPendingTasks(condition);
+            Shared.TaskList = dbHelper.getPendingTasksOrderBy(condition);
 
             TaskListAdapter taskListAdapter = new TaskListAdapter(mainActivity, R.layout.row_task);
             setListAdapter(taskListAdapter);
