@@ -1107,6 +1107,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     task.IsDone= Integer.parseInt(cursor.getString(14)) == 1 ? true: false;
                     task.MinimumPhoto=Integer.parseInt(cursor.getString(15));
                     task.Name=cursor.getString(16);
+                    task.IsShopPhoto=Integer.parseInt(cursor.getString(17)) == 1 ? true:false;
                     temp = cursor.getString(13);
                     if (temp == null || temp.isEmpty())
                         task.ShopPhotoUploaded = false;
@@ -1186,7 +1187,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         database.close();
         return id;
     }
-    public void updateRfeRequest(RfeViewModel rfeList) {
+    public int updateRfeRequest(RfeViewModel rfeList) {
         SQLiteDatabase database = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("Name", rfeList.FullName);
@@ -1196,10 +1197,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int result = database.update("RfeRequest", values, "ID" + " = ?",
                 new String[]{String.valueOf(rfeList.ID)});
         database.close();
+        return rfeList.ID;
     }
     public ArrayList<RfeViewModel> getAllRfeList() {
         ArrayList<RfeViewModel> rfeList = new ArrayList<RfeViewModel>();
-        String selectQuery = "SELECT * FROM MapSortByShopName Order By Distance ASC";
+        String selectQuery = "SELECT * FROM RfeRequest Order By Name ASC";
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
@@ -1215,5 +1217,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         database.close();
         return rfeList;
+    }
+    public long saveRfeList(RfeViewModel RfeViewModel) {
+        String selectQuery = "SELECT * FROM RfeRequest where RfeID = "
+                + RfeViewModel.ID;
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery(selectQuery, null);
+        int count = cursor.getCount();
+        database.close();
+        if (count == 0) {
+            return insertRfeRequest(RfeViewModel);
+        } else {
+            return updateRfeRequest(RfeViewModel);
+        }
     }
 }
