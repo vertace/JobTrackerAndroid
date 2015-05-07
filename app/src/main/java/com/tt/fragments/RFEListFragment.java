@@ -8,9 +8,12 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
@@ -62,17 +65,39 @@ public class RFEListFragment extends Fragment {
             adminmainActivity=(Admin_MainActivity) getActivity();
              dbHelper = new DatabaseHelper(adminmainActivity);
 
-
+           // m_ProgressDialog = ProgressDialog.show(getActivity(), "Please wait...", "Reading data from database...", true);
             SychRfe();
 
             m_ProgressDialog.dismiss();
         } catch (Exception e) {
             m_ProgressDialog.dismiss();
         }
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View v, int position, long arg3) {
+                // TODO Auto-generated method stub
+                Shared.Selected_Rfe=Shared.RfeList.get(position);
+                DownloadRfeTasksFromServer();
+                RfeTaskListFragment rfeTaskListFragment = new RfeTaskListFragment();
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.content_frame, rfeTaskListFragment);
+                fragmentTransaction.commit();
+            }
+        });
+
         return rootView;
     }
 
+    public void DownloadRfeTasksFromServer() {
+        m_ProgressDialog = ProgressDialog.show(getActivity(),
+                "Please wait...", "Downloading task list...", true);
 
+        GetRFeTaskList obj = new GetRFeTaskList(getActivity());
+        obj.execute();
+    }
     public void ShowRfeList() {
 
         m_ProgressDialog.dismiss();
@@ -110,14 +135,10 @@ public class RFEListFragment extends Fragment {
 
         protected ServerResult doInBackground(String... loginData) {
 
-            ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
-
-
             String response = null;
             try
             {
-                response = CustomHttpClient.executeHttpPost(Shared.RfeListAPI,
-                        postParameters);
+                response = CustomHttpClient.executeHttpGet(Shared.RfeListAPI);
                 String res = response.toString();
 
                 GsonBuilder gsonBuilder = new GsonBuilder();
@@ -156,12 +177,9 @@ public class RFEListFragment extends Fragment {
                     break;
                 case RfeListReceived:
 
-                    m_ProgressDialog = ProgressDialog.show(getActivity(),
-                            "Please wait...",
-                            "Data downloaded. Adding to database...", true);
                   for(RfeViewModel rfe:Shared.RfeList)
                   {
-                      dbHelper.insertRfeRequest(rfe);
+                      dbHelper.saveRfeList(rfe);
                   }
 
                     m_ProgressDialog.dismiss();
@@ -182,5 +200,83 @@ public class RFEListFragment extends Fragment {
             }
         }
     }
+    public class GetRFeTaskList extends AsyncTask<String, Integer, ServerResult> {
+        Context context;
 
+        public GetRFeTaskList(Context _context) {
+            context = _context;
+        }
+
+        protected ServerResult doInBackground(String... loginData) {
+
+            ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
+            postParameters.add(new BasicNameValuePair("RfeID",
+                    String.valueOf(Shared.Selected_Rfe.ID)));
+
+            String response = null;
+            try
+            {
+                response = CustomHttpClient.executeHttpPost(Shared.RfeTaskListAPI,
+                        postParameters);
+                String res = response.toString();
+
+                GsonBuilder gsonBuilder = new GsonBuilder();
+                Gson gson = gsonBuilder.create();
+
+                Type listType = new TypeToken<TaskListResponse>() {
+                }.getType();
+                TaskListResponse taskListResponse = gson.fromJson(res, listType);
+                List<TaskViewModel> taskList = taskListResponse.TaskList;
+
+                if (taskList == null || taskList.size() == 0) {
+                    return ServerResult.NoTasks;
+                } else {
+                    Shared.TaskList = taskList;
+                    return ServerResult.TaskListReceived;
+                }
+            } catch (UnknownHostException e) {
+                return ServerResult.ConnectionFailed;
+            } catch (Exception e) {
+                return ServerResult.UnknownError;
+            }
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+
+        }
+
+        protected void onPostExecute(ServerResult result) {
+            m_ProgressDialog.dismiss();
+
+            switch (result) {
+                case ConnectionFailed:
+                    SstAlert.Show(getActivity(), "No Internet",
+                            "You seem to have no internet connection");
+                    break;
+                case TaskListReceived:
+
+                    m_ProgressDialog = ProgressDialog.show(getActivity(),
+                            "Please wait...",
+                            "Data downloaded. Adding to database...", true);
+
+                    SyncHelperExecution syncHelper = new SyncHelperExecution(
+                            context);
+                    syncHelper
+                            .addTasksToLocalDatabase((ArrayList<TaskViewModel>) Shared.TaskList);
+                    m_ProgressDialog.dismiss();
+                    break;
+                case NoTasks:
+                    SstAlert.Show(getActivity(), "No Tasks",
+                            "No open tasks in your name");
+                    break;
+                case UnknownError:
+                    SstAlert.Show(getActivity(), "Unknown Error",
+                            "Some error occured");
+                    break;
+                default:
+                    break;
+
+            }
+        }
+    }
 }
