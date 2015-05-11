@@ -1,13 +1,20 @@
 package com.tt.jobtracker;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -43,6 +50,7 @@ import com.tt.data.TaskViewModel;
 import com.tt.enumerations.ServerResult;
 import com.tt.helpers.AppConstant;
 import com.tt.helpers.AsycResponse;
+import com.tt.helpers.CustomHttpClient;
 import com.tt.helpers.DatabaseHelper;
 import com.tt.helpers.PhotoDeleteHelper;
 import com.tt.helpers.Utility;
@@ -118,7 +126,7 @@ public class BackgroundService extends Service {
                 });
             }
         };
-        timer.schedule(doAsynchronousTask, 0, 1000 * 900);
+        timer.schedule(doAsynchronousTask, 0, 1000 * 300);
         return START_STICKY;
     }
 
@@ -164,7 +172,7 @@ public class BackgroundService extends Service {
 
     }
 
-    public void ShowPendingList() {
+    public void UploadMeasurementImage() {
 
         ArrayList<MeasurementPhoto> pendingList = LoadAllPendingUploads();
         if (pendingList.size() != 0) {
@@ -242,26 +250,33 @@ public class BackgroundService extends Service {
             {
                 if(t.IsShopPhoto==true && t.PhotoID!=null)
                 {
+
                     ShopPhotoUploadProcess(t);
                 }
                 Taskid=t.ID;
                 List<TaskLineItemViewModel> tasklineitems = dbHelper.getTaskLineItems("TaskID=" + String.valueOf(t.ID));
                 for (TaskLineItemViewModel tl : tasklineitems) {
                     if(t.IsMeasurement==true) {
-                        ShowPendingList();
+                        UploadMeasurementImage();
                     }
                     ArrayList<TaskLineItemPhotoViewModel> tdl = dbHelper.getAllTaskLineItemPhotos(String.valueOf(tl.ID));
-                    for (TaskLineItemPhotoViewModel tlp : tdl) {
+                    for (TaskLineItemPhotoViewModel tlp : tdl)
+                    {
                         Shared.SelecteduploadTasklineitemPhotos = tlp;
-                        doinmenthod(tlp);
+                      // String res= GetHaskKey(tlp.PhotoID);
+                        UploadExecutionImage(tlp);
+
                         String result= uploadResponse.getString("uploadResponse", null);
                         shopPhotoUploaded=IshopUloadResponse.getString("shopUploadResponse",null);
                         taskDelete=result;
                         if(result=="True")
                         {
                             SharedPreferences.Editor editor = uploadResponse.edit();
-                            editor.putString("uploadResponse", null); // Storing string
+                            editor.putString("uploadResponse", "False");
+
+
                             editor.commit();
+
                             PhotoDeleteHelper.DeletePhoto(String.valueOf(tlp.PhotoID));
                             dbHelper.deleteTaskLineItemPhoto(String.valueOf(tlp.ID));
                         }
@@ -306,6 +321,45 @@ public class BackgroundService extends Service {
                 editor.commit();
             }
         }
+        private String GetHaskKey(String photopath)
+        {
+            String path = photopath;
+            File f=new File(photopath);
+            if(f.exists()) {
+                File file = new File(path);
+                int size = (int) file.length();
+                byte[] bytes = new byte[size];
+                try {
+                    BufferedInputStream buf = new BufferedInputStream(
+                            new FileInputStream(file));
+                    buf.read(bytes, 0, bytes.length);
+                    buf.close();
+                } catch (FileNotFoundException e) {
+                    Toast.makeText(getApplicationContext(), "Not Found",
+                            Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    Toast.makeText(getApplicationContext(), "Exception",
+                            Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+                String hash = "";
+                MessageDigest m;
+                try {
+                    m = MessageDigest.getInstance("MD5");
+                    byte[] digest = m.digest(bytes);
+                    hash = new BigInteger(1, digest).toString(16);
+
+                    //lstTasks.setText(hash);
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }/* catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }*/
+                return hash;
+            }
+            return "null";
+        }
 
         protected ServerResult doInBackground(String... params) {
 
@@ -335,7 +389,7 @@ public class BackgroundService extends Service {
             }
 
             String fileName = new File(measurementPhoto.PhotoID).getName();
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sbResult = new StringBuilder();
             HttpURLConnection conn = null;
             DataOutputStream dos = null;
             String lineEnd = "\r\n";
@@ -432,18 +486,27 @@ public class BackgroundService extends Service {
                         String inputLine = "";
 
                         while ((inputLine = in.readLine()) != null)
-                            sb.append(inputLine);
+                            sbResult.append(inputLine);
                         in.close();
                     }
-
+                    responseMessage=sbResult.toString();
                     // close the streams //
                     // writer.close();
                     fileInputStream.close();
                     dos.flush();
                     dos.close();
+                    String values[]=responseMessage.split(",");
+                  //  String LocalCheckSum=GetHaskKey(measurementPhoto.PhotoID);
                     final SharedPreferences uploadResponse = getApplicationContext().getSharedPreferences(Shared.UploadResponse, 0);
                     SharedPreferences.Editor editor = uploadResponse.edit();
-                    editor.putString("uploadResponse", "True"); // Storing string
+                    if(Integer.parseInt(values[1])==measurementPhoto.TaskID)
+                    {
+                        editor.putString("uploadResponse", "True");
+                    }
+                    else
+                    {
+                        editor.putString("uploadResponse", "False");
+                    }
                     editor.commit();
                     //return ServerResult.UploadSuccess;
 
@@ -453,7 +516,7 @@ public class BackgroundService extends Service {
                     return "-3";
                 }
                 try {
-                    return sb.toString();//Integer.parseInt(sb.toString());
+                    return sbResult.toString();//Integer.parseInt(sb.toString());
                 } catch (NumberFormatException nex) {
                     return "-1";
                 }
@@ -496,9 +559,10 @@ public class BackgroundService extends Service {
         }
 
 
-        public ServerResult doinmenthod(TaskLineItemPhotoViewModel tlp) {
+        public ServerResult UploadExecutionImage(TaskLineItemPhotoViewModel tlp) {
             TaskLineItemPhotoViewModel tasklineItemPhotos=Shared.SelecteduploadTasklineitemPhotos;
             // String path = taskLineItem.PhotoID;
+
             String fileName = new File(tasklineItemPhotos.PhotoID).getName();
             StringBuilder sbResult = new StringBuilder();
             HttpURLConnection conn = null;
@@ -511,106 +575,157 @@ public class BackgroundService extends Service {
             int maxBufferSize = 1 * 1024 * 1024;
             File sourceFile = new File(tasklineItemPhotos.PhotoID);
             int serverResponseCode = 0;
-            try {
-
-                ArrayList<NameValuePair> taskLineItemPhotos1 = new ArrayList<NameValuePair>(
+            final SharedPreferences uploadResponse = getApplicationContext().getSharedPreferences(Shared.UploadResponse, 0);
+            if(tasklineItemPhotos.PhotoID.equals("NOT_DONE"))
+            {
+                ArrayList<NameValuePair> taskDetailRequest = new ArrayList<NameValuePair>(
                         5);
 
-                taskLineItemPhotos1.add(new BasicNameValuePair("TaskLineItemID", String.valueOf(tasklineItemPhotos.TaskLineItemID)));
-                taskLineItemPhotos1.add(new BasicNameValuePair("Lat", tasklineItemPhotos.Lat));
-                taskLineItemPhotos1.add(new BasicNameValuePair("Lon", tasklineItemPhotos.Lon));
-                taskLineItemPhotos1.add(new BasicNameValuePair("Time", tasklineItemPhotos.Time));
-                FileInputStream fileInputStream = new FileInputStream(
-                        sourceFile);
-                URL url = new URL(Shared.UploadAPI + "?" + Utility.getQuery(taskLineItemPhotos1));
+                taskDetailRequest.add(new BasicNameValuePair("TaskLineItemID", String.valueOf(tasklineItemPhotos.TaskLineItemID)));
+                taskDetailRequest.add(new BasicNameValuePair("Lat", tasklineItemPhotos.Lat));
+                taskDetailRequest.add(new BasicNameValuePair("Lon", tasklineItemPhotos.Lon));
+                taskDetailRequest.add(new BasicNameValuePair("Time", tasklineItemPhotos.Time));
+                taskDetailRequest.add(new BasicNameValuePair("Employee", Shared.LoggedInUser.ID));
+                taskDetailRequest.add(new BasicNameValuePair("NotDoneReason", tasklineItemPhotos.NotDoneReason));
+                try {
+                    String result = CustomHttpClient.executeHttpPost(
+                            Shared.UploadAPI, taskDetailRequest);
+                    sbResult.append(result);
+                    String value=result.replace("\n", "").replace("\r", "");
+                        SharedPreferences.Editor editor = uploadResponse.edit();
+                    if(Integer.parseInt(value)==tasklineItemPhotos.TaskLineItemID)
+                    {
+                        editor.putString("uploadResponse", "True");
 
-                // Open a HTTP connection to the URL
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setDoInput(true); // Allow Inputs
-                conn.setDoOutput(true); // Allow Outputs
-                conn.setUseCaches(false); // Don't use a Cached Copy
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Connection", "Keep-Alive");
-                conn.setRequestProperty("ENCTYPE", "multipart/form-data");
-                conn.setRequestProperty("Content-Type",
-                        "multipart/form-data;boundary=" + boundary);
+                    }
+                    else {
+                        editor.putString("uploadResponse", "False");
+                    }
+                    editor.commit();
 
-                conn.setRequestProperty("uploaded_file",
-                        Shared.GetLocationString() + fileName);
+                } catch (MalformedURLException ex) {
+                    return ServerResult.ConnectionFailed;
+                } catch (Exception e) {
+                   return  ServerResult.ConnectionFailed;
+                }
+            }
+            else
+            {
+                try {
 
-                dos = new DataOutputStream(conn.getOutputStream());
 
-                dos.writeBytes(twoHyphens + boundary + lineEnd);
-                dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""
-                        + fileName + "\"" + lineEnd);
+                    ArrayList<NameValuePair> taskLineItemPhotos1 = new ArrayList<NameValuePair>(
+                            5);
 
-                dos.writeBytes(lineEnd);
+                    taskLineItemPhotos1.add(new BasicNameValuePair("TaskLineItemID", String.valueOf(tasklineItemPhotos.TaskLineItemID)));
+                    taskLineItemPhotos1.add(new BasicNameValuePair("Lat", tasklineItemPhotos.Lat));
+                    taskLineItemPhotos1.add(new BasicNameValuePair("Lon", tasklineItemPhotos.Lon));
+                    taskLineItemPhotos1.add(new BasicNameValuePair("Time", tasklineItemPhotos.Time));
+                    FileInputStream fileInputStream = new FileInputStream(
+                            sourceFile);
+                    URL url = new URL(Shared.UploadAPI + "?" + Utility.getQuery(taskLineItemPhotos1));
 
-                // create a buffer of maximum size
-                bytesAvailable = fileInputStream.available();
+                    // Open a HTTP connection to the URL
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoInput(true); // Allow Inputs
+                    conn.setDoOutput(true); // Allow Outputs
+                    conn.setUseCaches(false); // Don't use a Cached Copy
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("Connection", "Keep-Alive");
+                    conn.setRequestProperty("ENCTYPE", "multipart/form-data");
+                    conn.setRequestProperty("Content-Type",
+                            "multipart/form-data;boundary=" + boundary);
 
-                bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                buffer = new byte[bufferSize];
+                    conn.setRequestProperty("uploaded_file",
+                            Shared.GetLocationString() + fileName);
 
-                // read file and write it into form...
-                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+                    dos = new DataOutputStream(conn.getOutputStream());
 
-                while (bytesRead > 0) {
+                    dos.writeBytes(twoHyphens + boundary + lineEnd);
+                    dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""
+                            + fileName + "\"" + lineEnd);
 
-                    dos.write(buffer, 0, bufferSize);
+                    dos.writeBytes(lineEnd);
+
+                    // create a buffer of maximum size
                     bytesAvailable = fileInputStream.available();
+
                     bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                    buffer = new byte[bufferSize];
+
+                    // read file and write it into form...
                     bytesRead = fileInputStream.read(buffer, 0, bufferSize);
 
+                    while (bytesRead > 0) {
+
+                        dos.write(buffer, 0, bufferSize);
+                        bytesAvailable = fileInputStream.available();
+                        bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                        bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+                    }
+
+                    // send multipart form data necesssary after file data...
+                    dos.writeBytes(lineEnd);
+                    dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+                    // Responses from the server (code and message)
+                    serverResponseCode = conn.getResponseCode();
+                    String responseMessage = conn.getResponseMessage();
+                    if (serverResponseCode == 200) {
+                        BufferedReader in = new BufferedReader(
+                                new InputStreamReader(conn.getInputStream()));
+                        String inputLine = "";
+
+                        while ((inputLine = in.readLine()) != null)
+                            sbResult.append(inputLine);
+                        in.close();
+
+                    }
+                    responseMessage = sbResult.toString();
+
+
+                    // close the streams //
+                    // writer.close();
+                    fileInputStream.close();
+                    dos.flush();
+                    dos.close();
+
+                    //Check md5 checksum
+                    String values[] = responseMessage.split(",");
+                    String LocalCheckSum = GetHaskKey(tlp.PhotoID);
+
+                    SharedPreferences.Editor editor = uploadResponse.edit();
+                    if (values[1].equals(LocalCheckSum)) {
+
+                        editor.putString("uploadResponse", "True");
+
+                    } else {
+                        editor.putString("uploadResponse", "False");
+                    }
+                    editor.commit();
+                    // Storing string
+
+                    return ServerResult.UploadSuccess;
+
+
+                } catch (MalformedURLException ex) {
+
+                    ex.printStackTrace();
+
+                    Log.e("Upload file to server", "error: " + ex.getMessage(), ex);
+                    return ServerResult.ConnectionFailed;
+                } catch (Exception e) {
+
+                    e.printStackTrace();
+
+                    Log.e("Upload file Exception",
+                            "Exception : " + e.getMessage(), e);
+                    return ServerResult.ConnectionFailed;
                 }
-
-                // send multipart form data necesssary after file data...
-                dos.writeBytes(lineEnd);
-                dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-
-                // Responses from the server (code and message)
-                serverResponseCode = conn.getResponseCode();
-                if (serverResponseCode == 200) {
-                    BufferedReader in = new BufferedReader(
-                            new InputStreamReader(conn.getInputStream()));
-                    String inputLine = "";
-
-                    while ((inputLine = in.readLine()) != null)
-                        sbResult.append(inputLine);
-                    in.close();
-
-                }
-
-                // close the streams //
-                // writer.close();
-                fileInputStream.close();
-                dos.flush();
-                dos.close();
-
-                final SharedPreferences uploadResponse = getApplicationContext().getSharedPreferences(Shared.UploadResponse, 0);
-                SharedPreferences.Editor editor = uploadResponse.edit();
-                editor.putString("uploadResponse", "True"); // Storing string
-                editor.commit();
-                return ServerResult.UploadSuccess;
-
-
-            } catch (MalformedURLException ex) {
-
-                ex.printStackTrace();
-
-                Log.e("Upload file to server", "error: " + ex.getMessage(), ex);
-                return ServerResult.ConnectionFailed;
-            } catch (Exception e) {
-
-                e.printStackTrace();
-
-                Log.e("Upload file Exception",
-                        "Exception : " + e.getMessage(), e);
-                return ServerResult.ConnectionFailed;
+                // String result=sbResult.toString();
             }
-            // String result=sbResult.toString();
-
-
+            return ServerResult.UploadSuccess;
 
         }
 
@@ -705,7 +820,8 @@ public class BackgroundService extends Service {
 
                     // Responses from the server (code and message)
                     serverResponseCode = conn.getResponseCode();
-                    if (serverResponseCode == 200)
+                    String responseMessage = conn.getResponseMessage();
+                   if (serverResponseCode == 200)
                     {
                         BufferedReader in = new BufferedReader(
                                 new InputStreamReader(conn.getInputStream()));
@@ -716,15 +832,27 @@ public class BackgroundService extends Service {
                         in.close();
 
                     }
-
+                    responseMessage=sbResult.toString();
+                    String resultFromServer=sbResult.toString();
                     // close the streams //
                     // writer.close();
                     fileInputStream.close();
                     dos.flush();
                     dos.close();
+                    String values[]=responseMessage.split(",");
+                    String LocalCheckSum=GetHaskKey(taskViewModel.PhotoID);
                     final SharedPreferences uploadResponse = getApplicationContext().getSharedPreferences(Shared.UploadResponse, 0);
                     SharedPreferences.Editor editor = uploadResponse.edit();
-                    editor.putString("uploadResponse", "True"); // Storing string
+                    if(values[1].equals(LocalCheckSum))
+                    {
+
+                        editor.putString("uploadResponse", "True");
+
+                    }
+                    else
+                    {
+                        editor.putString("uploadResponse", "False");
+                    }
                     editor.commit();
 
 

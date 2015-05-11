@@ -1,8 +1,10 @@
 package com.tt.jobtracker;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -12,7 +14,9 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.tt.data.TaskViewModel;
 import com.tt.jobtracker.R;
 
 import com.google.gson.Gson;
@@ -92,10 +96,21 @@ public class Login extends Activity {
             CheckDefaultLogin(employee);
         }
         else {
-            m_ProgressDialog.dismiss();
 
-            SstAlert.Show(Login.this, "Login Failed",
-                    "Wrong username/password");
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Wrong username/password!")
+                    .setCancelable(false)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent intent = new Intent(Login.this, Login.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            getApplicationContext().startActivity(intent);
+                            finish();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+            //SstAlert.Show(Login.this, "Login Failed","Wrong username/password");
 
         }
     }
@@ -111,16 +126,17 @@ public class Login extends Activity {
         // String  user=sh_Pref.getString("Username",null);
         employee   = dbHelper.AuthenticateUser(un.getText().toString(), pw.getText().toString());
         //  SharedPreference();-
-        m_ProgressDialog = ProgressDialog.show(Login.this, "Please wait...",
-                "Logging  in...");
+        m_ProgressDialog = ProgressDialog.show(Login.this, "Please wait...", "Logging  in...");
+       // m_ProgressDialog= ProgressDialog.show(Login.this,"Please wait...", "Logging  in...", true, false);
+        final SharedPreferences taskSync = getApplicationContext().getSharedPreferences(Shared.TaskSync, 0);
+        SharedPreferences.Editor editors = taskSync.edit();
+
+        editors.putString("tasksync","True"); // Storing string
+        editors.commit();
         Shared.sychIntiallyTasks=true;
         if (employee == null)
         {
 
-            final SharedPreferences taskSync = getApplicationContext().getSharedPreferences(Shared.TaskSync, 0);
-            SharedPreferences.Editor editor = taskSync.edit();
-            editor.putString("tasksync", "True"); // Storing string
-            editor.commit();
             employeeRetriever = new GetEmployeeList(this);
             employeeRetriever.execute();
             //  m_ProgressDialog.dismiss();
@@ -137,11 +153,7 @@ public class Login extends Activity {
         }
     }
     public void CheckDefaultLogin( EmployeeViewModel employee) {
-        final SharedPreferences taskSync = getApplicationContext().getSharedPreferences(Shared.TaskSync, 0);
-        SharedPreferences.Editor editor = taskSync.edit();
 
-        editor.putString("tasksync","True"); // Storing string
-        editor.commit();
         Shared.LoggedInUser = employee;
         if(Shared.LoggedInUser.IsAdmin==true)
         {
