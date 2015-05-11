@@ -17,6 +17,7 @@
     <string name="shopBranch">Shop Branch</string>
     <string name="shopLocation">Shop Location</string>
     <string name="shopAddress">Shop Address</string>
+    <string name="MinimumPhoto">Minimum Photo</string>
     <string name="exception_message">Some error occurred</string>
     <string name="upload">Upload</string>
     <string name="description">Description</string>
