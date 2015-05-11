@@ -53,7 +53,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d(LOGCAT, "TaskLineItemRequest Created");
 
         query = "CREATE TABLE TaskLineItemPhoto (ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + "TaskLineItemID TEXT, PhotoID TEXT, Time TEXT, Lat TEXT, Lon TEXT)";
+                + "TaskLineItemID TEXT, PhotoID TEXT, Time TEXT, Lat TEXT, Lon TEXT,NotDoneReason TEXT)";
         database.execSQL(query);
         Log.d(LOGCAT, "TaskLineItemPhoto Created");
 
@@ -159,6 +159,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 taskLineItemPhoto.Time = cursor.getString(3);
                 taskLineItemPhoto.Lat = cursor.getString(4);
                 taskLineItemPhoto.Lon = cursor.getString(5);
+                taskLineItemPhoto.NotDoneReason = cursor.getString(6);
                 taskLineItemPhotoList.add(taskLineItemPhoto);
             } while (cursor.moveToNext());
         }
@@ -178,6 +179,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 taskLineItemPhoto.Time = cursor.getString(3);
                 taskLineItemPhoto.Lat = cursor.getString(4);
                 taskLineItemPhoto.Lon = cursor.getString(5);
+                taskLineItemPhoto.NotDoneReason = cursor.getString(6);
             } while (cursor.moveToNext());
         }
         database.close();
@@ -206,10 +208,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("Time", taskLineItemPhoto.Time);
         values.put("Lat", taskLineItemPhoto.Lat);
         values.put("Lon", taskLineItemPhoto.Lon);
+        values.put("NotDoneReason",taskLineItemPhoto.NotDoneReason);
         database.insert("TaskLineItemPhoto", null, values);
         database.close();
     }
-
+    public void UpdateTaskLineItemPhoto(TaskLineItemPhotoViewModel taskLineItemPhoto) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("TaskLineItemID", taskLineItemPhoto.TaskLineItemID);
+        values.put("PhotoID", taskLineItemPhoto.PhotoID);
+        values.put("Time", taskLineItemPhoto.Time);
+        values.put("Lat", taskLineItemPhoto.Lat);
+        values.put("Lon", taskLineItemPhoto.Lon);
+        values.put("NotDoneReason",taskLineItemPhoto.NotDoneReason);
+        database.update("TaskLineItemPhoto", values, "ID" + " = ?",
+                new String[]{String.valueOf(taskLineItemPhoto.TaskLineItemID)});
+        database.close();
+        database.close();
+    }
+    public void saveTaskLineItemPhotos(TaskLineItemPhotoViewModel taskLineItemPhoto) {
+        String selectQuery = "SELECT * FROM TaskLineItemPhoto where TaskLineItemID = "
+                + taskLineItemPhoto.TaskLineItemID;
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery(selectQuery, null);
+        int count = cursor.getCount();
+        database.close();
+        if (count == 0) {
+             insertTaskLineItemPhoto(taskLineItemPhoto);
+        } else {
+             UpdateTaskLineItemPhoto(taskLineItemPhoto);
+        }
+    }
 
     public void deleteTaskLineItemPhoto(String id) {
         Log.d(LOGCAT, "delete");
