@@ -64,6 +64,7 @@ String value;
         if (bundle != null) {
             this.task = (TaskViewModel) bundle.get("Task");
         }
+        Shared.SelectedTask=task;
         ShowTaskLineItems();
     }
 
@@ -77,15 +78,16 @@ String value;
         TextView taskName = (TextView) view.findViewById(R.id.ShopName);
         TextView taskAddress = (TextView) view.findViewById(R.id.ShopAddress);
         TextView branchname = (TextView) view.findViewById(R.id.Branch);
+        TextView minimumPhoto = (TextView) view.findViewById(R.id.MinimumPhoto);
         branchname.setText(task.ShopBranch.toString());
         taskName.setText(task.Name.toString());
         taskAddress.setText(task.ShopAddress.toString());
+        minimumPhoto.setText("Minimum Photo: "+task.MinimumPhoto);
 
         ShowTaskLineItems();
         setHasOptionsMenu(true);
         mainActivity.CurrentScreen = JobTrackerScreen.TaskDetail;
         mainActivity.SetActionBarMenuItems();
-
         super.onCreate(savedInstanceState);
         return view;
     }
