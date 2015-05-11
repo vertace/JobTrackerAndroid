@@ -16,16 +16,23 @@
 
 package com.tt.jobtracker;
 
+import android.annotation.TargetApi;
+import android.app.ActivityManager;
+import android.app.ApplicationErrorReport;
 import android.app.SearchManager;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
@@ -65,6 +72,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -169,6 +177,20 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
         fragmentManager = getSupportFragmentManager();
 
     }
+
+  /* private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ApplicationErrorReport.RunningServiceInfo service : manager
+                .getRunningServices(Integer.MAX_VALUE))
+        {
+            if (serviceClass.getName().equals(service.service.getClassname())) {
+                return true;
+            }
+        }
+        return false;
+    }*/
+
+
 
     private void storeRegistrationId(Context context, String regId,
                                      String fbUserId) {
@@ -645,12 +667,29 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
 
         tlvm = taskLineItemViewModel;
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
         fileUri = CameraHelper.getOutputMediaFileUri(CameraHelper.MEDIA_TYPE_IMAGE); // create
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the
         startActivityForResult(intent, CAPTURE_TASKLINEITEM_IMAGE_ACTIVITY_REQUEST_CODE);
+
     }
 
+
+  /*  @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (fileUri != null) {
+            Shared.FileUri=fileUri;
+            outState.putString("cameraImageUri", fileUri.toString());
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState.containsKey("cameraImageUri")) {
+            fileUri = Uri.parse(savedInstanceState.getString("cameraImageUri"));
+        }
+    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -707,9 +746,12 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     private void AddTaskLineItemPhoto() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         TaskLineItemPhotoViewModel taskLineItemPhotoViewModel = new TaskLineItemPhotoViewModel();
+
+
         taskLineItemPhotoViewModel.PhotoID = fileUri.getPath();
         taskLineItemPhotoViewModel.TaskLineItemID = tlvm.ID;
         taskLineItemPhotoViewModel.Lat = String.valueOf(Shared.lat);
