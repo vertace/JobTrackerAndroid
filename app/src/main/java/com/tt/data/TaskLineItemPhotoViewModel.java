@@ -12,5 +12,7 @@ public class TaskLineItemPhotoViewModel implements Serializable {
     public String Lat;
     public String Lon;
     public int taskLIneItemPhotoCount;
+    public String NotDoneReason;
+
 
 }
