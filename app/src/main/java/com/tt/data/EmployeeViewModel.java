@@ -1,5 +1,7 @@
 package com.tt.data;
 
+import java.util.List;
+
 public class EmployeeViewModel {
     public String ID;
     public String Name;
@@ -11,4 +13,7 @@ public class EmployeeViewModel {
     public String Username;
     public String GcmRegID;
     public String RegID;
+    public boolean IsAdmin;
+    public List<TaskNotDoneViewModel> taskNotDoneReasonList;
+    public List<TaskLineItemNotDoneViewModel> taskLineItemNotDoneReasonList;
 }

@@ -45,6 +45,7 @@ public final class TaskListAdapter extends ArrayAdapter<TaskViewModel> {
         viewHolder.txtShopName.setText(entry.Name);
         viewHolder.txtShopBranch.setText(entry.ShopBranch);
         viewHolder.txtShopAddress.setText(entry.ShopAddress);
+
         if (entry.IsMeasurement) {
             viewHolder.txtStatus.setText("M");
         }
@@ -117,6 +118,7 @@ public final class TaskListAdapter extends ArrayAdapter<TaskViewModel> {
                     .findViewById(R.id.tvAddress);
             viewHolder.txtStatus = (TextView) workingView
                     .findViewById(R.id.status);
+
             // viewHolder.imgMap=(ImageView)workingView.findViewById(R.id.imgmap);
 
             workingView.setTag(viewHolder);
@@ -137,6 +139,7 @@ public final class TaskListAdapter extends ArrayAdapter<TaskViewModel> {
         public TextView txtShopBranch;
         public TextView txtShopAddress;
         public TextView txtStatus;
+
         //public ImageView imgMap;
     }
 

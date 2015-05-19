@@ -33,4 +33,11 @@ public class TaskViewModel implements Serializable {
 
     public boolean IsShopPhoto;
 
+    public double Lat;
+    public double Lon;
+
+    public String ActualLat;
+    public String ActualLon;
+
+
 }

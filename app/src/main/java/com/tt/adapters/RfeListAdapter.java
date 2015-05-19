@@ -20,10 +20,10 @@ public final  class RfeListAdapter extends ArrayAdapter<RfeViewModel> {
     Context mapContext;
 
     public RfeListAdapter(final Context context,
-                           final int _taskListLayoutResource) {
+                           final int _rfeListLayoutResource) {
         super(context, 0);
         mapContext = context;
-        this.rfeListLayoutResource = _taskListLayoutResource;
+        this.rfeListLayoutResource = _rfeListLayoutResource;
     }
     @Override
     public View getView(final int position, final View convertView,

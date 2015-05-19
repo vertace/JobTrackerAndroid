@@ -13,4 +13,6 @@ public class MeasurementPhoto {
     public String ShopName;
     public String ShopAddress;
 
+
+
 }

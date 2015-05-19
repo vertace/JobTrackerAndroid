@@ -39,7 +39,13 @@ public final class TaskDetailAdapter extends
         viewHolder.tvShopWall.setText(entry.ShopWall);
         viewHolder.tvInstruction.setText(entry.Instruction);
         view.setTag(entry);
-        view.setBackgroundResource(R.drawable.listpartial_selector);
+        if(entry.PhotoID!=null && entry.PhotoID.equals("NOT_DONE"))
+       {
+           view.setBackgroundResource(R.drawable.listpending_selector);
+        }
+       else {
+            view.setBackgroundResource(R.drawable.listpartial_selector);
+        }
         //setRowColor(view, entry);
         return view;
     }
