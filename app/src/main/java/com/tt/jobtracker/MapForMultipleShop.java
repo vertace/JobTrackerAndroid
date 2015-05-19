@@ -87,7 +87,7 @@ public class MapForMultipleShop extends FragmentActivity
     String addressText,currenttext;
     LocationManager mlocManager;
     LocationListener mlocListener;
-    List<android.location.Address> addresses=null;
+    List<android.location.Address> addresses=null,addressesList=null;
 
     Geocoder geocoder ;
     String latlngShop[];
@@ -120,18 +120,18 @@ public class MapForMultipleShop extends FragmentActivity
 
         SupportMapFragment fm = (SupportMapFragment)  getSupportFragmentManager().findFragmentById(R.id.map);
         mMap=fm.getMap();
-       // mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+        // mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         geocoder = new Geocoder(this);
         latlngShop=new String[Shared.TaskList.size()];
 
         MultipleRoute();
 
-      //  m_ProgressDialog = ProgressDialog.show(MapForMultipleShop.this,"Please wait...","Updating the route...",true);
+        //  m_ProgressDialog = ProgressDialog.show(MapForMultipleShop.this,"Please wait...","Updating the route...",true);
 
 
 
-      //  ArrayList<MapShopSortViewModel> test=mapShopSortList;
+        //  ArrayList<MapShopSortViewModel> test=mapShopSortList;
 
         if(latlngShop.length>0) {
             mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -142,7 +142,7 @@ public class MapForMultipleShop extends FragmentActivity
             isGPSEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             isNetworkEnabled = mlocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
             if (isGPSEnabled) {
-                    mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 10, mlocListener);
+                mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 10, mlocListener);
             } else {
                 mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 10, mlocListener);
             }
@@ -156,47 +156,58 @@ public class MapForMultipleShop extends FragmentActivity
         }
 
     }
-private void MultipleRoute()
-{
-    try
+    private void MultipleRoute()
     {
-        mapShopSortList=new ArrayList<MapShopSortViewModel>();
-        for(int k=0;k<Shared.TaskList.size();k++)
+        try
         {
-
-            latlngShop[k]=new String();
-
-            addresses= geocoder.getFromLocationName(Shared.TaskList.get(k).ShopAddress, 5);
-           // addresses= getAddrByWeb(getLocationInfo(Shared.TaskList.get(k).ShopAddress));
-            //  Map<String, String> treeMap = new TreeMap<String, String>(addresses);
-            if(addresses!=null && addresses.size()>0)
+            mapShopSortList=new ArrayList<MapShopSortViewModel>();
+            for(int k=0;k<Shared.TaskList.size();k++)
             {
-                for (int i = 0; i < addresses.size(); i++)
+
+                latlngShop[k]=new String();
+
+                addresses= geocoder.getFromLocationName(Shared.TaskList.get(k).ShopAddress, 5);
+                // addresses= getAddrByWeb(getLocationInfo(Shared.TaskList.get(k).ShopAddress));
+                //  Map<String, String> treeMap = new TreeMap<String, String>(addresses);
+                if(Shared.TaskList.get(k).Lat!=0 && Shared.TaskList.get(k).Lon!=0)
                 {
+                   // for (int i = 0; i < addresses.size(); i++)
+                   // {
 
-                    android.location.Address address = (android.location.Address) addresses.get(i);
+                       // android.location.Address address = (android.location.Address) addresses.get(i);
 
-                    // Creating an instance of GeoPoint, to display in Google Map
-                    latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                    latlngShop[k] = String.valueOf(address.getLatitude()) + "," + String.valueOf(address.getLongitude());
-                    addressText = String.format("%s, %s", address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
-                            address.getCountryName());
+                        double latitude=Shared.TaskList.get(k).Lat;
+                        double longitude=Shared.TaskList.get(k).Lon;
+                        latLng =new LatLng(latitude,longitude);
+                        latlngShop[k] = latitude + "," + longitude;
+                        addressesList = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+
+                        String addres = addressesList.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                        String city = addressesList.get(0).getLocality();
+                        String state = addressesList.get(0).getAdminArea();
+                        String country = addressesList.get(0).getCountryName();
+                        String postalCode = addressesList.get(0).getPostalCode();
+                        //String knownName = addresses.get(0).getFeatureName();
+                        String subLocalaity = addressesList.get(0).getSubLocality();
+                        addressText=subLocalaity+","+addres+","+city;
+                   /* addressText = String.format("%s, %s", address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
+                            address.getCountryName());*/
 
 
-                    //	Marker ciu = mMap.addMarker(new MarkerOptions().position(latLng).title("Address"));
-                    //     ciu.setTitle(addressText);
-                    // Locate the first location
+                        //	Marker ciu = mMap.addMarker(new MarkerOptions().position(latLng).title("Address"));
+                        //     ciu.setTitle(addressText);
+                        // Locate the first location
 
+                  //  }
+
+                    Marker ciu = mMap.addMarker(new MarkerOptions().position(latLng).title("Address"));
+                    ciu.setTitle(addressText);
+
+
+
+                    mMap.setMyLocationEnabled(true);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
                 }
-
-                Marker ciu = mMap.addMarker(new MarkerOptions().position(latLng).title("Address"));
-                ciu.setTitle(addressText);
-
-
-
-                mMap.setMyLocationEnabled(true);
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-            }
 
              /*   Double result= distance(12.9265533, 80.10782879999999,12.9908401,80.21827569999999);
                 double value=result;
@@ -204,88 +215,88 @@ private void MultipleRoute()
 
 
 
-        }
-
-    } catch (IOException e) {
-        // TODO Auto-generated catch block
-
-        e.printStackTrace();
-        MultipleRoute();
-        SstAlert.Show(MapForMultipleShop.this, "Error",
-                "Some Problem occured");
-    }
-}
-
-    public static JSONObject getLocationInfo(String address) {
-        StringBuilder stringBuilder = new StringBuilder();
-        try {
-
-            address = address.replaceAll(" ","%20");
-
-            HttpPost httppost = new HttpPost("http://maps.google.com/maps/api/geocode/json?address=" + address + "&sensor=false");
-            HttpClient client = new DefaultHttpClient();
-            HttpResponse response;
-            stringBuilder = new StringBuilder();
-
-
-            response = client.execute(httppost);
-            HttpEntity entity = response.getEntity();
-            InputStream stream = entity.getContent();
-            int b;
-            while ((b = stream.read()) != -1) {
-                stringBuilder.append((char) b);
             }
-        } catch (ClientProtocolException e) {
+
         } catch (IOException e) {
-        }
-
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject = new JSONObject(stringBuilder.toString());
-        } catch (JSONException e) {
             // TODO Auto-generated catch block
+
             e.printStackTrace();
+            MultipleRoute();
+            SstAlert.Show(MapForMultipleShop.this, "Error",
+                    "Some Problem occured");
         }
-
-        return jsonObject;
     }
-    private static List<Address> getAddrByWeb(JSONObject jsonObject){
-        List<Address> res = new ArrayList<Address>();
-        try
-        {
-            JSONArray array = (JSONArray) jsonObject.get("results");
-            for (int i = 0; i < array.length(); i++)
-            {
-                Double lon = new Double(0);
-                Double lat = new Double(0);
-                String name = "";
-                try
-                {
-                    lon = array.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lng");
 
-                    lat = array.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lat");
-                    name = array.getJSONObject(i).getString("formatted_address");
-                    Address addr = new Address(Locale.getDefault());
-                    addr.setLatitude(lat);
-                    addr.setLongitude(lon);
-                    addr.setAddressLine(0, name != null ? name : "");
-                    res.add(addr);
-                }
-                catch (JSONException e)
-                {
-                    e.printStackTrace();
+    /* public static JSONObject getLocationInfo(String address) {
+         StringBuilder stringBuilder = new StringBuilder();
+         try {
 
-                }
-            }
-        }
-        catch (JSONException e)
-        {
-            e.printStackTrace();
+             address = address.replaceAll(" ","%20");
 
-        }
+             HttpPost httppost = new HttpPost("http://maps.google.com/maps/api/geocode/json?address=" + address + "&sensor=false");
+             HttpClient client = new DefaultHttpClient();
+             HttpResponse response;
+             stringBuilder = new StringBuilder();
 
-        return res;
-    }
+
+             response = client.execute(httppost);
+             HttpEntity entity = response.getEntity();
+             InputStream stream = entity.getContent();
+             int b;
+             while ((b = stream.read()) != -1) {
+                 stringBuilder.append((char) b);
+             }
+         } catch (ClientProtocolException e) {
+         } catch (IOException e) {
+         }
+
+         JSONObject jsonObject = new JSONObject();
+         try {
+             jsonObject = new JSONObject(stringBuilder.toString());
+         } catch (JSONException e) {
+             // TODO Auto-generated catch block
+             e.printStackTrace();
+         }
+
+         return jsonObject;
+     }
+     private static List<Address> getAddrByWeb(JSONObject jsonObject){
+         List<Address> res = new ArrayList<Address>();
+         try
+         {
+             JSONArray array = (JSONArray) jsonObject.get("results");
+             for (int i = 0; i < array.length(); i++)
+             {
+                 Double lon = new Double(0);
+                 Double lat = new Double(0);
+                 String name = "";
+                 try
+                 {
+                     lon = array.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lng");
+
+                     lat = array.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lat");
+                     name = array.getJSONObject(i).getString("formatted_address");
+                     Address addr = new Address(Locale.getDefault());
+                     addr.setLatitude(lat);
+                     addr.setLongitude(lon);
+                     addr.setAddressLine(0, name != null ? name : "");
+                     res.add(addr);
+                 }
+                 catch (JSONException e)
+                 {
+                     e.printStackTrace();
+
+                 }
+             }
+         }
+         catch (JSONException e)
+         {
+             e.printStackTrace();
+
+         }
+
+         return res;
+     }*/
   /*  private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
         @Override
         public void onMyLocationChange(Location location) {
@@ -296,15 +307,15 @@ private void MultipleRoute()
             }
         }
     };*/
-  public static int convertToPixels(Context context, int nDP)
-  {
-      final float conversionScale = context.getResources().getDisplayMetrics().density;
+    public static int convertToPixels(Context context, int nDP)
+    {
+        final float conversionScale = context.getResources().getDisplayMetrics().density;
 
-      return (int) ((nDP * conversionScale) + 0.5f) ;
+        return (int) ((nDP * conversionScale) + 0.5f) ;
 
-  }
+    }
 
-   private double distance(double lat1, double lon1, double lat2, double lon2) {
+    private double distance(double lat1, double lon1, double lat2, double lon2) {
         double theta = lon1 - lon2;
         double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
         dist = Math.acos(dist);
@@ -367,11 +378,11 @@ private void MultipleRoute()
         return hash_key;
     }
     @Override
-         public boolean onCreateOptionsMenu(Menu menu) {
-           // Inflate the menu; this adds items to the action bar if it is present.
-           getMenuInflater().inflate(R.menu.mapmenu, menu);
-           return true;
-       }
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.mapmenu, menu);
+        return true;
+    }
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
@@ -379,8 +390,8 @@ private void MultipleRoute()
                 ShopShortList();
                 // startActivity(getIntent());
 
-               // intent = new Intent(this, TaskList.class);
-              //  intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                // intent = new Intent(this, TaskList.class);
+                //  intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 //getApplicationContext().startActivity(intent);
 
                 break;
@@ -389,7 +400,7 @@ private void MultipleRoute()
         }
         return false;
     }
-   private void  ShopShortList()
+    private void  ShopShortList()
     {
 
         if( mapShopsort!=null)
@@ -399,13 +410,13 @@ private void MultipleRoute()
             builderSingle.setIcon(R.drawable.ic_launcher);
             builderSingle.setTitle("Shop Name Order");
             final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MapForMultipleShop.this,android.R.layout.simple_list_item_1);
-           //ArrayList<MapShopSortViewModel> OrderShopList=dbHelper.getAllShopByOrder();
+            //ArrayList<MapShopSortViewModel> OrderShopList=dbHelper.getAllShopByOrder();
             for( int l=0;l< Shared.MapSortByShop.size();l++)
             {
                 i=l+1;
                 arrayAdapter.add(i+". "+ Shared.MapSortByShop.get(l).ShopName);
             }
-          //  arrayAdapter.addAll(Shared.end_address);
+            //  arrayAdapter.addAll(Shared.end_address);
             builderSingle.setAdapter(arrayAdapter, null);
             builderSingle.show();
         }
@@ -418,14 +429,14 @@ private void MultipleRoute()
 
     }
     /**private Handler mHandler = new Handler();
-    private Runnable onRequestLocation = new Runnable() {
-        @Override
-        public void run() {
-            // Ask for a location
-            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mlocListener);
-            // Run this again in an hour
-            mHandler.postDelayed(onRequestLocation, DateUtils.HOUR_IN_MILLIS);
-        }
+     private Runnable onRequestLocation = new Runnable() {
+    @Override
+    public void run() {
+    // Ask for a location
+    mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mlocListener);
+    // Run this again in an hour
+    mHandler.postDelayed(onRequestLocation, DateUtils.HOUR_IN_MILLIS);
+    }
     };*/
 
 
@@ -433,10 +444,10 @@ private void MultipleRoute()
     public class MyMapLocationListener implements LocationListener
     {
         Context context;
-  public MyMapLocationListener(Context context)
-  {
-      this.context=context;
-  }
+        public MyMapLocationListener(Context context)
+        {
+            this.context=context;
+        }
 
         @Override
         public void onLocationChanged(Location loc)
@@ -487,36 +498,36 @@ private void MultipleRoute()
                 dbHelper.insertMapSortByShopName(saveShop);
             }
             Shared.MapSortByShop= dbHelper.getAllShopByOrder();
-if(dbHelper!=null)
-{
-    ArrayList<MapShopSortViewModel> OrderShopList=dbHelper.getAllShopByOrder();
-    for( int l=0;l<OrderShopList.size();l++) {
-       int i=l+1;
-        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-        Bitmap bmp = Bitmap.createBitmap(100, 120, conf);
-        Canvas canvas = new Canvas(bmp);
-        Typeface tf = Typeface.create("Helvetica", Typeface.BOLD);
-        Paint paint = new Paint();
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.BLUE);
-        paint.setTypeface(tf);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(convertToPixels(context, 11));
-        canvas.drawText(String.valueOf(i), 20, 50, paint); // paint defines the text color, stroke width, size
-        mMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(OrderShopList.get(l).Lat, OrderShopList.get(l).Lon))
-                                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker2))
-                        .icon(BitmapDescriptorFactory.fromBitmap(bmp))
-                        .anchor(0.5f, 1)
-        );
+            if(dbHelper!=null)
+            {
+                ArrayList<MapShopSortViewModel> OrderShopList=dbHelper.getAllShopByOrder();
+                for( int l=0;l<OrderShopList.size();l++) {
+                    int i=l+1;
+                    Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+                    Bitmap bmp = Bitmap.createBitmap(100, 120, conf);
+                    Canvas canvas = new Canvas(bmp);
+                    Typeface tf = Typeface.create("Helvetica", Typeface.BOLD);
+                    Paint paint = new Paint();
+                    paint.setStyle(Paint.Style.FILL);
+                    paint.setColor(Color.BLUE);
+                    paint.setTypeface(tf);
+                    paint.setTextAlign(Paint.Align.CENTER);
+                    paint.setTextSize(convertToPixels(context, 11));
+                    canvas.drawText(String.valueOf(i), 20, 50, paint); // paint defines the text color, stroke width, size
+                    mMap.addMarker(new MarkerOptions()
+                                    .position(new LatLng(OrderShopList.get(l).Lat, OrderShopList.get(l).Lon))
+                                            //.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker2))
+                                    .icon(BitmapDescriptorFactory.fromBitmap(bmp))
+                                    .anchor(0.5f, 1)
+                    );
 
-    }
-}
+                }
+            }
             else {
-    ArrayList<MapShopSortViewModel> OrderShopList=dbHelper.getAllShopByOrder();
-}
+                ArrayList<MapShopSortViewModel> OrderShopList=dbHelper.getAllShopByOrder();
+            }
 
-                   // mlocManager.removeUpdates(mlocListener);
+            // mlocManager.removeUpdates(mlocListener);
             DrawRoute();
             btndirection.setVisibility(View.VISIBLE);
 
@@ -549,8 +560,8 @@ if(dbHelper!=null)
                 downloadTask.execute(url);
             }
             else {
-                 count = Shared.MapSortByShop.size() / 8;
-                  modulo=Shared.MapSortByShop.size()%8;
+                count = Shared.MapSortByShop.size() / 8;
+                modulo=Shared.MapSortByShop.size()%8;
                 for (i = 0; modulo==0?i < count:i <=count; i++)
                 {
                     String url = getDirectionsUrl(currentlang, latLng);
@@ -570,7 +581,7 @@ if(dbHelper!=null)
         {
 
             // Origin of route
-          //  String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+            //  String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
             //String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
 
             // Destination of route
@@ -584,19 +595,20 @@ if(dbHelper!=null)
 
             if(Shared.TaskList.size()<=8)
             {
-                for (int k = 0; k <Shared.TaskList.size(); k++) {
+                str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+                for (int k = 0; k < Shared.MapSortByShop.size(); k++) {
 
-                  //  waypoints = waypoints + latlngShop[k] + "|";
-                 //  latlngShopSort = Double.parseDouble(OrderShopList.get(k)) + "," + String.valueOf(OrderShopList.get(k));
+                    //  waypoints = waypoints + latlngShop[k] + "|";
+                    //  latlngShopSort = Double.parseDouble(OrderShopList.get(k)) + "," + String.valueOf(OrderShopList.get(k));
                     waypoints = waypoints +  Shared.MapSortByShop.get(k).Lat+","+ Shared.MapSortByShop.get(k).Lon + "|";
                 }
             }
             else {
                 if (count == i) {
-                     str_origin = "origin=" + Shared.MapSortByShop.get(globalVar).Lat + "," + Shared.MapSortByShop.get(globalVar).Lon;
+                    str_origin = "origin=" + Shared.MapSortByShop.get(globalVar).Lat + "," + Shared.MapSortByShop.get(globalVar).Lon;
                     for (int k = globalVar; k < globalVar + modulo; k++) {
 
-                       // waypoints = waypoints + latlngShop[k] + "|";
+                        // waypoints = waypoints + latlngShop[k] + "|";
                         waypoints = waypoints +  Shared.MapSortByShop.get(k).Lat+","+ Shared.MapSortByShop.get(k).Lon + "|";
 
                     }
@@ -606,7 +618,7 @@ if(dbHelper!=null)
                 } else {
                     if(globalVar==0)
                     {
-                         str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+                        str_origin = "origin=" + origin.latitude + "," + origin.longitude;
                     }
                     else {
                         str_origin = "origin=" + Shared.MapSortByShop.get(globalVar).Lat + "," + Shared.MapSortByShop.get(globalVar).Lon;
@@ -768,8 +780,8 @@ if(dbHelper!=null)
 
 
             // Drawing polyline in the Google Map for the i-th route
-         mMap.addPolyline(lineOptions);
-           // m_ProgressDialog.dismiss();
+            mMap.addPolyline(lineOptions);
+            // m_ProgressDialog.dismiss();
 
         }
 

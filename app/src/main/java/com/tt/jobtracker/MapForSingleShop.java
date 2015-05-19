@@ -42,6 +42,14 @@ import com.tt.fragments.SettingsFragment;
 import com.tt.fragments.TaskLineItemFragment;
 import com.tt.helpers.SstAlert;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -55,6 +63,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by BS-308 on 4/21/2015.
@@ -95,31 +104,39 @@ public class MapForSingleShop extends FragmentActivity{
 
                 }
 
-     //   SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-       // mMap = fm.getMap();
-
-        //  mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        geocoder = new Geocoder(this);
-//		 latlngShop=new String[Shared.SelectedTask.size()];
+        geocoder = new Geocoder(this);//		 latlngShop=new String[Shared.SelectedTask.size()];
         try {
 
-//			for(int k=0;k<Shared.TaskList.size();k++)
-//			{
-//				latlngShop[k]=new String();
             addresses = geocoder.getFromLocationName(Shared.SelectedTask.ShopAddress, 5);
 
-//			 for(int i=0;i<addresses.size();i++)
-//			 {
-            if (addresses != null && addresses.size() > 0) {
+
+            if (Shared.SelectedTask.Lat != 0 && Shared.SelectedTask.Lon!=0){
                 android.location.Address address = (android.location.Address) addresses.get(0);
 
                 // Creating an instance of GeoPoint, to display in Google Map
-                latLng = new LatLng(address.getLatitude(), address.getLongitude());
-	      //       latlngShop[k]=String.valueOf(address.getLatitude())+","+String.valueOf(address.getLongitude());
-                addressText = String.format("%s, %s",
+                    double latitude=Shared.SelectedTask.Lat;
+                double longitude=Shared.SelectedTask.Lon;
+                latLng =new LatLng(latitude,longitude);
+                Geocoder geocoder;
+                List<Address> addressesList;
+                geocoder = new Geocoder(this, Locale.getDefault());
+
+                addressesList = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+
+                String addres = addressesList.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                String city = addressesList.get(0).getLocality();
+                String state = addressesList.get(0).getAdminArea();
+                String country = addressesList.get(0).getCountryName();
+                String postalCode = addressesList.get(0).getPostalCode();
+                //String knownName = addresses.get(0).getFeatureName();
+                String subLocalaity = addressesList.get(0).getSubLocality();
+                addressText=subLocalaity+","+addres+","+city;
+
+                //       latlngShop[k]=String.valueOf(address.getLatitude())+","+String.valueOf(address.getLongitude());
+              /*  addressText = String.format("%s, %s",
                         address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
-                        address.getCountryName());
+                        address.getCountryName());*/
 
 
                 //	Marker ciu = mMap.addMarker(new MarkerOptions().position(latLng).title("Address"));
@@ -200,7 +217,64 @@ public class MapForSingleShop extends FragmentActivity{
                         true);*/
     }
 
+ /*   public static JSONObject getLocationInfo(String address) {
 
+        HttpGet httpGet = new HttpGet("http://maps.google.com/maps/api/geocode/json?address=" +address+"&ka&sensor=false");
+        HttpClient client = new DefaultHttpClient();
+        HttpResponse response;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            response = client.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            InputStream stream = entity.getContent();
+            int b;
+            while ((b = stream.read()) != -1) {
+                stringBuilder.append((char) b);
+            }
+        } catch (ClientProtocolException e) {
+        } catch (IOException e) {
+        }
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject = new JSONObject(stringBuilder.toString());
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+         getGeoPoint(jsonObject);
+        return jsonObject;
+    }
+
+    public static GeoPoint  getGeoPoint(JSONObject jsonObject) {
+
+        Double lon = new Double(0);
+        Double lat = new Double(0);
+
+        try {
+
+            lon = ((JSONArray)jsonObject.get("results")).getJSONObject(0)
+                    .getJSONObject("geometry").getJSONObject("location")
+                    .getDouble("lng");
+
+            lat = ((JSONArray)jsonObject.get("results")).getJSONObject(0)
+                    .getJSONObject("geometry").getJSONObject("location")
+                    .getDouble("lat");
+
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return new GeoPoint((int) (lat * 1E6), (int) (lon * 1E6));
+
+    }
+
+
+    GeoPoint srcGeoPoint =getGeoPoint(getLocationInfo(fromAddress.replace("\n"," ").replace(" ", "%20")));
+    GeoPoint destGeoPoint =getGeoPoint(getLocationInfo(CalDescription.toAddress.replace("\n"," ").replace(" ", "%20")));*/
 
 
     public void btnNavigationClick(View v)

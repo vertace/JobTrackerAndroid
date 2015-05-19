@@ -767,6 +767,10 @@ public class BackgroundService extends Service {
                             taskViewModel.StartTime));
                     taskDetailRequest.add(new BasicNameValuePair("Employee",
                             Shared.LoggedInUser.ID));
+                    taskDetailRequest.add(new BasicNameValuePair("ActualLat",
+                           String.valueOf(taskViewModel.ActualLat)));
+                    taskDetailRequest.add(new BasicNameValuePair("ActualLon",
+                            String.valueOf(taskViewModel.ActualLon)));
 
                     // open a URL connection to the Servlet
                     FileInputStream fileInputStream = new FileInputStream(

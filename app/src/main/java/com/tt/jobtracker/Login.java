@@ -16,6 +16,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tt.data.TaskLineItemNotDoneViewModel;
+import com.tt.data.TaskNotDoneViewModel;
 import com.tt.data.TaskViewModel;
 import com.tt.jobtracker.R;
 
@@ -314,7 +316,21 @@ public class Login extends Activity {
                     for (EmployeeViewModel employee : Shared.EmployeeList) {
                         dbHelper.saveEmployee(employee);
                     }
-                    // m_ProgressDialog.dismiss();
+                    if(Shared.sychIntiallyTasks=true) {
+                        dbHelper.deleteTaskNotDone();
+                        dbHelper.deleteTaskLineItemNotDone();
+                       // List<TaskNotDoneViewModel> taskNotDone = Shared.EmployeeList.get(0).taskNotDoneReasonList;
+                        //List<TaskLineItemNotDoneViewModel> taskLineItemNotDone = Shared.EmployeeList.get(0).taskLineItemNotDoneReasonList;
+                        for(TaskNotDoneViewModel tasknotdone:Shared.EmployeeList.get(0).taskNotDoneReasonList)
+                        {
+                            dbHelper.insertTaskNotDoneReason(tasknotdone);
+                        }
+                        for(TaskLineItemNotDoneViewModel taskLineItemNotDone:Shared.EmployeeList.get(0).taskLineItemNotDoneReasonList)
+                        {
+                            dbHelper.insertTaskLineItemNotDoneReason(taskLineItemNotDone);
+                        }
+
+                    }
                     LoginProcess();
                     //m_ProgressDialog.dismiss();
                     break;

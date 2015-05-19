@@ -53,6 +53,8 @@ public class TakeMeasurementList extends Activity {
     boolean isGPSEnabled = false;
     boolean isNetworkEnabled = false;
     private Uri fileUri;
+    String stringLongitude;
+    String stringLatitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +82,7 @@ public class TakeMeasurementList extends Activity {
             Display display = this.getWindowManager().getDefaultDisplay();
             Point size = new Point();
             display.getSize(size);
-
+            Shared.SelectedTask=dbHelper.getTaskInfo(String.valueOf(TaskID));
             MeasurementPhotoListAdapter measurementAdapter = new MeasurementPhotoListAdapter(
                     this, R.layout.measurementphoto_row, size);
 
@@ -133,24 +135,9 @@ public class TakeMeasurementList extends Activity {
                 TaskeMeasdurementPhoto();
                 break;
             case R.id.mnuCheckin:
-
-
-                Utility.getLocation(this);
-
-                /**   mlocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-
-                 mlocListener = new MyMeasurementLocationListener(this,mlocManager,0);
-                 isGPSEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-                 isNetworkEnabled = mlocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-                 if(isGPSEnabled)
-                 {
-                 mlocManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 0, 0, mlocListener);
-                 }
-                 else
-                 {
-                 mlocManager.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, 0, 0, mlocListener);
-                 }*/
-
+                Intent intent = new Intent(TakeMeasurementList.this, MapForSingleShop.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getApplicationContext().startActivity(intent);
                 break;
 
             default:
@@ -246,6 +233,11 @@ public class TakeMeasurementList extends Activity {
                         Toast.makeText(this, "Image saved to:\n" + fileUri,
                                 Toast.LENGTH_LONG).show();
                     }
+                    GPSTracker gpsTracker = new GPSTracker(this);
+                    if (gpsTracker.getIsGPSTrackingEnabled()) {
+                        stringLatitude = String.valueOf(gpsTracker.latitude);
+                        stringLongitude = String.valueOf(gpsTracker.longitude);
+                    }
                     MeasurementPhoto measurementPhoto = new MeasurementPhoto();
                     //	Utility.getLocation(this);
                     measurementPhoto.Lat = String.valueOf(Shared.lat);
@@ -255,6 +247,8 @@ public class TakeMeasurementList extends Activity {
                     measurementPhoto.ShopID = ShopID;
                     measurementPhoto.ShopName = ShopName;
                     measurementPhoto.ShopAddress = ShopAddress;
+                    measurementPhoto.Lat=stringLatitude;
+                    measurementPhoto.Lon=stringLongitude;
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
                     measurementPhoto.Time = sdf.format(new Date());
                     // dbHelper.deleteMeasurementPhoto("0");

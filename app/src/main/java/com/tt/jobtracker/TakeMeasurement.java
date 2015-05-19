@@ -19,6 +19,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.tt.data.Shared;
+import com.tt.data.TaskViewModel;
 import com.tt.helpers.PhotoDeleteHelper;
 import com.tt.jobtracker.R;
 import com.google.gson.Gson;
@@ -100,6 +102,7 @@ public class TakeMeasurement extends Activity implements AsyncResponse {
                 break;
             case R.id.mnuDiscard:
                 ImageDiscardFromSD(DeletePhotoID);
+
                 break;
             case R.id.mnuDelete:
                 mView.RemoveLastPoint();
@@ -186,6 +189,20 @@ public class TakeMeasurement extends Activity implements AsyncResponse {
                         PhotoDeleteHelper.DeletePhoto(path);
                         Toast.makeText(getApplicationContext(), "Image Deleted",
                                 Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(TakeMeasurement.this, TakeMeasurementList.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        TaskViewModel task= Shared.SelectedTask;
+                        intent.putExtra("TaskID", String.valueOf(task.ID));
+                        intent.putExtra("ShopID",
+                                String.valueOf(task.ShopID));
+                        intent.putExtra("ShopName",
+                                String.valueOf(task.ShopName));
+                        intent.putExtra("ShopAddress",
+                                String.valueOf(task.ShopAddress));
+                        intent.putExtra("IsDone",
+                                String.valueOf(task.IsDone));
+                        startActivity(intent);
+                        finish();
                     }
                 }).setNegativeButton("No", null).show();
     }

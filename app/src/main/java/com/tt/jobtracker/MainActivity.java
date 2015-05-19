@@ -28,6 +28,12 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -47,10 +53,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.tt.data.Shared;
 import com.tt.data.TaskLineItemPhotoViewModel;
 import com.tt.data.TaskLineItemViewModel;
@@ -125,10 +137,13 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
     private CharSequence mTitle;
     private String[] mMenuTitles;
     private Menu menu;
+    String stringLongitude;
+    String stringLatitude;
+
 
     public String SearchText;
 
-
+    LocationListener mlocListener;
     Context context;
     String regid;
     GoogleCloudMessaging gcm;
@@ -147,14 +162,14 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
             selectItem(0);
         }
 
-       /* context = getApplicationContext();
+       context = getApplicationContext();
         regid = getRegistrationId(context);
         Shared.LoggedInUser.GcmRegID = regid;
         if (regid.isEmpty()) {
             registerInBackground();
             GetRegID obj = new GetRegID(this);
             obj.execute();
-        }*/
+        }
 
         final SharedPreferences taskSyncLogin = getSharedPreferences(Shared.TaskSync, 0);
         String taskDownloadLogin= taskSyncLogin.getString("tasksync", null);
@@ -176,7 +191,9 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
         }
         fragmentManager = getSupportFragmentManager();
 
+
     }
+
 
   /* private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -748,14 +765,19 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     private void AddTaskLineItemPhoto() {
+
+        GPSTracker gpsTracker = new GPSTracker(this);
+        if (gpsTracker.getIsGPSTrackingEnabled()) {
+            stringLatitude = String.valueOf(gpsTracker.latitude);
+            stringLongitude = String.valueOf(gpsTracker.longitude);
+        }
+
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         TaskLineItemPhotoViewModel taskLineItemPhotoViewModel = new TaskLineItemPhotoViewModel();
-
-
         taskLineItemPhotoViewModel.PhotoID = fileUri.getPath();
         taskLineItemPhotoViewModel.TaskLineItemID = tlvm.ID;
-        taskLineItemPhotoViewModel.Lat = String.valueOf(Shared.lat);
-        taskLineItemPhotoViewModel.Lon = String.valueOf(Shared.lon);
+        taskLineItemPhotoViewModel.Lat = stringLatitude;
+        taskLineItemPhotoViewModel.Lon = stringLongitude;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         taskLineItemPhotoViewModel.Time = sdf.format(new Date());
         dbHelper.insertTaskLineItemPhoto(taskLineItemPhotoViewModel);
@@ -763,21 +785,35 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
         //processFinish(null);
     }
     private void AddTaskShopPhoto() {
+        GPSTracker gpsTracker = new GPSTracker(this);
+        if (gpsTracker.getIsGPSTrackingEnabled()) {
+
+            stringLatitude = String.valueOf(gpsTracker.latitude);
+            stringLongitude = String.valueOf(gpsTracker.longitude);
+
+        }
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         TaskViewModel taskViewModel = dbHelper.getTaskInfo(String.valueOf(tvm.ID));
         // TaskLineItemViewModel taskLineItemViewModel=new TaskLineItemViewModel();
         // TaskLineItemPhotoViewModel taskLineItemPhotoViewModel = new TaskLineItemPhotoViewModel();
         taskViewModel.PhotoID = fileUri.getPath();
         taskViewModel.ID = tvm.ID;
+        taskViewModel.ActualLat=stringLatitude;
+        taskViewModel.ActualLon=stringLongitude;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         taskViewModel.StartTime = sdf.format(new Date());
         taskViewModel.IsDone=false;
         dbHelper.saveTask(taskViewModel, true);
+
+
+
         //updateTaskLineItemPhotoCount();
         //processFinish(null);
     }
+
     private void updateTaskLineItemPhotoCount()
     {
+
         int photocount;
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         TaskLineItemViewModel taskilneItem=new TaskLineItemViewModel();
@@ -787,4 +823,6 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
         int result=dbHelper.updateTaskLineItem(taskilneItem,true);
         int cv=result;
     }
+
+
 }
