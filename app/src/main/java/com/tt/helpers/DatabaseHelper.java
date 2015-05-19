@@ -12,11 +12,15 @@ import com.tt.data.EmployeeViewModel;
 import com.tt.data.MapShopSortViewModel;
 import com.tt.data.MeasurementPhoto;
 import com.tt.data.RfeViewModel;
+import com.tt.data.TaskLineItemNotDoneViewModel;
 import com.tt.data.TaskLineItemPhotoViewModel;
 import com.tt.data.TaskLineItemViewModel;
+import com.tt.data.TaskNotDoneViewModel;
 import com.tt.data.TaskViewModel;
 
 import java.util.ArrayList;
+
+import javax.sql.StatementEvent;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String LOGCAT = null;
@@ -36,7 +40,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + "EmployeeName TEXT," + "EmployeeID INTEGER,"
                 + "TaskStatus TEXT," + "IsMeasurement INTEGER,"
                 + "PhotoID TEXT," + "StartTime TEXT,"
-                + "ShopPhotoUploaded INTEGER,"+"IsDone INTEGER,"+"MinimumPhotoCount int,"+"Name TEXT,"+"IsShopPhoto INTEGER)";
+                + "ShopPhotoUploaded INTEGER,"+"IsDone INTEGER,"+"MinimumPhotoCount int,"+"Name TEXT,"+"IsShopPhoto INTEGER,"+"Lat TEXT,"+"Lon TEXT,"+"ActualLat TEXT,"+"ActualLon TEXT)";
         database.execSQL(query);
         Log.d(LOGCAT, "TaskRequest Created");
 
@@ -53,7 +57,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d(LOGCAT, "TaskLineItemRequest Created");
 
         query = "CREATE TABLE TaskLineItemPhoto (ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + "TaskLineItemID TEXT, PhotoID TEXT, Time TEXT, Lat TEXT, Lon TEXT,NotDoneReason TEXT)";
+                + "TaskLineItemID TEXT, PhotoID TEXT, Time TEXT, Lat TEXT, Lon TEXT,NotDoneReason TEXT,NotDone INTEGER)";
         database.execSQL(query);
         Log.d(LOGCAT, "TaskLineItemPhoto Created");
 
@@ -76,6 +80,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + "Name TEXT," + "Code TEXT," + "Description TEXT,"+"RfeID INTEGER)";
         database.execSQL(query);
         Log.d(LOGCAT, "RfeRequest Created");
+
+        query = "CREATE TABLE TaskNotDoneReason (ID  INTEGER PRIMARY KEY,"
+                + "NotDoneReason TEXT," + "Description TEXT)";
+        database.execSQL(query);
+        Log.d(LOGCAT, "TaskNotDoneReason Created");
+
+        query = "CREATE TABLE TaskLineItemNotDoneReason (ID  INTEGER PRIMARY KEY,"
+                + "NotDoneReason TEXT," + "Description TEXT)";
+        database.execSQL(query);
+        Log.d(LOGCAT, "TaskLineItemNotDoneReason Created");
     }
 
     @Override
@@ -166,6 +180,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         database.close();
         return taskLineItemPhotoList;
     }
+    public TaskLineItemPhotoViewModel TestVa(int value) {
+        TaskLineItemPhotoViewModel taskLineItemPhoto = new TaskLineItemPhotoViewModel();
+        SQLiteDatabase database = this.getReadableDatabase();
+        String selectQuery = "SELECT * FROM TaskLineItemPhoto where NotDone ="+value;
+        Cursor cursor = database.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                taskLineItemPhoto.ID = Integer.parseInt(cursor.getString(0));
+                taskLineItemPhoto.TaskLineItemID = Integer.parseInt(cursor.getString(1));
+                taskLineItemPhoto.PhotoID = cursor.getString(2);
+                taskLineItemPhoto.Time = cursor.getString(3);
+                taskLineItemPhoto.Lat = cursor.getString(4);
+                taskLineItemPhoto.Lon = cursor.getString(5);
+                taskLineItemPhoto.NotDoneReason = cursor.getString(6);
+                taskLineItemPhoto.NotDone= Integer.parseInt(cursor.getString(7)) == 1 ? true: false;
+            } while (cursor.moveToNext());
+        }
+        database.close();
+        return taskLineItemPhoto;
+    }
     public TaskLineItemPhotoViewModel getTaskLineItemPhotos(String taskLineItemID) {
         TaskLineItemPhotoViewModel taskLineItemPhoto = new TaskLineItemPhotoViewModel();
         SQLiteDatabase database = this.getReadableDatabase();
@@ -180,6 +214,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 taskLineItemPhoto.Lat = cursor.getString(4);
                 taskLineItemPhoto.Lon = cursor.getString(5);
                 taskLineItemPhoto.NotDoneReason = cursor.getString(6);
+                taskLineItemPhoto.NotDone= Integer.parseInt(cursor.getString(7)) == 1 ? true: false;
             } while (cursor.moveToNext());
         }
         database.close();
@@ -208,7 +243,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("Time", taskLineItemPhoto.Time);
         values.put("Lat", taskLineItemPhoto.Lat);
         values.put("Lon", taskLineItemPhoto.Lon);
-        values.put("NotDoneReason",taskLineItemPhoto.NotDoneReason);
+        values.put("NotDone", taskLineItemPhoto.NotDone?1:0);
+        values.put("NotDoneReason", taskLineItemPhoto.NotDoneReason);
         database.insert("TaskLineItemPhoto", null, values);
         database.close();
     }
@@ -220,6 +256,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("Time", taskLineItemPhoto.Time);
         values.put("Lat", taskLineItemPhoto.Lat);
         values.put("Lon", taskLineItemPhoto.Lon);
+        values.put("NotDone", taskLineItemPhoto.NotDone?1:0);
         values.put("NotDoneReason",taskLineItemPhoto.NotDoneReason);
         database.update("TaskLineItemPhoto", values, "ID" + " = ?",
                 new String[]{String.valueOf(taskLineItemPhoto.TaskLineItemID)});
@@ -489,6 +526,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("IsMeasurement", task.IsMeasurement ? 1 : 0);
         values.put("IsDone", task.IsDone?1:0);
         values.put("IsShopPhoto", task.IsShopPhoto?1:0);
+        values.put("Lat", task.Lat);
+        values.put("Lon", task.Lon);
+        values.put("ActualLat", task.ActualLat);
+        values.put("ActualLon", task.ActualLon);
         values.put("MinimumPhotoCount",task.MinimumPhoto);
         values.put("Name",task.Name);
         database.insert("TaskRequest", null, values);
@@ -510,6 +551,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put("ShopID", task.ShopID);
             values.put("IsDone", task.IsDone ? 1 : 0);
             values.put("IsShopPhoto", task.IsShopPhoto?1:0);
+            values.put("Lat", task.Lat);
+            values.put("Lon", task.Lon);
+            values.put("ActualLat", task.ActualLat);
+            values.put("ActualLon", task.ActualLon);
             values.put("IsMeasurement", task.IsMeasurement ? 1 : 0);
             values.put("MinimumPhotoCount",task.MinimumPhoto);
             values.put("PhotoID",task.PhotoID);
@@ -569,6 +614,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 temp = cursor.getString(13);
                 task.IsDone= Integer.parseInt(cursor.getString(14)) == 1 ? true: false;
                 task.IsShopPhoto= Integer.parseInt(cursor.getString(17)) == 1 ? true: false;
+                task.Lat=Double.parseDouble(cursor.getString(18));
+                task.Lon=Double.parseDouble(cursor.getString(19));
+                task.ActualLat=cursor.getString(20);
+                task.ActualLon=cursor.getString(21);
                 task.MinimumPhoto=Integer.parseInt(cursor.getString(15));
                 if (temp == null || temp.isEmpty())
                     task.ShopPhotoUploaded = false;
@@ -613,6 +662,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 task.MinimumPhoto=Integer.parseInt(cursor.getString(15));
                 task.Name=cursor.getString(16);
                 task.IsShopPhoto= Integer.parseInt(cursor.getString(17)) == 1 ? true: false;
+                task.Lat=Double.parseDouble(cursor.getString(18));
+                task.Lon=Double.parseDouble(cursor.getString(19));
+                task.ActualLat=cursor.getString(20);
+                task.ActualLon=cursor.getString(21);
                 temp = cursor.getString(13);
                 if (temp == null || temp.isEmpty())
                     task.ShopPhotoUploaded = false;
@@ -659,6 +712,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 task.MinimumPhoto=Integer.parseInt(cursor.getString(15));
                 task.Name=cursor.getString(16);
                 task.IsShopPhoto= Integer.parseInt(cursor.getString(17)) == 1 ? true: false;
+                task.Lat=Double.parseDouble(cursor.getString(18));
+                task.Lon=Double.parseDouble(cursor.getString(19));
+                task.ActualLat=cursor.getString(20);
+                task.ActualLon=cursor.getString(21);
                 temp = cursor.getString(13);
                 if (temp == null || temp.isEmpty())
                     task.ShopPhotoUploaded = false;
@@ -708,6 +765,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     task.MinimumPhoto=Integer.parseInt(cursor.getString(15));
                     task.Name=cursor.getString(16);
                     task.IsShopPhoto= Integer.parseInt(cursor.getString(17)) == 1 ? true: false;
+                    task.Lat=Double.parseDouble(cursor.getString(18));
+                    task.Lon=Double.parseDouble(cursor.getString(19));
+                    task.ActualLat=cursor.getString(20);
+                    task.ActualLon=cursor.getString(21);
                     temp = cursor.getString(13);
                     if (temp == null || temp.isEmpty())
                         task.ShopPhotoUploaded = false;
@@ -727,18 +788,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public int PhotoUploadCount(int id) {
-        int result;
-        TaskLineItemViewModel taskLineItem = new TaskLineItemViewModel();
-        TaskLineItemPhotoViewModel taskLineItemPhotoViewModel = new TaskLineItemPhotoViewModel();
+
         SQLiteDatabase database = this.getReadableDatabase();
-        //String selectQuery = "SELECT COUNT(*) FROM TaskLineItem AS TI WHERE TI.TaskID = '"+taskLineItem.ID+"'";
-        //String selectQuery1 = "(SELECT COUNT(*) FROM TaskLineItemPhoto AS TP WHERE TP.TaskID= '"+taskLineItem.ID+"')< TI.TaskLineItemPhotoCount";
-        String selectQuery = "SELECT COUNT(*) FROM TaskLineItemRequest AS TI WHERE TI.TaskID = '"+id+"' AND (SELECT COUNT(*) FROM TaskLineItemPhoto AS TP WHERE TP.TaskLineItemID=TI.ID)< (Select MinimumPhotoCount  from TaskRequest where TaskID='"+id+"')";
+
+        //String selectQuery="select count(*) from TaskLineItemRequest as tli where TaskID='"+id+"' and (((select MinimumPhotoCount from TaskRequest where id='"+id+"' ) > (select count(*) from TaskLineItemPhoto as tlip where tlip.TaskLineItemID= tli.ID )) and ((select count(*) from TaskLineItemPhoto as tlip where tlip.TaskLineItemID= tli.ID and PhotoID='Not_Done')<=0))";
+
+         String selectQuery = "SELECT COUNT(*) FROM TaskLineItemRequest AS TI WHERE TI.TaskID = '"+id+"' AND (((Select MinimumPhotoCount  from TaskRequest where TaskID='"+id+"') > (SELECT COUNT(*) FROM TaskLineItemPhoto AS TP WHERE TP.TaskLineItemID=TI.ID)) and ((SELECT count(*) FROM TaskLineItemPhoto AS TP WHERE TP.TaskLineItemID=TI.ID and TP.NotDone=1) <= 0))";
+        //String selectQuery="SELECT COUNT(*) FROM TaskLineItemRequest AS TI WHERE TI.TaskID = '"+id+"' AND ((SELECT count(*) FROM TaskLineItemPhoto AS TP WHERE TP.TaskLineItemID=TI.ID and TP.NotDone=1)<= 0)";
+        //String selectQuery="SELECT COUNT(*) FROM TaskLineItemRequest AS TI WHERE TI.TaskID = '"+id+"' AND  (SELECT COUNT(*) FROM TaskLineItemPhoto AS TP WHERE TP.TaskLineItemID=TI.ID)< (Select MinimumPhotoCount  from TaskRequest where TaskID='"+id+"')";
         Cursor cursor = database.rawQuery(selectQuery, null);
         if(cursor!=null)
         {
             cursor.moveToFirst();
-
         }
         return cursor.getInt(0);
 
@@ -777,6 +838,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 task.MinimumPhoto=Integer.parseInt(cursor.getString(15));
                 task.IsDone= Integer.parseInt(cursor.getString(14)) == 1 ? true: false;
                 task.Name=cursor.getString(16);
+                task.IsShopPhoto= Integer.parseInt(cursor.getString(17)) == 1 ? true: false;
+                task.Lat=Double.parseDouble(cursor.getString(18));
+                task.Lon=Double.parseDouble(cursor.getString(19));
+                task.ActualLat=cursor.getString(20);
+                task.ActualLon=cursor.getString(21);
                 temp = cursor.getString(13);
                 if (temp == null || temp.isEmpty())
                     task.ShopPhotoUploaded = false;
@@ -1137,6 +1203,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     task.MinimumPhoto=Integer.parseInt(cursor.getString(15));
                     task.Name=cursor.getString(16);
                     task.IsShopPhoto=Integer.parseInt(cursor.getString(17)) == 1 ? true:false;
+                    task.Lat=Double.parseDouble(cursor.getString(18));
+                    task.Lon=Double.parseDouble(cursor.getString(19));
                     temp = cursor.getString(13);
                     if (temp == null || temp.isEmpty())
                         task.ShopPhotoUploaded = false;
@@ -1259,5 +1327,65 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } else {
             return updateRfeRequest(RfeViewModel);
         }
+    }
+
+    public void insertTaskNotDoneReason(TaskNotDoneViewModel taskNotDone) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("NotDoneReason", taskNotDone.title);
+        values.put("Description", taskNotDone.description);
+        database.insert("TaskNotDoneReason", null, values);
+        database.close();
+    }
+    public void insertTaskLineItemNotDoneReason(TaskLineItemNotDoneViewModel taskLineItemNotDone) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("NotDoneReason", taskLineItemNotDone.LineItemtitle);
+        values.put("Description", taskLineItemNotDone.LineItemdescription);
+        database.insert("TaskLineItemNotDoneReason", null, values);
+        database.close();
+    }
+
+    public void  deleteTaskNotDone() {
+        SQLiteDatabase database = this.getWritableDatabase();
+        String deleteQuery = "DELETE FROM TaskNotDoneReason";
+        database.execSQL(deleteQuery);
+    }
+    public void  deleteTaskLineItemNotDone() {
+        SQLiteDatabase database = this.getWritableDatabase();
+        String deleteQuery = "DELETE FROM TaskLineItemNotDoneReason";
+        database.execSQL(deleteQuery);
+    }
+    public ArrayList<TaskNotDoneViewModel> getAllTaskNotDone() {
+        ArrayList<TaskNotDoneViewModel> taskNotDoneList = new ArrayList<TaskNotDoneViewModel>();
+        String selectQuery = "SELECT * FROM TaskNotDoneReason ";
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                TaskNotDoneViewModel taskNotDone = new TaskNotDoneViewModel();
+                taskNotDone.title = cursor.getString(1);
+                taskNotDone.description = cursor.getString(2);
+                taskNotDoneList.add(taskNotDone);
+            } while (cursor.moveToNext());
+        }
+        database.close();
+        return taskNotDoneList;
+    }
+    public ArrayList<TaskLineItemNotDoneViewModel> getAllTaskLineItemNotDone() {
+        ArrayList<TaskLineItemNotDoneViewModel> taskLineItemNotDoneList = new ArrayList<TaskLineItemNotDoneViewModel>();
+        String selectQuery = "SELECT * FROM TaskLineItemNotDoneReason ";
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                TaskLineItemNotDoneViewModel taskLineItemNotDone = new TaskLineItemNotDoneViewModel();
+                taskLineItemNotDone.LineItemtitle = cursor.getString(1);
+                taskLineItemNotDone.LineItemdescription = cursor.getString(2);
+                taskLineItemNotDoneList.add(taskLineItemNotDone);
+            } while (cursor.moveToNext());
+        }
+        database.close();
+        return taskLineItemNotDoneList;
     }
 }
