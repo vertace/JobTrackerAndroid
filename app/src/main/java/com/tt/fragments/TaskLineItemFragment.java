@@ -22,7 +22,9 @@ import android.widget.Toast;
 
 import com.tt.adapters.TaskDetailAdapter;
 import com.tt.data.Shared;
+import com.tt.data.TaskLineItemPhotoViewModel;
 import com.tt.data.TaskLineItemViewModel;
+import com.tt.data.TaskNotDoneViewModel;
 import com.tt.data.TaskViewModel;
 import com.tt.enumerations.JobTrackerScreen;
 import com.tt.helpers.DatabaseHelper;
@@ -41,13 +43,14 @@ public class TaskLineItemFragment extends ListFragment {
 
     OnTaskLineItemSelected mCallback;
     //onTaskLineItemShopPhoto mCallback;
-
+    MainActivity mainActivity = (MainActivity) getActivity();
+    DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
     // Container Activity must implement this interface
     public interface OnTaskLineItemSelected {
         public void onTaskLineItemSelected(TaskLineItemViewModel taskLineItemViewModel);
         public void onTaskLineItemShopPhoto(TaskViewModel taskViewModel);
     }
-
+    String Items[];
     TaskViewModel task;
     TaskLineItemViewModel taskLineItemViewModel;
 
@@ -60,6 +63,7 @@ String value;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        task=Shared.SelectedTask;
         Bundle bundle = getArguments();
         if (bundle != null) {
             this.task = (TaskViewModel) bundle.get("Task");
@@ -116,7 +120,7 @@ String value;
             case R.id.mnuMap:
 
                 break;
-            case R.id.action_task_notdone:
+            case R.id.action_task_notdone_TaskLineItem:
               TaskNotDone();
                 break;
             case R.id.action_task_takephoto:
@@ -152,45 +156,16 @@ String value;
         final DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
         Shared.TaskDetail = dbHelper.getTaskLineItems(" TaskID = " + String.valueOf(task.ID));
         Shared.SelectedTask=dbHelper.getTaskInfo(String.valueOf(task.ID));
+        TaskLineItemViewModel tltest=dbHelper.getTaskLineItemInfo(String.valueOf(Shared.SelectedTask.ID));
+        TaskLineItemPhotoViewModel test=dbHelper.TestVa(1);
         //  TaskLineItemViewModel task=dbHelper.getTaskLineItemInfo(String.valueOf(t));
         // final ArrayList<String> imageList = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(task.ID));
 
         //List <TaskLineItemViewModel> tasklineitems=dbHelper.getTaskLineItems(" TaskID = " + String.valueOf(task.ID));
-        if(dbHelper.PhotoUploadCount(task.ID)<=0)
+        int value=dbHelper.PhotoUploadCount(task.ID);
+        if(value<=0)
         {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder
-                    .setTitle("Alert")
-                    .setMessage("Are you sure to mark this as complete?")
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            //Yes button clicked, do something
-                            SharedPreferences.Editor editor = mainClassCall.edit();
-                            editor.putString("mainClassCall", "True"); // Storing string
-                            editor.commit();
-                            TaskViewModel taskViewModel = Shared.SelectedTask;
-
-                            taskViewModel.IsDone = true;
-
-                            dbHelper.saveTask(taskViewModel, true);
-                            Toast.makeText(getActivity(), " Move to Done list", Toast.LENGTH_LONG).show();
-                            Intent myIntent = new Intent(getActivity(), MainActivity.class);
-                            getActivity().startActivity(myIntent);
-                        }
-                    })
-                    .setNegativeButton("No",new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            SharedPreferences.Editor editor = mainClassCall.edit();
-                            editor.putString("mainClassCall", "True"); // Storing string
-                            editor.commit();
-                            Intent myIntent = new Intent(getActivity(), MainActivity.class);
-                            getActivity().startActivity(myIntent);
-                        }
-                    })						//Do nothing on no
-                    .show();
-
+            alertdailogue();
         }
         else
         {
@@ -198,36 +173,65 @@ String value;
             Toast.makeText(getActivity(), " Take Minimum Photo", Toast.LENGTH_LONG).show();
         }
     }
+    public void alertdailogue()
+    {
+        MainActivity mainActivity = (MainActivity) getActivity();
+        final DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
+        final SharedPreferences mainClassCall = getActivity().getSharedPreferences(Shared.MainClassCall, 0);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder
+                .setTitle("Alert")
+                .setMessage("Are you sure to mark this as complete?")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Yes button clicked, do something
+                        SharedPreferences.Editor editor = mainClassCall.edit();
+                        editor.putString("mainClassCall", "True"); // Storing string
+                        editor.commit();
+                        TaskViewModel taskViewModel = Shared.SelectedTask;
+
+                        taskViewModel.IsDone = true;
+
+                        dbHelper.saveTask(taskViewModel, true);
+                        Toast.makeText(getActivity(), " Move to Done list", Toast.LENGTH_LONG).show();
+                        Intent myIntent = new Intent(getActivity(), MainActivity.class);
+                        getActivity().startActivity(myIntent);
+                    }
+                })
+                .setNegativeButton("No",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        SharedPreferences.Editor editor = mainClassCall.edit();
+                        editor.putString("mainClassCall", "True"); // Storing string
+                        editor.commit();
+                        Intent myIntent = new Intent(getActivity(), MainActivity.class);
+                        getActivity().startActivity(myIntent);
+                    }
+                })						//Do nothing on no
+                .show();
+    }
 public void TaskNotDone()
 {
     AlertDialog levelDialog;
 
-// Strings to Show In Dialog with Radio Buttons
-    final CharSequence[] items = {" StructuralDamage "," NoSpace "," MaterialDamage "," MaterialMissing "};
+    List<TaskNotDoneViewModel> taskNotDone;
+    MainActivity mainActivity = (MainActivity) getActivity();
+    final DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
+   taskNotDone=dbHelper.getAllTaskNotDone();
+    Items=new String[taskNotDone.size()];
+    for(int i=0;i<taskNotDone.size();i++)
+    {
+        Items[i]=new String();
+      Items[i]=taskNotDone.get(i).title;
+    }
+  //  final CharSequence[] items = {" Structural Damage ", " NoSpace ", " MaterialDamage ", " MaterialMissing "};
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     builder.setTitle("Select The Reason");
-    builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+    builder.setSingleChoiceItems(Items, -1, new DialogInterface.OnClickListener() {
         public void onClick(DialogInterface dialog, int item) {
+                notDoneReason= Items[item];
 
-
-            switch(item)
-            {
-                case 0:
-                  value="StructuralDamage";
-                    break;
-                case 1:
-                    value="NoSpace";
-
-                    break;
-                case 2:
-                    value="MaterialDamage";
-                    break;
-                case 3:
-                    value="MaterialMissing";
-                    break;
-
-            }
-            notDoneReason=value;
             notDoneTaskLineItem();
            // levelDialog.dismiss();
         }
@@ -239,37 +243,42 @@ public void TaskNotDone()
 
     private void notDoneTaskLineItem() {
         final SharedPreferences mainClassCall = getActivity().getSharedPreferences(Shared.MainClassCall, 0);
-        TaskLineItemViewModel selectedTaskLineItem=new TaskLineItemViewModel();
-        selectedTaskLineItem.Uri = Uri.EMPTY;
-        selectedTaskLineItem.Lat = String.valueOf(Shared.lat);
-        selectedTaskLineItem.Lon = String.valueOf(Shared.lon);
-        selectedTaskLineItem.SaveToDB = true;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        selectedTaskLineItem.Time = sdf.format(new Date());
+        MainActivity mainActivity = (MainActivity) getActivity();
+        DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
+        Shared.TaskDetail = dbHelper.getTaskLineItems(" TaskID = " + String.valueOf(task.ID));
+        for(TaskLineItemViewModel tasklineitem:Shared.TaskDetail) {
+            TaskLineItemPhotoViewModel taskLineItemPhotoViewModel = new TaskLineItemPhotoViewModel();
+            taskLineItemPhotoViewModel.PhotoID = "NOT_DONE";
+            taskLineItemPhotoViewModel.NotDoneReason = notDoneReason;
+            taskLineItemPhotoViewModel.TaskLineItemID = tasklineitem.ID;
+            taskLineItemPhotoViewModel.Lat = String.valueOf(Shared.lat);
+            taskLineItemPhotoViewModel.Lon = String.valueOf(Shared.lon);
+            taskLineItemPhotoViewModel.NotDone=true;
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+            taskLineItemPhotoViewModel.Time = sdf.format(new Date());
+            dbHelper.saveTaskLineItemPhotos(taskLineItemPhotoViewModel);
 
-        selectedTaskLineItem.PhotoID = "NOT_DONE";
+
+            TaskLineItemViewModel selectedTaskLineItem = new TaskLineItemViewModel();
+            selectedTaskLineItem.Uri = Uri.EMPTY;
+            selectedTaskLineItem.Lat = String.valueOf(Shared.lat);
+            selectedTaskLineItem.Lon = String.valueOf(Shared.lon);
+            selectedTaskLineItem.SaveToDB = true;
+            selectedTaskLineItem.Time = sdf.format(new Date());
+
+            selectedTaskLineItem.PhotoID = "NOT_DONE";
     /*    if (selectedTaskLineItem.OldImage == null
                 || selectedTaskLineItem.OldImage.isEmpty()) {
             selectedTaskLineItem.OldTakenNow = true;
             selectedTaskLineItem.OldImage = "NOT_DONE";
         }*/
-        selectedTaskLineItem.NewImage = "NOT_DONE";
-        selectedTaskLineItem.NotDoneReason = notDoneReason;
-        MainActivity mainActivity = (MainActivity) getActivity();
-        DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
-        dbHelper.saveTaskLineItem(selectedTaskLineItem, true);
+            selectedTaskLineItem.NewImage = "NOT_DONE";
+            selectedTaskLineItem.NotDoneReason = notDoneReason;
+
+            dbHelper.saveTaskLineItem(selectedTaskLineItem, true);
+        }
         Shared.SelectedTask=dbHelper.getTaskInfo(String.valueOf(task.ID));
-        TaskViewModel taskViewModel = Shared.SelectedTask;
-        taskViewModel.IsDone = true;
-        dbHelper.saveTask(taskViewModel, true);
-
-        Toast.makeText(getActivity(), " Move to Done list", Toast.LENGTH_LONG).show();
-        SharedPreferences.Editor editor = mainClassCall.edit();
-        editor.putString("mainClassCall", "True"); // Storing string
-        editor.commit();
-        Intent myIntent = new Intent(getActivity(), MainActivity.class);
-        getActivity().startActivity(myIntent);
-
+        alertdailogue();
     }
 
 

@@ -75,14 +75,12 @@ public class TaskListFragment extends Fragment
 
         final SharedPreferences taskSync = getActivity().getApplicationContext().getSharedPreferences(Shared.TaskSync, 0);
         String syncTaskStatus= taskSync.getString("tasksync", null);
-        if(syncTaskStatus=="True" && Shared.sychIntiallyTasks==true)
+        if(syncTaskStatus=="True")
         {
-            if(Shared.sychIntiallyTasks==true) {
                 DownloadTasksFromServer();
                 SharedPreferences.Editor editor = taskSync.edit();
-                editor.putString("tasksync", null); // Storing string
+                editor.putString("tasksync", "False"); // Storing string
                 editor.commit();
-            }
         }
         //DownloadTasksFromServer();
 
@@ -146,7 +144,7 @@ public class TaskListFragment extends Fragment
                 String condition = " EmployeeID = " + String.valueOf(Shared.LoggedInUser.ID);
 
                 DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
-                Shared.TaskList = dbHelper.getPendingTasks(condition);
+                //Shared.TaskList = dbHelper.getPendingTasks(condition);
                 Intent myIntent = new Intent(getActivity(), MapForMultipleShop.class);
                 getActivity().startActivity(myIntent);
                 break;
