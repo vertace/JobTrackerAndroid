@@ -24,15 +24,20 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.tt.data.Shared;
+import com.tt.data.TaskViewModel;
 import com.tt.enumerations.JobTrackerScreen;
+import com.tt.fragments.PendingListFragment;
 import com.tt.fragments.RFEListFragment;
+import com.tt.fragments.RfeTaskListFragment;
 import com.tt.fragments.SettingsFragment;
+import com.tt.fragments.TaskDetailFragment;
 import com.tt.fragments.TaskListFragment;
+import com.tt.helpers.DatabaseHelper;
 
 /**
  * Created by BS-308 on 5/6/2015.
  */
-public class Admin_MainActivity extends ActionBarActivity {
+public class Admin_MainActivity extends ActionBarActivity implements RfeTaskListFragment.OnTaskSelected{
     public static FragmentManager fragmentManager;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -264,5 +269,54 @@ public class Admin_MainActivity extends ActionBarActivity {
         mDrawerList.setItemChecked(position, true);
         setTitle(mMenuTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
+    }
+    public void onTaskSelected(TaskViewModel task)
+    {
+        Shared.hideMenu=String.valueOf(task.IsDone);
+
+
+        if(task.IsMeasurement)
+        {
+            //call measurement fragment
+
+            Shared.MeasurementTaskID = task.ID;
+            Intent intent = new Intent(Admin_MainActivity.this,
+                    TakeMeasurementList.class);
+            DatabaseHelper dbHelper = new DatabaseHelper(this);
+            Shared.SelectedTask=dbHelper.getTaskInfo(String.valueOf(task.ID));
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("TaskID", String.valueOf(task.ID));
+            intent.putExtra("ShopID",
+                    String.valueOf(task.ShopID));
+            intent.putExtra("ShopName",
+                    String.valueOf(task.ShopName));
+            intent.putExtra("ShopAddress",
+                    String.valueOf(task.ShopAddress));
+            intent.putExtra("IsDone",
+                    String.valueOf(task.IsDone));
+            getApplicationContext().startActivity(intent);
+
+            // Intent myIntent = new Intent(MainActivity.this, TakeMeasurement.class);
+            //myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            // myIntent.putExtra("PhotoID",taskLineItemViewModel.PhotoID);
+            // getApplicationContext().startActivity(myIntent);
+            // finish();
+
+        }
+
+        else {
+            //call execution fragment
+
+            Fragment fragment = new TaskDetailFragment();
+            if (fragment != null) {
+                Bundle args = new Bundle();
+                args.putSerializable("Task", task);
+                fragment.setArguments(args);
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.content_frame, fragment).addToBackStack("tasklist").commit();
+            }
+        }
     }
 }
