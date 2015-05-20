@@ -4,13 +4,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+
     <TextView
         android:id="@+id/wallType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="5dip"
-        android:paddingBottom="10dip"
+        android:paddingBottom="2dip"
         android:text="@string/shopName"
         android:textColor="#040404"
         android:paddingLeft="8dip"
@@ -18,6 +19,7 @@
         android:textStyle="bold"
         android:typeface="sans" />
     <!-- Address-->
+
     <TextView
         android:id="@+id/wallDetail"
         android:layout_width="wrap_content"
@@ -30,7 +32,21 @@
         android:text="@string/shopAddress"
         android:textColor="#777777"
         android:textSize="10sp"
-        android:textStyle="italic"
+        android:textStyle="bold"
+        />
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="320dp"
+        android:layout_marginTop="-30dp"
+        android:layout_marginBottom="30dp"
+        android:text="status"
+        android:textColor="#000000"
+        android:textSize="12sp"
+        android:typeface="sans"
+        android:textStyle="bold"
+
         />
     <TextView
         android:id="@+id/space"

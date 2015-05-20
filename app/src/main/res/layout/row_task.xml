@@ -65,6 +65,7 @@
         android:layout_alignLeft="@+id/tvShopBranch"
         android:layout_alignStart="@+id/tvShopBranch" />
 
+
     <!-- <ImageView
          android:id="@+id/imgmap"
          android:layout_width="30dp"
