@@ -2,25 +2,35 @@ package com.tt.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tt.adapters.MeasurementPhotoListAdapter;
 import com.tt.adapters.TaskDetailAdapter;
+import com.tt.data.MeasurementPhoto;
 import com.tt.data.Shared;
 import com.tt.data.TaskLineItemPhotoViewModel;
 import com.tt.data.TaskLineItemViewModel;
@@ -51,8 +61,10 @@ public class TaskLineItemFragment extends ListFragment {
         public void onTaskLineItemShopPhoto(TaskViewModel taskViewModel);
     }
     String Items[];
+    String Photocount[];
     TaskViewModel task;
     TaskLineItemViewModel taskLineItemViewModel;
+    ListView listView;
 
     private ListAdapter mAdapter;
 String value;
@@ -83,6 +95,7 @@ String value;
         TextView taskAddress = (TextView) view.findViewById(R.id.ShopAddress);
         TextView branchname = (TextView) view.findViewById(R.id.Branch);
         TextView minimumPhoto = (TextView) view.findViewById(R.id.MinimumPhoto);
+        ImageView shopphoto=(ImageView) view.findViewById(R.id.ShopPhoto);
         branchname.setText(task.ShopBranch.toString());
         taskName.setText(task.Name.toString());
         taskAddress.setText(task.ShopAddress.toString());
@@ -93,15 +106,36 @@ String value;
         mainActivity.CurrentScreen = JobTrackerScreen.TaskDetail;
         mainActivity.SetActionBarMenuItems();
         super.onCreate(savedInstanceState);
+        shopphoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                MainActivity mainActivity = (MainActivity) getActivity();
+                DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
+                Dialog settingsDialog = new Dialog(getActivity());
+                settingsDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+                View viewDialog=getActivity().getLayoutInflater().inflate(R.layout.image_layout, null);
+                settingsDialog.setContentView(viewDialog);
+                ImageView imgShop=(ImageView)viewDialog.findViewById(R.id.ShopImage);
+                TaskViewModel task=dbHelper.getTaskInfo(String.valueOf(Shared.SelectedTask.ID));
+                Bitmap bmp = BitmapFactory.decodeFile(task.PhotoID);
+
+                imgShop.setImageBitmap(bmp);
+                settingsDialog.show();
+            }
+        });
         return view;
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
+        switch (item.getItemId())
+        {
 
             case R.id.action_task_done:
+
                 moveto_donetask();
+
                 return true;
             case R.id.action_task_shopmap:
                 MainActivity mainActivity = (MainActivity) getActivity();
@@ -124,6 +158,7 @@ String value;
               TaskNotDone();
                 break;
             case R.id.action_task_takephoto:
+
                 if(task.IsShopPhoto)
                 {
                     takephoto_TaskShopPhoto();
@@ -285,6 +320,17 @@ public void TaskNotDone()
     private void ShowTaskLineItems() {
         MainActivity mainActivity = (MainActivity) getActivity();
         DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
+        String condition="TaskID="+task.ID;
+      ArrayList<TaskLineItemViewModel> taskLineItem=dbHelper.getTaskLineItems(condition);
+        Photocount=new String[taskLineItem.size()];
+        for(int i=0;i<taskLineItem.size();i++)
+        {
+            Photocount[i]=new String();
+            final ArrayList<String> imageList = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(taskLineItem.get(i).ID));
+            int size=imageList.size();
+            Photocount[i]=String.valueOf(size);
+        }
+        Shared.SharedPhotocount=Photocount;
         mainActivity.CurrentScreen = JobTrackerScreen.TaskDetail;
         mainActivity.SetActionBarMenuItems();
         TaskDetailAdapter taskDetailAdapter = new TaskDetailAdapter(mainActivity, R.layout.row_tasklineitem);

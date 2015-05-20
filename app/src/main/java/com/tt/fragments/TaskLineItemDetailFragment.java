@@ -46,6 +46,7 @@ public class TaskLineItemDetailFragment extends Fragment {
     ImageAdapter adapter;
     TextView Walltype;
     TextView WallDetail;
+    TextView PhotoCount;
     AlertDialog levelDialog;
     String Items[];
     MainActivity mainActivity = (MainActivity) getActivity();
@@ -82,12 +83,21 @@ public class TaskLineItemDetailFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_detail_tasklineitem, container, false);
         Walltype = (TextView) view.findViewById(R.id.wallType);
         WallDetail = (TextView) view.findViewById(R.id.wallDetail);
+        PhotoCount = (TextView) view.findViewById(R.id.status);
         TaskLineItemViewModel tasklineitemviewmodel = new TaskLineItemViewModel();
-
+        final ArrayList<String> imageListsize = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(taskLineItemViewModel.ID));
+        int size=imageListsize.size();
         tasklineitemviewmodel= dbHelper.getTaskLineItemInfo(String.valueOf(taskLineItemViewModel.ID));
         Walltype.setText(tasklineitemviewmodel.Type.toString());
         // Walltype.setText(String.valueOf(tasklineitemviewmodel.Type));
         WallDetail.setText(tasklineitemviewmodel.Instruction.toString());
+      if(imageListsize.get(0).equals("NOT_DONE")) {
+          PhotoCount.setText("");
+      }
+        else {
+          PhotoCount.setText(size + "/" + Shared.SelectedTask.MinimumPhoto);
+      }
+
 //        Button button = (Button) view.findViewById(R.id.btnTakePhoto);
 //        button.setOnClickListener(new View.OnClickListener() {
 //            @Override
