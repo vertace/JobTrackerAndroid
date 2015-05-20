@@ -54,6 +54,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -151,7 +152,7 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
     public TaskLineItemViewModel taskLineItemViewModel;
-
+DatabaseHelper dbHelper=new DatabaseHelper(this);
     public JobTrackerScreen CurrentScreen = JobTrackerScreen.TaskList;
 
     @Override
@@ -411,7 +412,8 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         this.menu = menu;
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
@@ -422,12 +424,31 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
                 .getActionView();
         searchView.setSearchableInfo(searchManager
                 .getSearchableInfo(getComponentName()));
+     /*   ImageView tickImg=(ImageView) menu.findItem(R.id.action_task_done);
+        if(Shared.SelectedTask!=null)
+        {
+            int value = dbHelper.PhotoUploadCount(Shared.SelectedTask.ID);
+            if(value==0)
+            {
+                tickImg.setImageResource(R.drawable.done);
+                tickImg.setFocusable(true);
+                tickImg.setFocusableInTouchMode(true);
+
+            }
+            else
+            {
+                tickImg.setFocusable(false);
+                tickImg.setFocusableInTouchMode(false);
+                tickImg.setImageResource(R.drawable.ic_launcher);
+            }
+        }*/
 
         SetActionBarMenuItems();
         return super.onCreateOptionsMenu(menu);
     }
 
-    public void showTaskListMenu(boolean showMenu) {
+    public void showTaskListMenu(boolean showMenu)
+    {
 
     }
 
@@ -573,6 +594,7 @@ public class MainActivity extends ActionBarActivity implements PendingListFragme
                 if( Shared.hideMenu=="true")
                 {
                     menu.setGroupVisible(R.id.actionbar_group_taskdetail, false);
+
                 }
                 else {
                     menu.setGroupVisible(R.id.actionbar_group_taskdetail, true);

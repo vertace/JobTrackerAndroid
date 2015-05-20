@@ -398,9 +398,9 @@ public class MapForSingleShop extends FragmentActivity{
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras)
-        {
+    {
 
-        }
+    }
         public  void DrawRoute()
         {
             String url = getDirectionsUrl(currentlang, latLng);
