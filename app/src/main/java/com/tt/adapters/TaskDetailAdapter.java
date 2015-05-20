@@ -7,8 +7,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.tt.data.Shared;
 import com.tt.jobtracker.R;
 import com.tt.data.TaskLineItemViewModel;
+
+import java.util.ArrayList;
 
 /**
  * Adapts NewsEntry objects onto views for lists
@@ -31,20 +34,24 @@ public final class TaskDetailAdapter extends
         // We need to get the best view (re-used if possible) and then
         // retrieve its corresponding ViewHolder, which optimizes lookup
         // efficiency
+
         final View view = getWorkingView(convertView);
         final ViewHolder viewHolder = getViewHolder(view);
         final TaskLineItemViewModel entry = getItem(position);
-
         // Setting the title view is straightforward
         viewHolder.tvShopWall.setText(entry.ShopWall);
         viewHolder.tvInstruction.setText(entry.Instruction);
+
+
         view.setTag(entry);
         if(entry.PhotoID!=null && entry.PhotoID.equals("NOT_DONE"))
        {
            view.setBackgroundResource(R.drawable.listpending_selector);
+           viewHolder.status.setText("");
         }
        else {
             view.setBackgroundResource(R.drawable.listpartial_selector);
+            viewHolder.status.setText(Shared.SharedPhotocount[position] + "/" + Shared.SelectedTask.MinimumPhoto);
         }
         //setRowColor(view, entry);
         return view;
@@ -92,7 +99,7 @@ public final class TaskDetailAdapter extends
                     .findViewById(R.id.tvShopWall);
             viewHolder.tvInstruction = (TextView) workingView
                     .findViewById(R.id.tvInstruction);
-
+            viewHolder.status=(TextView)workingView.findViewById(R.id.status);
             workingView.setTag(viewHolder);
 
         } else {
@@ -109,6 +116,7 @@ public final class TaskDetailAdapter extends
     private static class ViewHolder {
         public TextView tvShopWall;
         public TextView tvInstruction;
+        public TextView status;
     }
 
 }
