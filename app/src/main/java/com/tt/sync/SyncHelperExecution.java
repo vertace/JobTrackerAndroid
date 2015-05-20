@@ -27,14 +27,17 @@ public class SyncHelperExecution {
         TaskIDList = (String) TaskIDList
                 .subSequence(1, TaskIDList.length() - 1);
         for (TaskViewModel task : tasklist) {
-            dbHelper.saveTask(task, false);
-            if (task.TaskLineItemViewModelList != null
-                    && task.TaskLineItemViewModelList.size() > 0)
-                for (TaskLineItemViewModel taskLineItem : task.TaskLineItemViewModelList) {
-                    taskLineItem.ShopName = task.ShopName;
-                    taskLineItem.ShopAddress = task.ShopAddress;
-                    dbHelper.saveTaskLineItem(taskLineItem, false);
-                }
+            TaskViewModel checkIsDone=dbHelper.getTaskInfo(String.valueOf(task.ID));
+            if(checkIsDone.IsDone==false) {
+                dbHelper.saveTask(task, false);
+                if (task.TaskLineItemViewModelList != null
+                        && task.TaskLineItemViewModelList.size() > 0)
+                    for (TaskLineItemViewModel taskLineItem : task.TaskLineItemViewModelList) {
+                        taskLineItem.ShopName = task.ShopName;
+                        taskLineItem.ShopAddress = task.ShopAddress;
+                        dbHelper.saveTaskLineItem(taskLineItem, false);
+                    }
+            }
 
         }
     }
