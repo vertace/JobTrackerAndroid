@@ -152,7 +152,7 @@ public class MapForMultipleShop extends FragmentActivity
             //	Marker ciu = mMap.addMarker(new MarkerOptions() .position(CIU).title("My Office"));
         }
         else{
-            Toast.makeText(getApplicationContext(), "Network is slow wait...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Not valid Address...", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -166,10 +166,10 @@ public class MapForMultipleShop extends FragmentActivity
 
                 latlngShop[k]=new String();
 
-                addresses= geocoder.getFromLocationName(Shared.TaskList.get(k).ShopAddress, 5);
+              //  addresses= geocoder.getFromLocationName(Shared.TaskList.get(k).ShopAddress, 5);
                 // addresses= getAddrByWeb(getLocationInfo(Shared.TaskList.get(k).ShopAddress));
                 //  Map<String, String> treeMap = new TreeMap<String, String>(addresses);
-                if(Shared.TaskList.get(k).Lat!=0 && Shared.TaskList.get(k).Lon!=0)
+                if(Shared.TaskList.get(k).Lat>0 && Shared.TaskList.get(k).Lon>0)
                 {
                    // for (int i = 0; i < addresses.size(); i++)
                    // {
@@ -178,8 +178,10 @@ public class MapForMultipleShop extends FragmentActivity
 
                         double latitude=Shared.TaskList.get(k).Lat;
                         double longitude=Shared.TaskList.get(k).Lon;
-                        latLng =new LatLng(latitude,longitude);
+
+                        latLng = new LatLng(latitude, longitude);
                         latlngShop[k] = latitude + "," + longitude;
+
                         addressesList = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
 
                         String addres = addressesList.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
@@ -567,12 +569,6 @@ public class MapForMultipleShop extends FragmentActivity
                     String url = getDirectionsUrl(currentlang, latLng);
                     DownloadTask downloadTask = new DownloadTask();
                     downloadTask.execute(url);
-
-
-
-
-
-
                 }
             }
 
@@ -593,7 +589,7 @@ public class MapForMultipleShop extends FragmentActivity
             String mode = "mode=driving";
             String waypoints="waypoints=";
 
-            if(Shared.TaskList.size()<=8)
+            if(Shared.MapSortByShop.size()<=8)
             {
                 str_origin = "origin=" + origin.latitude + "," + origin.longitude;
                 for (int k = 0; k < Shared.MapSortByShop.size(); k++) {
@@ -602,6 +598,7 @@ public class MapForMultipleShop extends FragmentActivity
                     //  latlngShopSort = Double.parseDouble(OrderShopList.get(k)) + "," + String.valueOf(OrderShopList.get(k));
                     waypoints = waypoints +  Shared.MapSortByShop.get(k).Lat+","+ Shared.MapSortByShop.get(k).Lon + "|";
                 }
+                str_dest = "destination=" + Shared.MapSortByShop.get(Shared.MapSortByShop.size()-1).Lat + "," + Shared.MapSortByShop.get(Shared.MapSortByShop.size()-1).Lon;
             }
             else {
                 if (count == i) {

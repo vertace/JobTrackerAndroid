@@ -112,7 +112,7 @@ public class MapForSingleShop extends FragmentActivity{
 
 
             if (Shared.SelectedTask.Lat != 0 && Shared.SelectedTask.Lon!=0){
-                android.location.Address address = (android.location.Address) addresses.get(0);
+               // android.location.Address address = (android.location.Address) addresses.get(0);
 
                 // Creating an instance of GeoPoint, to display in Google Map
                     double latitude=Shared.SelectedTask.Lat;
@@ -152,7 +152,10 @@ public class MapForSingleShop extends FragmentActivity{
                 mMap.setMyLocationEnabled(true);
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
             }
-
+else
+            {
+                Toast.makeText(getApplicationContext(), "Not valid Address", Toast.LENGTH_SHORT).show();
+            }
 
 //			}
 
@@ -164,7 +167,7 @@ public class MapForSingleShop extends FragmentActivity{
                     "Some Problem occured");
         }
         //  mobileLocation = mlocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (addresses != null && addresses.size() > 0) {
+        if (Shared.SelectedTask.Lat != 0 && Shared.SelectedTask.Lon!=0){
             mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
            // Criteria criteria = new Criteria();
@@ -194,7 +197,7 @@ public class MapForSingleShop extends FragmentActivity{
             alertDialog.setTitle("Alert Dialog");
 
             // Setting Dialog Message
-            alertDialog.setMessage("Some Error Occured");
+            alertDialog.setMessage("Not valid address");
 
             // Setting Icon to Dialog
             alertDialog.setIcon(R.drawable.ic_launcher);
@@ -346,7 +349,7 @@ public class MapForSingleShop extends FragmentActivity{
         return false;
     }*/
 
-    private Handler mHandler = new Handler();
+  /*  private Handler mHandler = new Handler();
     private Runnable onRequestLocation = new Runnable() {
         @Override
         public void run() {
@@ -355,7 +358,7 @@ public class MapForSingleShop extends FragmentActivity{
             // Run this again in an hour
             mHandler.postDelayed(onRequestLocation, DateUtils.HOUR_IN_MILLIS);
         }
-    };
+    };*/
 
     public class MyMapLocationListener implements LocationListener
     {

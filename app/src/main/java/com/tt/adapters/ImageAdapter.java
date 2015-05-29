@@ -10,6 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
+import com.tt.data.Shared;
 import com.tt.jobtracker.R;
 import com.squareup.picasso.Picasso;
 
@@ -40,9 +42,13 @@ public class ImageAdapter extends ArrayAdapter<String> {
         } else {
             imageView = (ImageView) convertView;
         }
-        Picasso.with(mContext).load(Uri.fromFile(new File(getItem(position)))).placeholder(R.drawable.photo)
-                .error(R.drawable.camera).into(imageView);
-
+        if(Shared.admin_mian_activity==true) {
+            UrlImageViewHelper.setUrlDrawable(imageView, getItem(position));
+        }
+        else {
+              Picasso.with(mContext).load(Uri.fromFile(new File(getItem(position)))).placeholder(R.drawable.photo)
+              .error(R.drawable.camera).into(imageView);
+        }
         //imageView.setImageBitmap(getThumbnailImage(getItem(position)));
         return imageView;
     }

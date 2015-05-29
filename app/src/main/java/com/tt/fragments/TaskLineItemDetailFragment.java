@@ -5,6 +5,10 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,8 +24,10 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.tt.adapters.ImageAdapter;
 import com.tt.data.Shared;
+import com.tt.data.TaskLineItemImageListViewModel;
 import com.tt.data.TaskLineItemNotDoneViewModel;
 import com.tt.data.TaskLineItemPhotoViewModel;
 import com.tt.data.TaskLineItemViewModel;
@@ -29,10 +35,20 @@ import com.tt.data.TaskNotDoneViewModel;
 import com.tt.data.TaskViewModel;
 import com.tt.enumerations.JobTrackerScreen;
 import com.tt.helpers.DatabaseHelper;
+import com.tt.jobtracker.Admin_MainActivity;
 import com.tt.jobtracker.FullScreenImageViewActivity;
 import com.tt.jobtracker.MainActivity;
 import com.tt.jobtracker.R;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.BufferedHttpEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.io.InputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -78,25 +94,32 @@ public class TaskLineItemDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        MainActivity mainActivity = (MainActivity) getActivity();
-        DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
         View view = inflater.inflate(R.layout.fragment_detail_tasklineitem, container, false);
-        Walltype = (TextView) view.findViewById(R.id.wallType);
-        WallDetail = (TextView) view.findViewById(R.id.wallDetail);
-        PhotoCount = (TextView) view.findViewById(R.id.status);
-        TaskLineItemViewModel tasklineitemviewmodel = new TaskLineItemViewModel();
-        final ArrayList<String> imageListsize = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(taskLineItemViewModel.ID));
-        int size=imageListsize.size();
-        tasklineitemviewmodel= dbHelper.getTaskLineItemInfo(String.valueOf(taskLineItemViewModel.ID));
-        Walltype.setText(tasklineitemviewmodel.Type.toString());
-        // Walltype.setText(String.valueOf(tasklineitemviewmodel.Type));
-        WallDetail.setText(tasklineitemviewmodel.Instruction.toString());
-      if(imageListsize.get(0).equals("NOT_DONE")) {
-          PhotoCount.setText("");
-      }
-        else {
-          PhotoCount.setText(size + "/" + Shared.SelectedTask.MinimumPhoto);
-      }
+
+        if(Shared.admin_mian_activity==false) {
+            MainActivity mainActivity = (MainActivity) getActivity();
+            DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
+
+            Walltype = (TextView) view.findViewById(R.id.wallType);
+            WallDetail = (TextView) view.findViewById(R.id.wallDetail);
+            PhotoCount = (TextView) view.findViewById(R.id.status);
+            TaskLineItemViewModel tasklineitemviewmodel = new TaskLineItemViewModel();
+            final ArrayList<String> imageListsize = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(taskLineItemViewModel.ID));
+            int size = imageListsize.size();
+            tasklineitemviewmodel = dbHelper.getTaskLineItemInfo(String.valueOf(taskLineItemViewModel.ID));
+            Walltype.setText(tasklineitemviewmodel.Type.toString());
+            // Walltype.setText(String.valueOf(tasklineitemviewmodel.Type));
+            WallDetail.setText(tasklineitemviewmodel.Instruction.toString());
+            if (size > 0) {
+                if (imageListsize.get(0).equals("NOT_DONE")) {
+                    PhotoCount.setText("");
+                } else {
+                    PhotoCount.setText(size + "/" + Shared.SelectedTask.MinimumPhoto);
+                }
+            } else {
+                PhotoCount.setText(size + "/" + Shared.SelectedTask.MinimumPhoto);
+            }
+
 
 //        Button button = (Button) view.findViewById(R.id.btnTakePhoto);
 //        button.setOnClickListener(new View.OnClickListener() {
@@ -107,31 +130,50 @@ public class TaskLineItemDetailFragment extends Fragment {
 //
 //        });
 
+            GridView gridview = (GridView) view.findViewById(R.id.gridview);
+            adapter = new ImageAdapter(mainActivity);
+            gridview.setAdapter(adapter);
+            final ArrayList<String> imageList = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(taskLineItemViewModel.ID));
+            adapter.addAll(imageList);
 
+            gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-        GridView gridview = (GridView) view.findViewById(R.id.gridview);
-        adapter = new ImageAdapter(mainActivity);
-        gridview.setAdapter(adapter);
-
-
-        final ArrayList<String> imageList = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(taskLineItemViewModel.ID));
-        adapter.addAll(imageList);
-
-        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), FullScreenImageViewActivity.class);
-                intent.putExtra("ImageList", imageList.toArray());
-                intent.putExtra("Position", position);
-                startActivity(intent);
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getActivity(), FullScreenImageViewActivity.class);
+                    intent.putExtra("ImageList", imageList.toArray());
+                    intent.putExtra("Position", position);
+                    startActivity(intent);
+                }
+            });
+            mainActivity.CurrentScreen = JobTrackerScreen.TaskLineItemDetail;
+            mainActivity.SetActionBarMenuItems();
+        }
+        else
+        {
+            Admin_MainActivity mainActivity = (Admin_MainActivity) getActivity();
+            DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
+            Walltype = (TextView) view.findViewById(R.id.wallType);
+            WallDetail = (TextView) view.findViewById(R.id.wallDetail);
+            PhotoCount = (TextView) view.findViewById(R.id.status);
+            TaskLineItemViewModel tasklineitemviewmodel = new TaskLineItemViewModel();
+            int size = Shared.TaskLineitemImageList.size();
+            tasklineitemviewmodel = dbHelper.getTaskLineItemInfo(String.valueOf(taskLineItemViewModel.ID));
+            Walltype.setText(tasklineitemviewmodel.Type.toString());
+            // Walltype.setText(String.valueOf(tasklineitemviewmodel.Type));
+            WallDetail.setText(tasklineitemviewmodel.Instruction.toString());
+            PhotoCount.setText(size + "/" + Shared.SelectedTask.MinimumPhoto);
+            GridView gridview = (GridView) view.findViewById(R.id.gridview);
+            adapter = new ImageAdapter(mainActivity);
+            gridview.setAdapter(adapter);
+           for(TaskLineItemImageListViewModel taskLineItemImage:Shared.TaskLineitemImageList) {
+                String url ="http://sunsigns.blob.core.windows.net/cdn/Images/WallImages/"+Shared.TaskLineitemImageList.get(0).ShopID+"/_"+Shared.TaskLineitemImageList.get(0).ShopWallID+"/Thumb_"+taskLineItemImage.ImageName;
+                adapter.add(url);
             }
-        });
-
+            mainActivity.CurrentScreen = JobTrackerScreen.TaskLineItemDetail;
+            mainActivity.SetActionBarMenuItems();
+        }
         setHasOptionsMenu(true);
-        mainActivity.CurrentScreen = JobTrackerScreen.TaskLineItemDetail;
-        mainActivity.SetActionBarMenuItems();
-
         super.onCreate(savedInstanceState);
         return view;
     }
@@ -270,7 +312,7 @@ public class TaskLineItemDetailFragment extends Fragment {
         DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
         final ArrayList<String> imageList = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(taskLineItemViewModel.ID));
         adapter.clear();
-        adapter.addAll(imageList);
+       // adapter.addAll(imageList);
         adapter.notifyDataSetChanged();
     }
 

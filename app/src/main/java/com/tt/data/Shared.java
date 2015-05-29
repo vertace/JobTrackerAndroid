@@ -11,8 +11,8 @@ public class Shared {
 
     //public static String WebAPI = "http://sunsigns.azurewebsites.net/";
     //public static String WebAPI = "http://emtracker.specialeffect.co.in/";
-     //public static String WebAPI = "http://192.168.0.105:1989/";
-  public static String WebAPI = "http://jobtrack.azurewebsites.net/";
+    // public static String WebAPI = "http://192.168.0.106:1989/";
+    public static String WebAPI = "http://jobtrack.azurewebsites.net/";
     public static String LoginAPI = WebAPI + "/Employee/Login";
     public static String TaskListAPI = WebAPI + "/Task/GetTasksForEmployeeNew";
     public static String TaskDetailAPI = WebAPI + "/Task/GetTaskDetail";
@@ -30,6 +30,7 @@ public class Shared {
 
     public static String RfeListAPI=WebAPI+"Task/GetRfeList";
     public static String RfeTaskListAPI = WebAPI + "/Task/GetRfeTaskList";
+    public static String RfeImageListtAPI = WebAPI + "/Task/GetRfeImageList";
 
     public static EmployeeViewModel LoggedInUser;
     public static List<TaskViewModel> TaskList;
@@ -37,6 +38,7 @@ public class Shared {
     public static  RfeViewModel Selected_Rfe;
 
     public static List<TaskLineItemViewModel> TaskDetail;
+    public static TaskLineItemViewModel TaskLineItem;
     public static MeasurementPhoto MeasurementUploadPhoto;
     public static TaskViewModel UploadShopPhoto;
 
@@ -57,6 +59,7 @@ public class Shared {
 
     public static String OrderByTask;
 
+    public static  String[] SharedPhotocount;
     public static long sharedCheckinID;
 
     public static ArrayList<String> html_instructions;
@@ -64,10 +67,15 @@ public class Shared {
 
     public static boolean sychIntiallyTasks;
 
+    public static boolean LoadAllTaskIntially;
+
+    public static boolean admin_mian_activity;
+
     public static String sharedprefs_uploadstatus="Uploadonwifi";
 
     public static String sharedprefs_switchstatus="WifiOnOff";
 
+    public static List<TaskLineItemImageListViewModel> TaskLineitemImageList;
     public static String Username;
     public static String Password;
     public static String TaskSync;

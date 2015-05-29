@@ -1,14 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<GridLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:rowCount="6"
+    android:columnCount="2"
+    android:layout_gravity="center_horizontal"
+    android:id="@+id/grid"
+    android:layout_weight="0.04"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#f2c777">
 
-    <ListView
-        android:id="@android:id/list"
-        android:layout_width="fill_parent"
+    <TextView
+        android:id="@+id/RfeName"
+        android:layout_column="0"
+        android:layout_row="1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:divider="#b5b5b5"
-        android:dividerHeight="1dp"
-        android:listSelector="@drawable/list_selector"></ListView>
-</LinearLayout>
+        android:paddingLeft="8dip"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dip"
+        android:paddingBottom="0dip"
+        android:text="@string/Rfename"
+        android:textColor="#040404"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:typeface="sans" />
+
+    <RelativeLayout
+        android:id="@+id/relative"
+        android:layout_column="0"
+
+        android:layout_row="2">
+        <TextView
+            android:id="@+id/Description"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="9dip"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="5dip"
+            android:paddingRight="50dip"
+            android:paddingBottom="2dip"
+            android:text="@string/Description"
+            android:textColor="#040404"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:typeface="sans" />
+
+        <TextView
+            android:id="@+id/Rfecode"
+            android:layout_width="wrap_content"
+            android:paddingLeft="15dip"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/tvShopName"
+            android:layout_below="@+id/Description"
+            android:paddingBottom="2dip"
+            android:text="@string/Rfecode"
+            android:textColor="#777777"
+            android:textStyle="bold"
+            android:textSize="10sp" />
+
+
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/Description"
+            android:layout_alignStart="@+id/Description"
+            android:id="@+id/spinner"
+            android:layout_marginLeft="219dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignBottom="@+id/Rfecode"
+            android:textColor="@android:color/holo_blue_dark"
+            android:spinnerMode="dropdown" />
+
+
+    </RelativeLayout>
+
+    <!-- Address-->
+    <TextView
+        android:id="@+id/space"
+        android:layout_column="0"
+        android:layout_row="4"
+        android:layout_width="400dp"
+        android:layout_height="10dp"
+        android:paddingTop="0dip"
+        android:textColor="#777777"
+        android:textSize="10sp"
+        />
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="455dp" tools:context="com.tt.fragments.TaskLineItemFragment"
+        android:layout_column="0"
+        android:layout_row="5"
+        android:background="#ffffff">
+
+        <ListView android:id="@android:id/list" android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView android:id="@android:id/empty" android:layout_width="match_parent"
+            android:layout_height="422dp" android:gravity="center" />
+
+    </FrameLayout>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageButton"
+        android:layout_row="5"
+        android:layout_column="1" />
+
+</GridLayout>

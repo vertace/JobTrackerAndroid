@@ -132,7 +132,7 @@ public class PendingListFragment extends ListFragment
         else {
 
             condition = " EmployeeID = "
-                    + String.valueOf(Shared.LoggedInUser.ID +" AND TaskRequest.IsDone = 0 ORDER BY ShopName COLLATE NOCASE ASC");
+                    + String.valueOf(Shared.LoggedInUser.ID +" AND TaskRequest.RFEID=0 AND TaskRequest.IsDone = 0 ORDER BY ShopName COLLATE NOCASE ASC");
             if (mainActivity.SearchText != "") {
                 condition = condition + " AND TaskRequest.ShopName like '%" + mainActivity.SearchText + "%'";
             }

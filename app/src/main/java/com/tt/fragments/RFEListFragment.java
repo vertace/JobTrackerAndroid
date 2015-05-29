@@ -10,11 +10,17 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -47,7 +53,7 @@ import java.util.List;
 /**
  * Created by BS-308 on 5/6/2015.
  */
-public class RFEListFragment extends Fragment {
+public class RFEListFragment extends Fragment  {
     private ProgressDialog m_ProgressDialog = null;
    GetRfeList rfeListRetriever;
     DatabaseHelper dbHelper;
@@ -59,16 +65,23 @@ public class RFEListFragment extends Fragment {
     {
         View rootView = inflater.inflate(R.layout.fragment_rfe_list, container, false);
         listView = (ListView) rootView.findViewById(R.id.RfeList);
+       // EditText edittext = (EditText) rootView.findViewById(R.id.action_RFE_search);
+       // edittext.addTextChangedListener(this);
         try {
             super.onCreate(savedInstanceState);
 
             adminmainActivity=(Admin_MainActivity) getActivity();
              dbHelper = new DatabaseHelper(adminmainActivity);
-
+            final SharedPreferences taskSync = getActivity().getApplicationContext().getSharedPreferences(Shared.TaskSync, 0);
+            String syncTaskStatus= taskSync.getString("tasksync", null);
            // m_ProgressDialog = ProgressDialog.show(getActivity(), "Please wait...", "Reading data from database...", true);
-            SychRfe();
-
-            m_ProgressDialog.dismiss();
+            setHasOptionsMenu(true);
+            Shared.admin_mian_activity=true;
+            if(syncTaskStatus=="True") {
+                SychRfe();
+            }
+            ShowRfeList();
+           // m_ProgressDialog.dismiss();
         } catch (Exception e) {
             m_ProgressDialog.dismiss();
         }
@@ -78,29 +91,41 @@ public class RFEListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> arg0, View v, int position, long arg3) {
                 // TODO Auto-generated method stub
-                Shared.Selected_Rfe=Shared.RfeList.get(position);
+                Shared.Selected_Rfe = Shared.RfeList.get(position);
                 DownloadRfeTasksFromServer();
-                RfeTaskListFragment rfeTaskListFragment = new RfeTaskListFragment();
-                FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.content_frame, rfeTaskListFragment);
-                fragmentTransaction.commit();
+
             }
         });
 
+
+
+
         return rootView;
     }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
 
+
+            case R.id.action_admin_sync:
+                SychRfe();
+                break;
+            case R.id.action_home_sort:
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return false;
+    }
     public void DownloadRfeTasksFromServer() {
-        m_ProgressDialog = ProgressDialog.show(getActivity(),
-                "Please wait...", "Downloading task list...", true);
+        m_ProgressDialog = ProgressDialog.show(getActivity(),"Please wait...", "Downloading task list...", true);
 
         GetRFeTaskList obj = new GetRFeTaskList(getActivity());
         obj.execute();
     }
     public void ShowRfeList() {
 
-        m_ProgressDialog.dismiss();
+       // m_ProgressDialog.dismiss();
         Shared.RfeList = dbHelper.getAllRfeList();
         RfeListAdapter rfeListAdapter = new RfeListAdapter(adminmainActivity, R.layout.row_rfe);
         rfeListAdapter.addAll(Shared.RfeList);
@@ -112,7 +137,6 @@ public class RFEListFragment extends Fragment {
 
 
 
-
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -120,11 +144,29 @@ public class RFEListFragment extends Fragment {
 
     private void SychRfe() {
         m_ProgressDialog = ProgressDialog.show(getActivity(),
-                "Please wait...", "Downloading task list...", true);
+                "Please wait...", "Downloading RFE list...", true);
 
         GetRfeList obj = new GetRfeList(getActivity());
         obj.execute();
     }
+
+   /* @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after)
+    {
+        Toast.makeText(getActivity(), " No Shop photo", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count)
+    {
+        Toast.makeText(getActivity(), "Hai", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void afterTextChanged(Editable s)
+    {
+        Toast.makeText(getActivity(), " No Shop photo", Toast.LENGTH_LONG).show();
+    }*/
 
     public class GetRfeList extends AsyncTask<String, Integer, ServerResult> {
         Context context;
@@ -246,7 +288,7 @@ public class RFEListFragment extends Fragment {
         }
 
         protected void onPostExecute(ServerResult result) {
-            m_ProgressDialog.dismiss();
+          //  m_ProgressDialog.dismiss();
 
             switch (result) {
                 case ConnectionFailed:
@@ -255,23 +297,27 @@ public class RFEListFragment extends Fragment {
                     break;
                 case TaskListReceived:
 
-                    m_ProgressDialog = ProgressDialog.show(getActivity(),
-                            "Please wait...",
-                            "Data downloaded. Adding to database...", true);
+                  //  m_ProgressDialog = ProgressDialog.show(getActivity(),"Please wait...","Data downloaded. Adding to database...", true);
 
                     SyncHelperExecution syncHelper = new SyncHelperExecution(
                             context);
-                    syncHelper
-                            .addTasksToLocalDatabase((ArrayList<TaskViewModel>) Shared.TaskList);
+                    syncHelper.addRfeTasksToLocalDatabase((ArrayList<TaskViewModel>) Shared.TaskList);
+                    RfeTaskListFragment rfeTaskListFragment = new RfeTaskListFragment();
+                    FragmentManager fragmentManager = getFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.content_frame, rfeTaskListFragment);
+                    fragmentTransaction.commit();
                     m_ProgressDialog.dismiss();
                     break;
                 case NoTasks:
                     SstAlert.Show(getActivity(), "No Tasks",
                             "No open tasks in your name");
+                    m_ProgressDialog.dismiss();
                     break;
                 case UnknownError:
                     SstAlert.Show(getActivity(), "Unknown Error",
                             "Some error occured");
+                    m_ProgressDialog.dismiss();
                     break;
                 default:
                     break;

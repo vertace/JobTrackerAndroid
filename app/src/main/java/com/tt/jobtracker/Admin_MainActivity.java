@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,6 +25,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.tt.data.Shared;
+import com.tt.data.TaskLineItemViewModel;
 import com.tt.data.TaskViewModel;
 import com.tt.enumerations.JobTrackerScreen;
 import com.tt.fragments.PendingListFragment;
@@ -31,13 +33,16 @@ import com.tt.fragments.RFEListFragment;
 import com.tt.fragments.RfeTaskListFragment;
 import com.tt.fragments.SettingsFragment;
 import com.tt.fragments.TaskDetailFragment;
+import com.tt.fragments.TaskLineItemDetailFragment;
+import com.tt.fragments.TaskLineItemFragment;
 import com.tt.fragments.TaskListFragment;
+import com.tt.helpers.CameraHelper;
 import com.tt.helpers.DatabaseHelper;
 
 /**
  * Created by BS-308 on 5/6/2015.
  */
-public class Admin_MainActivity extends ActionBarActivity implements RfeTaskListFragment.OnTaskSelected{
+public class Admin_MainActivity extends ActionBarActivity implements RfeTaskListFragment.OnTaskSelected,TaskDetailFragment.OnFragmentInteractionListener,TaskLineItemFragment.OnTaskLineItemSelected, TaskLineItemDetailFragment.OnTaskLineItemPhotoClickInitiated{
     public static FragmentManager fragmentManager;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -47,11 +52,15 @@ public class Admin_MainActivity extends ActionBarActivity implements RfeTaskList
     private CharSequence mTitle;
     private String[] mMenuTitles;
     private Menu menu;
-
+    public TaskLineItemViewModel taskLineItemViewModel;
     public String SearchText;
 
     public JobTrackerScreen CurrentScreen = JobTrackerScreen.TaskList;
     Context context;
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,10 +135,11 @@ public class Admin_MainActivity extends ActionBarActivity implements RfeTaskList
 
         // Associate searchable configuration with the SearchView
         SearchManager searchManager = (SearchManager) getSystemService(this.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.action_search)
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_RFE_search)
                 .getActionView();
         searchView.setSearchableInfo(searchManager
                 .getSearchableInfo(getComponentName()));
+
 
         SetActionBarMenuItems();
         return super.onCreateOptionsMenu(menu);
@@ -160,7 +170,10 @@ public class Admin_MainActivity extends ActionBarActivity implements RfeTaskList
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
+    public void onFragmentInteraction(Uri uri)
+    {
 
+    }
 
     /* The click listner for ListView in the navigation drawer */
     private class DrawerItemClickListener implements
@@ -178,17 +191,18 @@ public class Admin_MainActivity extends ActionBarActivity implements RfeTaskList
         menu.setGroupVisible(R.id.actionbar_group_home, false);
         menu.setGroupVisible(R.id.actionbar_group_taskdetail, false);
         menu.setGroupVisible(R.id.actionbar_group_tasklineitem_detail, false);
+        menu.setGroupVisible(R.id.actionbar_Admin_group_home, false);
 
 
         switch (CurrentScreen) {
             case TaskList:
-                menu.setGroupVisible(R.id.actionbar_group_home, true);
+                menu.setGroupVisible(R.id.actionbar_Admin_group_home, true);
                 break;
             case TaskDetail:
-                    menu.setGroupVisible(R.id.actionbar_group_taskdetail, true);
+                    menu.setGroupVisible(R.id.actionbar_group_taskdetail, false);
                 break;
             case TaskLineItemDetail:
-                    menu.setGroupVisible(R.id.actionbar_group_tasklineitem_detail, true);
+                    menu.setGroupVisible(R.id.actionbar_group_tasklineitem_detail, false);
                 break;
             case Setting:
                 break;
@@ -318,5 +332,47 @@ public class Admin_MainActivity extends ActionBarActivity implements RfeTaskList
                         .replace(R.id.content_frame, fragment).addToBackStack("tasklist").commit();
             }
         }
+    }
+    TaskLineItemDetailFragment taskLineItemDetailFragment;
+
+    @Override
+    public void onTaskLineItemSelected(TaskLineItemViewModel taskLineItemViewModel) {
+
+        taskLineItemDetailFragment = new TaskLineItemDetailFragment();
+        if (taskLineItemDetailFragment != null) {
+            Bundle args = new Bundle();
+            args.putSerializable("TaskLineItem", taskLineItemViewModel);
+            taskLineItemDetailFragment.setArguments(args);
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, taskLineItemDetailFragment).addToBackStack("taskdetail").commit();
+        }
+
+    }
+    public void onTaskLineItemShopPhoto(TaskViewModel taskViewModel) {
+        tvm=taskViewModel;
+        tlvm = taskLineItemViewModel;
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        fileUri = CameraHelper.getOutputMediaFileUri(CameraHelper.MEDIA_TYPE_IMAGE); // create
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the
+        startActivityForResult(intent, CAPTURE_TASKLINEITEM_SHOP_IMAGE_ACTIVITY_REQUEST_CODE);
+    }
+    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+    private static final int CAPTURE_TASKLINEITEM_IMAGE_ACTIVITY_REQUEST_CODE = 200;
+    private static final int CAPTURE_TASKLINEITEM_SHOP_IMAGE_ACTIVITY_REQUEST_CODE = 300;
+    private Uri fileUri;
+    private TaskLineItemViewModel tlvm;
+    private TaskViewModel tvm;
+
+    @Override
+    public void onTaskLineItemPhotoClickInitiated(TaskLineItemViewModel taskLineItemViewModel) {
+
+        tlvm = taskLineItemViewModel;
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        fileUri = CameraHelper.getOutputMediaFileUri(CameraHelper.MEDIA_TYPE_IMAGE); // create
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the
+        startActivityForResult(intent, CAPTURE_TASKLINEITEM_IMAGE_ACTIVITY_REQUEST_CODE);
+
     }
 }

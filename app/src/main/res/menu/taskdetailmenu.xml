@@ -14,7 +14,7 @@
 
     <item
         android:id="@+id/mnuCheckin"
-        android:icon="@drawable/checkin"
+        android:icon="@drawable/map"
         android:showAsAction="always"
         android:title="Checkin"></item>
 

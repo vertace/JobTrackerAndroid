@@ -57,10 +57,24 @@
             android:textStyle="bold"
             android:textSize="10sp" />
 
+        <TextView
+            android:id="@+id/MinimumPhoto"
+            android:layout_width="wrap_content"
+            android:paddingLeft="13dip"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/ShopAddress"
+            android:layout_below="@+id/ShopAddress"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="0dip"
+            android:text="@string/MinimumPhoto"
+            android:textColor="#777777"
+            android:textStyle="bold"
+            android:textSize="13sp" />
+
         <ImageView
             android:id="@+id/ShopPhoto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="82px"
+            android:layout_height="82px"
             android:layout_alignParentRight="true"
             android:layout_toRightOf="@+id/Branch"
             android:layout_centerVertical="true"
@@ -70,21 +84,7 @@
     </RelativeLayout>
 
     <!-- Address-->
-    <TextView
-        android:id="@+id/MinimumPhoto"
-        android:layout_column="0"
-        android:layout_row="3"
-        android:layout_width="wrap_content"
-        android:paddingLeft="13dip"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/ShopAddress"
-        android:layout_below="@+id/tvShopName"
-        android:layout_centerHorizontal="true"
-        android:paddingTop="0dip"
-        android:text="@string/MinimumPhoto"
-        android:textColor="#777777"
-        android:textStyle="bold"
-        android:textSize="13sp" />
+
     <TextView
         android:id="@+id/space"
         android:layout_column="0"

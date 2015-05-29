@@ -424,7 +424,8 @@ DatabaseHelper dbHelper=new DatabaseHelper(this);
                 .getActionView();
         searchView.setSearchableInfo(searchManager
                 .getSearchableInfo(getComponentName()));
-     /*   ImageView tickImg=(ImageView) menu.findItem(R.id.action_task_done);
+
+       /* ImageView tickImg=(ImageView) menu.findItem(R.id.action_task_done);
         if(Shared.SelectedTask!=null)
         {
             int value = dbHelper.PhotoUploadCount(Shared.SelectedTask.ID);
@@ -458,6 +459,7 @@ DatabaseHelper dbHelper=new DatabaseHelper(this);
         // If the nav drawer is open, hide action items related to the content
         // view
         boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+
         //menu.findItem(R.id.mnuSync).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }
@@ -578,6 +580,7 @@ DatabaseHelper dbHelper=new DatabaseHelper(this);
         menu.setGroupVisible(R.id.actionbar_group_home, false);
         menu.setGroupVisible(R.id.actionbar_group_taskdetail, false);
         menu.setGroupVisible(R.id.actionbar_group_tasklineitem_detail, false);
+        menu.setGroupVisible(R.id.actionbar_Admin_group_home, false);
 
 
         switch (CurrentScreen) {
@@ -597,7 +600,21 @@ DatabaseHelper dbHelper=new DatabaseHelper(this);
 
                 }
                 else {
+
                     menu.setGroupVisible(R.id.actionbar_group_taskdetail, true);
+                    if(Shared.SelectedTask!=null) {
+                        int value = dbHelper.PhotoUploadCount(Shared.SelectedTask.ID);
+                        if (value <= 0) {
+                            MenuItem item = menu.findItem(R.id.action_task_done);
+                            item.setVisible(true);
+                            this.invalidateOptionsMenu();
+                        }
+                        else {
+                            MenuItem item = menu.findItem(R.id.action_task_done);
+                            item.setVisible(false);
+                            this.invalidateOptionsMenu();
+                        }
+                    }
                 }
                 break;
             case TaskLineItemDetail:
@@ -785,7 +802,6 @@ DatabaseHelper dbHelper=new DatabaseHelper(this);
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     private void AddTaskLineItemPhoto() {
 
         GPSTracker gpsTracker = new GPSTracker(this);

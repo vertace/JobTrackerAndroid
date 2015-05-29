@@ -2,6 +2,7 @@ package com.tt.sync;
 
 import android.content.Context;
 
+import com.tt.data.Shared;
 import com.tt.data.TaskLineItemViewModel;
 import com.tt.data.TaskViewModel;
 import com.tt.helpers.DatabaseHelper;
@@ -29,6 +30,7 @@ public class SyncHelperExecution {
         for (TaskViewModel task : tasklist) {
             TaskViewModel checkIsDone=dbHelper.getTaskInfo(String.valueOf(task.ID));
             if(checkIsDone.IsDone==false) {
+                task.RfeId= 0;
                 dbHelper.saveTask(task, false);
                 if (task.TaskLineItemViewModelList != null
                         && task.TaskLineItemViewModelList.size() > 0)
@@ -38,6 +40,24 @@ public class SyncHelperExecution {
                         dbHelper.saveTaskLineItem(taskLineItem, false);
                     }
             }
+
+        }
+    }
+    public void addRfeTasksToLocalDatabase(ArrayList<TaskViewModel> tasklist) {
+        getTasskIdsFromTaskList(tasklist);
+        TaskIDList = (String) TaskIDList
+                .subSequence(1, TaskIDList.length() - 1);
+        for (TaskViewModel task : tasklist) {
+                task.RfeId= Shared.Selected_Rfe.ID;
+                dbHelper.saveTask(task, false);
+                if (task.TaskLineItemViewModelList != null
+                        && task.TaskLineItemViewModelList.size() > 0)
+                    for (TaskLineItemViewModel taskLineItem : task.TaskLineItemViewModelList) {
+                        taskLineItem.ShopName = task.ShopName;
+                        taskLineItem.ShopAddress = task.ShopAddress;
+                        dbHelper.saveTaskLineItem(taskLineItem, false);
+                    }
+
 
         }
     }

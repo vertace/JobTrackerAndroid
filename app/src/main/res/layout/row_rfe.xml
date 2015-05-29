@@ -26,7 +26,6 @@
         android:text="@string/shopName"
         android:textColor="#040404"
         android:textSize="23sp"
-        android:textStyle="bold"
         android:typeface="sans" />
 
 

@@ -111,6 +111,19 @@ public class TakeMeasurementList extends Activity {
 
             }else {
                 getMenuInflater().inflate(R.menu.taskdetailmenu, menu);
+                final TaskViewModel taskviewmeasurement=Shared.SelectedTask;
+                MeasurementPhoto measurementPhoto = dbHelper.getMeasurementPhotoValidate(String.valueOf(taskviewmeasurement.ID));
+                if(measurementPhoto.PhotoID!=null) {
+                    MenuItem item = menu.findItem(R.id.mnuTaskList);
+                    item.setVisible(true);
+                    this.invalidateOptionsMenu();
+                }
+                else {
+                    MenuItem item = menu.findItem(R.id.mnuTaskList);
+                    item.setVisible(false);
+                    this.invalidateOptionsMenu();
+                }
+
             }
             return true;
         } catch (Exception e) {
@@ -132,7 +145,7 @@ public class TakeMeasurementList extends Activity {
                 TakePhoto();
                 break;
             case R.id.mnuTaskList:
-                TaskeMeasdurementPhoto();
+                Moveto_Done();
                 break;
             case R.id.mnuCheckin:
                 Intent intent = new Intent(TakeMeasurementList.this, MapForSingleShop.class);
@@ -145,7 +158,7 @@ public class TakeMeasurementList extends Activity {
         }
         return false;
     }
-    private void TaskeMeasdurementPhoto()
+    private void Moveto_Done()
     {
         final TaskViewModel taskviewmeasurement=Shared.SelectedTask;
         final SharedPreferences mainClassCall = getSharedPreferences(Shared.MainClassCall, 0);

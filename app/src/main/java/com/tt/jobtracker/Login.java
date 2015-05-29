@@ -32,12 +32,21 @@ import com.tt.helpers.DatabaseHelper;
 import com.tt.helpers.SstAlert;
 import com.tt.helpers.Utility;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 
 import java.lang.reflect.Type;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
@@ -77,7 +86,7 @@ public class Login extends Activity {
             CheckDefaultLogin(employee);
             //String userValue=
         }
-       // this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+        // this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         //SharedPreference();
     }
     private void LoginProcess( )
@@ -117,42 +126,48 @@ public class Login extends Activity {
         }
     }
     public void btnLogin_click(View view) {
-
+       String user= un.getText().toString();
+        String pass= pw.getText().toString();
+if(!user.isEmpty() && !pass.isEmpty()) {
 // new LoginToServer().execute();
-        InputMethodManager inputMethodManager = (InputMethodManager)this.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
+    InputMethodManager inputMethodManager = (InputMethodManager) this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+    inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
 
-        final SharedPreferences username = getApplicationContext().getSharedPreferences(Shared.Username, 0);
-        final SharedPreferences password = getApplicationContext().getSharedPreferences(Shared.Password, 0);
-        EmployeeViewModel employee ;
-        // String  user=sh_Pref.getString("Username",null);
-        employee   = dbHelper.AuthenticateUser(un.getText().toString(), pw.getText().toString());
-        //  SharedPreference();-
-        m_ProgressDialog = ProgressDialog.show(Login.this, "Please wait...", "Logging  in...");
-       // m_ProgressDialog= ProgressDialog.show(Login.this,"Please wait...", "Logging  in...", true, false);
-        final SharedPreferences taskSync = getApplicationContext().getSharedPreferences(Shared.TaskSync, 0);
-        SharedPreferences.Editor editors = taskSync.edit();
+    final SharedPreferences username = getApplicationContext().getSharedPreferences(Shared.Username, 0);
+    final SharedPreferences password = getApplicationContext().getSharedPreferences(Shared.Password, 0);
+    EmployeeViewModel employee;
+    // String  user=sh_Pref.getString("Username",null);
+    employee = dbHelper.AuthenticateUser(un.getText().toString().toLowerCase(), pw.getText().toString());
+    //  SharedPreference();-
+    m_ProgressDialog = ProgressDialog.show(Login.this, "Please wait...", "Logging  in...");
+    // m_ProgressDialog= ProgressDialog.show(Login.this,"Please wait...", "Logging  in...", true, false);
+    final SharedPreferences taskSync = getApplicationContext().getSharedPreferences(Shared.TaskSync, 0);
+    SharedPreferences.Editor editors = taskSync.edit();
 
-        editors.putString("tasksync","True"); // Storing string
-        editors.commit();
-        Shared.sychIntiallyTasks=true;
-        if (employee == null)
-        {
+    editors.putString("tasksync", "True"); // Storing string
+    editors.commit();
+    Shared.sychIntiallyTasks = true;
+    if (employee == null) {
 
-            employeeRetriever = new GetEmployeeList(this);
-            employeeRetriever.execute();
-            //  m_ProgressDialog.dismiss();
+        employeeRetriever = new GetEmployeeList(this);
+        employeeRetriever.execute();
+        //  m_ProgressDialog.dismiss();
 
-        } else {
-            SharedPreferences.Editor editor = username.edit();
-            editor.putString("Loginuser",un.getText().toString() ); // Storing string
-            editor.commit();
-            SharedPreferences.Editor editor1 = password.edit();
-            editor1.putString("LoginPass",pw.getText().toString() ); // Storing string
-            editor1.commit();
-            //   m_ProgressDialog.dismiss();
-            CheckDefaultLogin(employee);
-        }
+    } else {
+        SharedPreferences.Editor editor = username.edit();
+        editor.putString("Loginuser", un.getText().toString()); // Storing string
+        editor.commit();
+        SharedPreferences.Editor editor1 = password.edit();
+        editor1.putString("LoginPass", pw.getText().toString()); // Storing string
+        editor1.commit();
+        //   m_ProgressDialog.dismiss();
+        CheckDefaultLogin(employee);
+    }
+}
+        else
+{
+    Toast.makeText(getApplicationContext(), " Username or password is empty!!!", Toast.LENGTH_LONG).show();
+}
     }
     public void CheckDefaultLogin( EmployeeViewModel employee) {
 
@@ -264,6 +279,22 @@ public class Login extends Activity {
             String response = null;
 
             try {
+
+             //   HttpGet httpGet = new HttpGet(Shared.EmployeeListAPI);
+             //   HttpParams httpParameters = new BasicHttpParams();
+// Set the timeout in milliseconds until a connection is established.
+// The default value is zero, that means the timeout is not used.
+          //      int timeoutConnection = 30000;
+           //     HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+// Set the default socket timeout (SO_TIMEOUT)
+// in milliseconds which is the timeout for waiting for data.
+           //     int timeoutSocket = 50000;
+           //     HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+
+           //     DefaultHttpClient httpClient = new DefaultHttpClient(httpParameters);
+             //   HttpResponse responses = (BasicHttpResponse) httpClient.execute(httpGet);
+            //    HttpEntity entity = responses.getEntity();
+
                 response = CustomHttpClient
                         .executeHttpGet(Shared.EmployeeListAPI);
                 String res = response.toString();
@@ -319,7 +350,7 @@ public class Login extends Activity {
                     if(Shared.sychIntiallyTasks=true) {
                         dbHelper.deleteTaskNotDone();
                         dbHelper.deleteTaskLineItemNotDone();
-                       // List<TaskNotDoneViewModel> taskNotDone = Shared.EmployeeList.get(0).taskNotDoneReasonList;
+                        // List<TaskNotDoneViewModel> taskNotDone = Shared.EmployeeList.get(0).taskNotDoneReasonList;
                         //List<TaskLineItemNotDoneViewModel> taskLineItemNotDone = Shared.EmployeeList.get(0).taskLineItemNotDoneReasonList;
                         for(TaskNotDoneViewModel tasknotdone:Shared.EmployeeList.get(0).taskNotDoneReasonList)
                         {

@@ -42,16 +42,19 @@ public final class TaskDetailAdapter extends
         viewHolder.tvShopWall.setText(entry.ShopWall);
         viewHolder.tvInstruction.setText(entry.Instruction);
 
-
-        view.setTag(entry);
-        if(entry.PhotoID!=null && entry.PhotoID.equals("NOT_DONE"))
-       {
-           view.setBackgroundResource(R.drawable.listpending_selector);
-           viewHolder.status.setText("");
-        }
-       else {
+        if(Shared.admin_mian_activity==false) {
+            view.setTag(entry);
+            if (entry.PhotoID != null && entry.PhotoID.equals("NOT_DONE")) {
+                view.setBackgroundResource(R.drawable.listpending_selector);
+                viewHolder.status.setText("");
+            } else {
+                view.setBackgroundResource(R.drawable.listpartial_selector);
+                viewHolder.status.setText(Shared.SharedPhotocount[position] + "/" + Shared.SelectedTask.MinimumPhoto);
+            }
+        }else
+        {
             view.setBackgroundResource(R.drawable.listpartial_selector);
-            viewHolder.status.setText(Shared.SharedPhotocount[position] + "/" + Shared.SelectedTask.MinimumPhoto);
+            viewHolder.status.setText("");
         }
         //setRowColor(view, entry);
         return view;
