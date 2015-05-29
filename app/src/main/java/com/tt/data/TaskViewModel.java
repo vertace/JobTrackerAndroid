@@ -38,6 +38,10 @@ public class TaskViewModel implements Serializable {
 
     public String ActualLat;
     public String ActualLon;
+    public int RfeId;
+    public String ShopPhoto;
+
+    public int TaskStatusID;
 
 
 }
