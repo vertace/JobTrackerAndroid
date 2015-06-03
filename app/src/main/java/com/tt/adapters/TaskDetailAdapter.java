@@ -48,12 +48,12 @@ public final class TaskDetailAdapter extends
                 view.setBackgroundResource(R.drawable.listpending_selector);
                 viewHolder.status.setText("");
             } else {
-                view.setBackgroundResource(R.drawable.listpartial_selector);
+              //  view.setBackgroundResource(R.drawable.listpartial_selector);
                 viewHolder.status.setText(Shared.SharedPhotocount[position] + "/" + Shared.SelectedTask.MinimumPhoto);
             }
         }else
         {
-            view.setBackgroundResource(R.drawable.listpartial_selector);
+           // view.setBackgroundResource(R.drawable.listpartial_selector);
             viewHolder.status.setText("");
         }
         //setRowColor(view, entry);

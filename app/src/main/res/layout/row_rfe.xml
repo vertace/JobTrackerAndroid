@@ -26,7 +26,21 @@
         android:text="@string/shopName"
         android:textColor="#040404"
         android:textSize="23sp"
+        android:textStyle="bold"
+
         android:typeface="sans" />
+    <TextView
+        android:id="@+id/tvRfeDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/shopBranch"
+        android:textColor="#040404"
+        android:textSize="19sp"
+
+        android:typeface="sans"
+        android:layout_below="@+id/tvRfeName"
+        android:layout_alignLeft="@+id/tvRfeName"
+        android:layout_alignStart="@+id/tvRfeName" />
 
 
 </RelativeLayout>  

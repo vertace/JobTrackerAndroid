@@ -70,7 +70,7 @@ public class RfeTaskListFragment extends ListFragment
                              Bundle savedInstanceState)
 
     {
-        View rootView = inflater.inflate(R.layout.fragment_list_task_pending, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_admin_tasklist, container, false);
         TextView rfeName = (TextView) rootView.findViewById(R.id.RfeName);
         TextView description = (TextView) rootView.findViewById(R.id.Description);
         TextView rfecode = (TextView) rootView.findViewById(R.id.Rfecode);
@@ -78,6 +78,7 @@ public class RfeTaskListFragment extends ListFragment
         rfeName.setText(Shared.Selected_Rfe.FullName);
         description.setText(Shared.Selected_Rfe.Code);
         rfecode.setText(Shared.Selected_Rfe.Description);
+        Shared.onbackpress=false;
         Spinner spinner = (Spinner) rootView.findViewById(R.id.spinner);
         spinner = (Spinner) rootView.findViewById(R.id.spinner);
         ArrayAdapter<String> adapter;

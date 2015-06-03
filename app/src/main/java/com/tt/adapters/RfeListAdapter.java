@@ -41,7 +41,8 @@ public final  class RfeListAdapter extends ArrayAdapter<RfeViewModel> {
         if(entry.IsDone && entry.ID==showUploadModel.ID) {
             viewHolder.txtStatus.setText("Up");
         }*/
-        viewHolder.txtRfeName.setText(entry.FullName);
+        viewHolder.txtRfeName.setText(entry.RFENumber);
+        viewHolder.txtDescription.setText(entry.Description);
 
         return view;
     }
@@ -73,6 +74,8 @@ public final  class RfeListAdapter extends ArrayAdapter<RfeViewModel> {
 
             viewHolder.txtRfeName = (TextView) workingView
                     .findViewById(R.id.tvRfeName);
+            viewHolder.txtDescription = (TextView) workingView
+                    .findViewById(R.id.tvRfeDescription);
 
             // viewHolder.imgMap=(ImageView)workingView.findViewById(R.id.imgmap);
 
@@ -91,7 +94,7 @@ public final  class RfeListAdapter extends ArrayAdapter<RfeViewModel> {
      */
     private static class ViewHolder {
         public TextView txtRfeName;
-        public TextView txtCode;
+        public TextView txtDescription;
 
     }
 }

@@ -34,6 +34,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.tt.adapters.MeasurementPhotoListAdapter;
 import com.tt.adapters.TaskDetailAdapter;
 import com.tt.data.MeasurementPhoto;
@@ -109,6 +110,7 @@ String value;
             this.task = (TaskViewModel) bundle.get("Task");
         }
         Shared.SelectedTask=task;
+        Shared.onbackpress=false;
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
@@ -163,10 +165,12 @@ String value;
                             View viewDialog = getActivity().getLayoutInflater().inflate(R.layout.image_layout, null);
                             settingsDialog.setContentView(viewDialog);
                             ImageView imgShop = (ImageView) viewDialog.findViewById(R.id.ShopImage);
-                            try {
-                                URL url = new URL("http://sunsigns.blob.core.windows.net/cdn/Images/ShopImages/" + Shared.SelectedTask.ShopPhoto);
+                            UrlImageViewHelper.setUrlDrawable(imgShop, "http://sunsigns.blob.core.windows.net/cdn/Images/ShopImages/" + Shared.SelectedTask.ShopPhoto,R.drawable.image_loading);
+                            settingsDialog.show();
+                        //    try {
+                             //   URL url = new URL("http://sunsigns.blob.core.windows.net/cdn/Images/ShopImages/" + Shared.SelectedTask.ShopPhoto);
                                 //try this url = "http://0.tqn.com/d/webclipart/1/0/5/l/4/floral-icon-5.jpg"
-                                HttpGet httpRequest = null;
+                              /*  HttpGet httpRequest = null;
 
                                 httpRequest = new HttpGet(url.toURI());
 
@@ -181,10 +185,10 @@ String value;
                                 Bitmap bitmap = BitmapFactory.decodeStream(input);
 
                                 imgShop.setImageBitmap(bitmap);
-                                settingsDialog.show();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                                settingsDialog.show();*/
+                          //  } catch (Exception e) {
+                         //       e.printStackTrace();
+                          //  }
                         }
                         else
                         {
@@ -605,7 +609,7 @@ public void TaskNotDone()
                     break;
                 case NoPhoto:
                     SstAlert.Show(getActivity(), "Empty",
-                            "No Photos for this line Item");
+                            "No photos for this line Item");
                 default:
                     break;
 

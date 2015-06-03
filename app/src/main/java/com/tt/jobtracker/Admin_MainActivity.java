@@ -39,6 +39,8 @@ import com.tt.fragments.TaskListFragment;
 import com.tt.helpers.CameraHelper;
 import com.tt.helpers.DatabaseHelper;
 
+import java.util.logging.Handler;
+
 /**
  * Created by BS-308 on 5/6/2015.
  */
@@ -68,6 +70,7 @@ public class Admin_MainActivity extends ActionBarActivity implements RfeTaskList
         if (savedInstanceState == null) {
             selectItem(0);
         }
+        Shared.onbackpress=true;
         fragmentManager = getSupportFragmentManager();
     }
     @Override
@@ -271,10 +274,12 @@ public class Admin_MainActivity extends ActionBarActivity implements RfeTaskList
             getApplicationContext().startActivity(intent);
         }
 
+
+
         if (fragment != null) {
             Bundle args = new Bundle();
             fragment.setArguments(args);
-
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.content_frame, fragment).commit();
@@ -374,5 +379,25 @@ public class Admin_MainActivity extends ActionBarActivity implements RfeTaskList
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the
         startActivityForResult(intent, CAPTURE_TASKLINEITEM_IMAGE_ACTIVITY_REQUEST_CODE);
 
+    }
+    private static long back_pressed;
+    @Override
+    public void onBackPressed() {
+        if (Shared.onbackpress==true) {
+            if (back_pressed + 2000 > System.currentTimeMillis()) {
+            //    super.onBackPressed();
+                Intent startMain = new Intent(Intent.ACTION_MAIN);
+                startMain.addCategory(Intent.CATEGORY_HOME);
+                startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(startMain);
+            } else {
+                Toast.makeText(getBaseContext(), "Press once again to exit!", Toast.LENGTH_SHORT).show();
+                back_pressed = System.currentTimeMillis();
+            }
+        }
+        else
+        {
+            super.onBackPressed();
+        }
     }
 }

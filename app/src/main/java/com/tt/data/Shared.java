@@ -11,7 +11,7 @@ public class Shared {
 
     //public static String WebAPI = "http://sunsigns.azurewebsites.net/";
     //public static String WebAPI = "http://emtracker.specialeffect.co.in/";
-    // public static String WebAPI = "http://192.168.0.106:1989/";
+     //public static String WebAPI = "http://192.168.0.113:1989/";
     public static String WebAPI = "http://jobtrack.azurewebsites.net/";
     public static String LoginAPI = WebAPI + "/Employee/Login";
     public static String TaskListAPI = WebAPI + "/Task/GetTasksForEmployeeNew";
@@ -63,11 +63,13 @@ public class Shared {
     public static long sharedCheckinID;
 
     public static ArrayList<String> html_instructions;
+
+    public static ArrayList<String> imagelisttasklineitemdetail;
     public static int WayPointsShopCount;
 
     public static boolean sychIntiallyTasks;
 
-    public static boolean LoadAllTaskIntially;
+    public static boolean onbackpress;
 
     public static boolean admin_mian_activity;
 

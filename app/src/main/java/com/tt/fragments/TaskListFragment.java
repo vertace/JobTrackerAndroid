@@ -67,7 +67,7 @@ public class TaskListFragment extends Fragment
                 DoneListFragment.class, null);
         //mTabHost.addTab(mTabHost.newTabSpec("UploadedListFragment").setIndicator("Uploaded List"),
         // UploadedListFragment.class, null);
-
+        Shared.onbackpress=true;
         setHasOptionsMenu(true);
         // mTabHost.setCurrentTab(0);
         mainActivity.CurrentScreen = JobTrackerScreen.TaskList;

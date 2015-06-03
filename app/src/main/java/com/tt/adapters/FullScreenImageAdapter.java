@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
+import com.tt.data.Shared;
 import com.tt.jobtracker.R;
 import com.squareup.picasso.Picasso;
 import com.tt.custom.TouchImageView;
@@ -52,9 +54,14 @@ public class FullScreenImageAdapter extends PagerAdapter {
 
         imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.imgDisplay);
         // btnClose = (Button) viewLayout.findViewById(R.id.btnClose);
-
-        Uri uri = Uri.fromFile(new File(String.valueOf(_imagePaths.get(position))));
-        Picasso.with(_activity).load(uri).into(imgDisplay);
+if(Shared.admin_mian_activity==false) {
+    Uri uri = Uri.fromFile(new File(String.valueOf(_imagePaths.get(position))));
+    Picasso.with(_activity).load(uri).into(imgDisplay);
+}
+        else
+{
+    UrlImageViewHelper.setUrlDrawable(imgDisplay,_imagePaths.get(position), R.drawable.image_loading);
+}
 
         // close button click event
         //  btnClose.setOnClickListener(new View.OnClickListener() {

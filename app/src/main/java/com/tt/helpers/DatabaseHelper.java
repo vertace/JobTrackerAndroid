@@ -79,7 +79,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d(LOGCAT, "MapSortByShopName Created");
 
         query = "CREATE TABLE RfeRequest (ID  INTEGER PRIMARY KEY,"
-                + "Name TEXT," + "Code TEXT," + "Description TEXT,"+"RfeID INTEGER)";
+                + "Name TEXT," + "Code TEXT," + "Description TEXT,"+"RfeID INTEGER,"+"RfeName TEXT)";
         database.execSQL(query);
         Log.d(LOGCAT, "RfeRequest Created");
 
@@ -1310,6 +1310,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("Code", rfeList.Code);
         values.put("Description", rfeList.Description);
         values.put("RfeID", rfeList.ID);
+        values.put("RfeName",rfeList.RFENumber);
         long id = database.insert("RfeRequest", null, values);
         database.close();
         return id;
@@ -1321,6 +1322,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("Code", rfeList.Code);
         values.put("Description", rfeList.Description);
         values.put("RfeID", rfeList.ID);
+        values.put("RfeName",rfeList.RFENumber);
         int result = database.update("RfeRequest", values, "ID" + " = ?",
                 new String[]{String.valueOf(rfeList.ID)});
         database.close();
@@ -1339,6 +1341,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 rfe.Code = cursor.getString(2);
                 rfe.Description = cursor.getString(3);
                 rfe.ID = Integer.parseInt(cursor.getString(4));
+                rfe.RFENumber = cursor.getString(5);
                 rfeList.add(rfe);
             } while (cursor.moveToNext());
         }

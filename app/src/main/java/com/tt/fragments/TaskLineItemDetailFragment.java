@@ -2,25 +2,20 @@ package com.tt.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,8 +26,6 @@ import com.tt.data.TaskLineItemImageListViewModel;
 import com.tt.data.TaskLineItemNotDoneViewModel;
 import com.tt.data.TaskLineItemPhotoViewModel;
 import com.tt.data.TaskLineItemViewModel;
-import com.tt.data.TaskNotDoneViewModel;
-import com.tt.data.TaskViewModel;
 import com.tt.enumerations.JobTrackerScreen;
 import com.tt.helpers.DatabaseHelper;
 import com.tt.jobtracker.Admin_MainActivity;
@@ -40,15 +33,6 @@ import com.tt.jobtracker.FullScreenImageViewActivity;
 import com.tt.jobtracker.MainActivity;
 import com.tt.jobtracker.R;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.BufferedHttpEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import java.io.InputStream;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -67,6 +51,8 @@ public class TaskLineItemDetailFragment extends Fragment {
     String Items[];
     MainActivity mainActivity = (MainActivity) getActivity();
     final DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
+    public static ArrayList<String> imageArray;
+
 
     public interface OnTaskLineItemPhotoClickInitiated {
         void onTaskLineItemPhotoClickInitiated(TaskLineItemViewModel taskLineItemViewModel);
@@ -87,6 +73,7 @@ public class TaskLineItemDetailFragment extends Fragment {
             this.taskLineItemViewModel = (TaskLineItemViewModel) bundle.get("TaskLineItem");
         }
 
+
     }
 
 
@@ -95,7 +82,7 @@ public class TaskLineItemDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail_tasklineitem, container, false);
-
+        Shared.onbackpress=false;
         if(Shared.admin_mian_activity==false) {
             MainActivity mainActivity = (MainActivity) getActivity();
             DatabaseHelper dbHelper = new DatabaseHelper(mainActivity);
@@ -134,6 +121,8 @@ public class TaskLineItemDetailFragment extends Fragment {
             adapter = new ImageAdapter(mainActivity);
             gridview.setAdapter(adapter);
             final ArrayList<String> imageList = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(taskLineItemViewModel.ID));
+            imageArray=imageList;
+            Shared.imagelisttasklineitemdetail=imageList;
             adapter.addAll(imageList);
 
             gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -166,10 +155,26 @@ public class TaskLineItemDetailFragment extends Fragment {
             GridView gridview = (GridView) view.findViewById(R.id.gridview);
             adapter = new ImageAdapter(mainActivity);
             gridview.setAdapter(adapter);
+            int i=0;
+imageArray=new ArrayList<String>();
            for(TaskLineItemImageListViewModel taskLineItemImage:Shared.TaskLineitemImageList) {
+
                 String url ="http://sunsigns.blob.core.windows.net/cdn/Images/WallImages/"+Shared.TaskLineitemImageList.get(0).ShopID+"/_"+Shared.TaskLineitemImageList.get(0).ShopWallID+"/Thumb_"+taskLineItemImage.ImageName;
+               imageArray.add(url);
                 adapter.add(url);
             }
+            gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Dialog settingsDialog = new Dialog(getActivity());
+                    View viewDialog = getActivity().getLayoutInflater().inflate(R.layout.image_layout, null);
+                    settingsDialog.setContentView(viewDialog);
+                    ImageView imgShop = (ImageView) viewDialog.findViewById(R.id.ShopImage);
+                    UrlImageViewHelper.setUrlDrawable(imgShop, "http://sunsigns.blob.core.windows.net/cdn/Images/WallImages/"+Shared.TaskLineitemImageList.get(0).ShopID+"/_"+Shared.TaskLineitemImageList.get(0).ShopWallID+"/Thumb_"+Shared.TaskLineitemImageList.get(position).ImageName);
+                    settingsDialog.show();
+                }
+            });
             mainActivity.CurrentScreen = JobTrackerScreen.TaskLineItemDetail;
             mainActivity.SetActionBarMenuItems();
         }
@@ -312,7 +317,7 @@ public class TaskLineItemDetailFragment extends Fragment {
         DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
         final ArrayList<String> imageList = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(taskLineItemViewModel.ID));
         adapter.clear();
-       // adapter.addAll(imageList);
+        adapter.addAll(imageList);
         adapter.notifyDataSetChanged();
     }
 

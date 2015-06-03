@@ -162,7 +162,7 @@ DatabaseHelper dbHelper=new DatabaseHelper(this);
         if (savedInstanceState == null) {
             selectItem(0);
         }
-
+        Shared.onbackpress=true;
        context = getApplicationContext();
         regid = getRegistrationId(context);
         Shared.LoggedInUser.GcmRegID = regid;
@@ -178,7 +178,7 @@ DatabaseHelper dbHelper=new DatabaseHelper(this);
 
         }
 
-
+        Shared.admin_mian_activity=false;
         final SharedPreferences mainClassCall = getSharedPreferences(Shared.MainClassCall, 0);
         String status= mainClassCall.getString("mainClassCall", null);
         if(status!="True") {
@@ -861,6 +861,25 @@ DatabaseHelper dbHelper=new DatabaseHelper(this);
         int result=dbHelper.updateTaskLineItem(taskilneItem,true);
         int cv=result;
     }
-
+    private static long back_pressed;
+    @Override
+    public void onBackPressed() {
+        if (Shared.onbackpress==true) {
+            if (back_pressed + 2000 > System.currentTimeMillis()) {
+                //    super.onBackPressed();
+                Intent startMain = new Intent(Intent.ACTION_MAIN);
+                startMain.addCategory(Intent.CATEGORY_HOME);
+                startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(startMain);
+            } else {
+                Toast.makeText(getBaseContext(), "Press once again to exit!", Toast.LENGTH_SHORT).show();
+                back_pressed = System.currentTimeMillis();
+            }
+        }
+        else
+        {
+            super.onBackPressed();
+        }
+    }
 
 }
