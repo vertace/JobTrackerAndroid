@@ -2,17 +2,74 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#7EC0EE">
+
+
+    <TextView
+        android:id="@+id/wallType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dip"
+        android:paddingBottom="2dip"
+        android:text="@string/shopName"
+        android:textColor="#040404"
+        android:paddingLeft="8dip"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:typeface="sans" />
+    <!-- Address-->
+
+    <TextView
+        android:id="@+id/wallDetail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tvShopName"
+        android:layout_below="@+id/tvShopName"
+        android:paddingLeft="13dip"
+        android:layout_centerHorizontal="true"
+        android:paddingTop="0dip"
+        android:text="@string/shopAddress"
+        android:textColor="#040404"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        />
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="320dp"
+        android:layout_marginTop="-30dp"
+        android:layout_marginBottom="30dp"
+        android:text="status"
+        android:textColor="#000000"
+        android:textSize="12sp"
+        android:typeface="sans"
+        android:textStyle="bold"
+
+        />
+    <TextView
+        android:id="@+id/space"
+        android:layout_width="400dp"
+        android:layout_height="10dp"
+        android:paddingTop="0dip"
+        android:textColor="#777777"
+        android:textSize="10sp"
+        />
 
     <GridView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/gridview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:columnWidth="90dp"
-        android:numColumns="auto_fit"
-        android:verticalSpacing="10dp"
-        android:horizontalSpacing="10dp"
+        android:numColumns="3"
+        android:verticalSpacing="-7dp"
+        android:paddingLeft="2dip"
+        android:paddingRight="2dip"
+        android:horizontalSpacing="2dp"
         android:stretchMode="columnWidth"
         android:gravity="center"
+        android:background="#ffffff"
         />
 </LinearLayout><!-- From: file:/D:/poovalagan/Projects/JobTrackerAndroid/app/src/main/res/layout/fragment_detail_tasklineitem.xml -->

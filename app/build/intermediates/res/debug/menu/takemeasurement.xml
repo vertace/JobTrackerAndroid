@@ -8,7 +8,12 @@
         android:title="@string/connect"></item>
     <item
         android:id="@+id/mnuDelete"
-        android:icon="@drawable/delete"
+        android:icon="@drawable/list1"
+        android:showAsAction="always"
+        android:title="@string/delete"></item>
+    <item
+        android:id="@+id/mnuDiscard"
+        android:icon="@drawable/discard"
         android:showAsAction="always"
         android:title="@string/delete"></item>
     <item

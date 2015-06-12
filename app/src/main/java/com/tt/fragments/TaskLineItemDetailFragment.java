@@ -125,7 +125,7 @@ public class TaskLineItemDetailFragment extends Fragment {
             Shared.imagelisttasklineitemdetail=imageList;
             adapter.addAll(imageList);
 
-            gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+           /* gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -134,7 +134,7 @@ public class TaskLineItemDetailFragment extends Fragment {
                     intent.putExtra("Position", position);
                     startActivity(intent);
                 }
-            });
+            });*/
             mainActivity.CurrentScreen = JobTrackerScreen.TaskLineItemDetail;
             mainActivity.SetActionBarMenuItems();
         }
@@ -156,14 +156,14 @@ public class TaskLineItemDetailFragment extends Fragment {
             adapter = new ImageAdapter(mainActivity);
             gridview.setAdapter(adapter);
             int i=0;
-imageArray=new ArrayList<String>();
+           imageArray=new ArrayList<String>();
            for(TaskLineItemImageListViewModel taskLineItemImage:Shared.TaskLineitemImageList) {
 
                 String url ="http://sunsigns.blob.core.windows.net/cdn/Images/WallImages/"+Shared.TaskLineitemImageList.get(0).ShopID+"/_"+Shared.TaskLineitemImageList.get(0).ShopWallID+"/Thumb_"+taskLineItemImage.ImageName;
                imageArray.add(url);
                 adapter.add(url);
             }
-            gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+          /*  gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -174,7 +174,7 @@ imageArray=new ArrayList<String>();
                     UrlImageViewHelper.setUrlDrawable(imgShop, "http://sunsigns.blob.core.windows.net/cdn/Images/WallImages/"+Shared.TaskLineitemImageList.get(0).ShopID+"/_"+Shared.TaskLineitemImageList.get(0).ShopWallID+"/Thumb_"+Shared.TaskLineitemImageList.get(position).ImageName);
                     settingsDialog.show();
                 }
-            });
+            });*/
             mainActivity.CurrentScreen = JobTrackerScreen.TaskLineItemDetail;
             mainActivity.SetActionBarMenuItems();
         }
@@ -316,6 +316,7 @@ imageArray=new ArrayList<String>();
     public void updateImageAdapter() {
         DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
         final ArrayList<String> imageList = dbHelper.getAllTaskLineItemPhotoUri(String.valueOf(taskLineItemViewModel.ID));
+        imageArray=imageList;
         adapter.clear();
         adapter.addAll(imageList);
         adapter.notifyDataSetChanged();

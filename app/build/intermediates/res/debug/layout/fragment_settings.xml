@@ -9,16 +9,19 @@
         android:layout_height="wrap_content"
         android:rowCount="1"
         android:columnCount="2"
+        android:paddingTop="10dip"
         android:layout_gravity="center_horizontal"
         android:id="@+id/grid"
         android:layout_weight="0.04">
 
         <ToggleButton
             android:layout_width="102dp"
-            android:layout_height="34dp"
+            android:layout_height="37dp"
             android:text="New ToggleButton"
             android:id="@+id/toggleButton"
             android:layout_weight="0.05"
+            android:paddingRight="10dip"
+            android:paddingTop="10dip"
             android:layout_column="1"
             android:layout_row="0"
             android:checked="false" />
@@ -28,8 +31,10 @@
             android:layout_weight="0.05"
             android:layout_column="0"
             android:layout_row="0"
+            android:paddingLeft="10dip"
+            android:paddingTop="10dip"
             android:layout_height="52dp"
-            android:layout_width="265dp" />
+            android:layout_width="246dp" />
     </GridLayout>
 
 </LinearLayout><!-- From: file:/D:/poovalagan/Projects/JobTrackerAndroid/app/src/main/res/layout/fragment_settings.xml -->

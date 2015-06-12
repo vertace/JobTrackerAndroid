@@ -1,13 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="com.tt.fragments.TaskLineItemFragment">
+<GridLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:rowCount="5"
+    android:columnCount="1"
+    android:layout_gravity="center_horizontal"
+    android:id="@+id/grid"
+    android:layout_weight="0.04"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#7EC0EE">
 
-    <ListView android:id="@android:id/list" android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <TextView
+        android:id="@+id/ShopName"
+        android:layout_column="0"
+        android:layout_row="0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="8dip"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dip"
+        android:paddingBottom="0dip"
+        android:text="@string/shopName"
+        android:textColor="#040404"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:typeface="sans" />
 
-    <TextView android:id="@android:id/empty" android:layout_width="match_parent"
-        android:layout_height="match_parent" android:gravity="center" />
+    <RelativeLayout
+        android:id="@+id/relative"
+        android:layout_column="0"
+        android:layout_row="1">
+        <TextView
+            android:id="@+id/Branch"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dip"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="5dip"
+            android:paddingRight="50dip"
+            android:paddingBottom="2dip"
+            android:text="@string/shopName"
+            android:textColor="#040404"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:typeface="sans" />
 
-</FrameLayout>
-<!-- From: file:/D:/poovalagan/Projects/JobTrackerAndroid/app/src/main/res/layout/fragment_list_tasklineitem.xml -->
+        <TextView
+            android:id="@+id/ShopAddress"
+            android:layout_width="wrap_content"
+            android:paddingLeft="13dip"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/tvShopName"
+            android:layout_below="@+id/Branch"
+            android:paddingBottom="2dip"
+            android:text="@string/shopAddress"
+            android:textColor="#040404"
+            android:textStyle="bold"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/MinimumPhoto"
+            android:layout_width="wrap_content"
+            android:paddingLeft="13dip"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/ShopAddress"
+            android:layout_below="@+id/ShopAddress"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="0dip"
+            android:text="@string/MinimumPhoto"
+            android:textColor="#040404"
+            android:textStyle="bold"
+            android:textSize="13sp" />
+
+        <ImageView
+            android:id="@+id/ShopPhoto"
+            android:layout_width="82px"
+            android:layout_height="82px"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@+id/Branch"
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/shopphotoicon" />
+
+    </RelativeLayout>
+
+    <!-- Address-->
+
+    <TextView
+        android:id="@+id/space"
+        android:layout_column="0"
+        android:layout_row="4"
+        android:layout_width="400dp"
+        android:layout_height="10dp"
+        android:paddingTop="0dip"
+        android:textColor="#777777"
+        android:textSize="10sp"
+        />
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="455dp" tools:context="com.tt.fragments.TaskLineItemFragment"
+        android:layout_column="0"
+        android:layout_row="4"
+        android:background="#ffffff">
+
+        <ListView android:id="@android:id/list" android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView android:id="@android:id/empty" android:layout_width="match_parent"
+            android:layout_height="422dp" android:gravity="center" />
+
+    </FrameLayout>
+
+</GridLayout><!-- From: file:/D:/poovalagan/Projects/JobTrackerAndroid/app/src/main/res/layout/fragment_list_tasklineitem.xml -->

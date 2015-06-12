@@ -7,6 +7,19 @@
 
 
     <!-- Rightend Arrow -->
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="30dp"
+        android:text="status"
+        android:textColor="#000000"
+        android:textSize="12sp"
+        android:typeface="sans"
+        android:textStyle="bold"
+        android:layout_below="@+id/tvShopName"
+        android:layout_alignBottom="@+id/tvShopBranch" />
     <ImageView
         android:id="@+id/imageView1"
         android:layout_width="wrap_content"
@@ -22,24 +35,36 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="5dip"
-        android:paddingBottom="10dip"
         android:text="@string/shopName"
         android:textColor="#040404"
-        android:textSize="25sp"
+        android:textSize="23sp"
         android:textStyle="bold"
         android:typeface="sans" />
+    <TextView
+        android:id="@+id/tvShopBranch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/shopBranch"
+        android:textColor="#040404"
+        android:textSize="19sp"
+        android:textStyle="bold"
+        android:typeface="sans"
+        android:layout_below="@+id/tvShopName"
+        android:layout_alignLeft="@+id/tvShopName"
+        android:layout_alignStart="@+id/tvShopName" />
     <!-- Address-->
     <TextView
         android:id="@+id/tvAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/tvShopName"
-        android:layout_below="@+id/tvShopName"
-        android:layout_centerHorizontal="true"
         android:paddingTop="0dip"
         android:text="@string/shopAddress"
         android:textColor="#777777"
-        android:textSize="15sp" />
+        android:textSize="15sp"
+        android:layout_below="@+id/tvShopBranch"
+        android:layout_alignLeft="@+id/tvShopBranch"
+        android:layout_alignStart="@+id/tvShopBranch" />
+
 
     <!-- <ImageView
          android:id="@+id/imgmap"

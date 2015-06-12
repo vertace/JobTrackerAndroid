@@ -112,5 +112,6 @@
     <orderEntry type="library" exported="" name="play-services-games-7.0.0" level="project" />
     <orderEntry type="library" exported="" name="httpmime-4.3.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-nearby-7.0.0" level="project" />
+    <orderEntry type="module" module-name="urlimageviewhelper-1.0.4" exported="" />
   </component>
 </module>

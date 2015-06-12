@@ -2,6 +2,11 @@
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
     <!-- From: file:/D:/poovalagan/Projects/JobTrackerAndroid/app/src/main/res/values/strings.xml -->
     <eat-comment/>
+    <string-array name="admin_array_menu_main">
+        <item>RFE List</item>
+        <item>Settings</item>
+        <item>Logout</item>
+    </string-array>
     <string-array name="array_menu_main">
         <item>Task List</item>
         <item>Settings</item>
@@ -235,6 +240,10 @@
     <item name="fragment_tasklineitem" type="layout">@layout/fragment_list_tasklineitem</item>
     <!-- From: file:/D:/poovalagan/Projects/JobTrackerAndroid/app/src/main/res/values/strings.xml -->
     <eat-comment/>
+    <string name="Description">Description</string>
+    <string name="MinimumPhoto">Minimum Photo</string>
+    <string name="Rfecode">Code</string>
+    <string name="Rfename">Rfe Name</string>
     <string name="SyncButton">Sync</string>
     <!-- From: file:/D:/poovalagan/Projects/JobTrackerAndroid/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.0.0/res/values/values.xml -->
     <eat-comment/>
@@ -342,6 +351,7 @@ available. Please contact the developer for assistance.</string>
     <string name="save">Save</string>
     <string name="search_hint">Search Tasks</string>
     <string name="shopAddress">Shop Address</string>
+    <string name="shopBranch">Shop Branch</string>
     <string name="shopLocation">Shop Location</string>
     <string name="shopName">Shop Name</string>
     <string name="sort">Sort</string>

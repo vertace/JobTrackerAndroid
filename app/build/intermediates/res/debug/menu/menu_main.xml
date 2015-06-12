@@ -19,11 +19,7 @@
             android:icon="@drawable/map"
             android:title="@string/map"
             app:showAsAction="always" />
-        <item
-            android:id="@+id/action_home_group"
-            android:icon="@drawable/group"
-            android:title="@string/group"
-            app:showAsAction="always" />
+
         <item
             android:id="@+id/action_home_sort"
             android:icon="@drawable/sort"
@@ -31,17 +27,34 @@
             app:showAsAction="always" />
 
     </group>
+    <group android:id="@+id/actionbar_Admin_group_home">
+        <item
+            android:id="@+id/action_RFE_search"
+            android:icon="@drawable/ic_action_search"
+            android:title="@string/action_search"
+            app:actionViewClass="android.support.v7.widget.SearchView"
+            app:showAsAction="always|collapseActionView" />
+        <item
+            android:id="@+id/action_admin_sync"
+            android:icon="@drawable/sync"
+            android:title="@string/sync"
+            app:showAsAction="always" />
+
+        <item
+            android:id="@+id/action_admin_home_sort"
+            android:icon="@drawable/sort"
+            android:title="@string/sort"
+            app:showAsAction="always" />
+
+    </group>
+
     <group android:id="@+id/actionbar_group_taskdetail">
         <item
             android:id="@+id/action_task_done"
             android:icon="@drawable/done"
             android:title="@string/done"
             app:showAsAction="always" />
-        <item
-            android:id="@+id/action_task_notdone"
-            android:icon="@drawable/notdone"
-            android:title="@string/notDone"
-            app:showAsAction="always" />
+
         <item
             android:id="@+id/action_task_shopmap"
             android:icon="@drawable/map"
@@ -52,23 +65,25 @@
             android:icon="@drawable/camera"
             android:title="@string/takePhoto"
             app:showAsAction="always" />
-
-    </group>
-    <group android:id="@+id/actionbar_group_tasklineitem_detail">
         <item
-            android:id="@+id/action_tasklineitem_done"
-            android:icon="@drawable/done"
-            android:title="@string/done"
-            app:showAsAction="always" />
-        <item
-            android:id="@+id/action_tasklineitem_notdone"
+            android:id="@+id/action_task_notdone_TaskLineItem"
             android:icon="@drawable/notdone"
             android:title="@string/notDone"
             app:showAsAction="always" />
+
+    </group>
+
+    <group android:id="@+id/actionbar_group_tasklineitem_detail">
+
         <item
             android:id="@+id/action_tasklineitem_takephoto"
             android:icon="@drawable/camera"
             android:title="@string/takePhoto"
+            app:showAsAction="always" />
+        <item
+            android:id="@+id/action_task_notdone"
+            android:icon="@drawable/notdone"
+            android:title="@string/notDone"
             app:showAsAction="always" />
 
     </group>

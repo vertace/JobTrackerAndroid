@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import android.widget.Gallery;
 import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.tt.data.Shared;
@@ -47,6 +49,9 @@ public class ImageAdapter extends ArrayAdapter<String> {
             float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 120, r.getDisplayMetrics());
             // if it's not recycled, initialize some attributes
             imageView = new ImageView(mContext);
+
+            //LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+           // imageView.setLayoutParams(new GridView.LayoutParams(params));
             imageView.setLayoutParams(new GridView.LayoutParams((int)px, (int)px));
 
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -54,7 +59,8 @@ public class ImageAdapter extends ArrayAdapter<String> {
         } else {
             imageView = (ImageView) convertView;
         }
-        if(Shared.admin_mian_activity==true) {
+        if(Shared.admin_mian_activity==true)
+        {
             UrlImageViewHelper.setUrlDrawable(imageView, getItem(position),R.drawable.image_loading);
         }
         else {
